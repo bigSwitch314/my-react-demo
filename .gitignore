@@ -1,0 +1,8 @@
+/node_modules/
+.vscode/**
+!.vscode/settings.json
+/dist/
+/static/
+/flow-typed/
+.alpharc.js
+.DS_Store
