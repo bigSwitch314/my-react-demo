@@ -14,5 +14,9 @@
     ],
     "@babel/preset-react"
   ],
-  "plugins": [["import", { "libraryName": "antd", "style": "css" }]]
+  "plugins": [
+    ["import", { "libraryName": "antd", "style": "css" }],
+    "dynamic-import-webpack",
+    "@babel/plugin-proposal-class-properties"
+  ]
 }

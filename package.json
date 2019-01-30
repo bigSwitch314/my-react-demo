@@ -6,20 +6,31 @@
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config config/webpack.dev.conf.js",
     "build": "webpack --config config/webpack.prod.conf.js",
-    "start": "nohup npm run dev  >> /dev/null 2>&1 &",
+    "start": "nohup npm run dev  > .nohup 2>&1 &",
     "stop": "netstat -aon | grep -E '9080.*LISTENING' | awk '{print $5}' | xargs tskill",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "config": {
+    "title": "管理平台",
+    "ROUTE_PATH": "/client/page",
+    "icon": "assets/images/header-icon.png",
+    "port": 8000
+  },
+  "antdTheme": {
+    "primary-color": "#4986F2"
   },
   "author": "luoqiang",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.2.2",
+    "@babel/plugin-proposal-class-properties": "^7.3.0",
     "@babel/preset-env": "^7.3.1",
     "@babel/preset-react": "^7.0.0",
     "antd": "^3.12.4",
     "autoprefixer": "^9.4.6",
     "babel-loader": "^8.0.5",
     "babel-plugin-antd": "^0.5.1",
+    "babel-plugin-dynamic-import-webpack": "^1.1.0",
     "babel-plugin-import": "^1.11.0",
     "chalk": "^2.4.2",
     "clean-webpack-plugin": "^1.0.1",
@@ -41,6 +52,7 @@
   },
   "dependencies": {
     "react": "^16.7.0",
-    "react-dom": "^16.7.0"
+    "react-dom": "^16.7.0",
+    "react-router-dom": "^4.3.1"
   }
 }

@@ -1,0 +1,156 @@
+
+.basic-layout {
+  min-width: 1366px;
+  min-height: 100%;
+  max-height: 100%;
+  &-header {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 25px;
+    background-image: linear-gradient(90deg, #194C8C 0%, #4986F2 100%);
+    &-left {
+      z-index: 1;
+      margin: 15px 0px 10px 0px;
+      width: 200px;
+      min-width: 200px;
+      border-radius: 2px;
+      line-height: 32px;
+      font-size: 20px;
+      a {
+        color: #FFFFFF;
+      }
+    }
+    &-right {
+      z-index: 1;
+      width: 220px;
+      text-align: right;
+      color: #FFFFFF;
+      >span {
+        display: inline-block;
+      }
+      i {
+        color: rgba(255,255,255,0.85);
+        vertical-align: middle;
+        font-size: 24px;
+        cursor: pointer;
+      }
+      .notice {
+        padding-right: 24px;
+      }
+      .avatar {
+        padding-right: 8px;
+        cursor: pointer;
+      }
+      .name {
+        padding-right: 20px;
+        vertical-align: middle;
+        opacity: 0.85;
+        font-size: 14px;
+        cursor: pointer;
+      }
+    }
+  }
+  &-content {
+    display: flex;
+    background: #F0F2F5;
+    .ant-layout-has-sider {
+      .basic-layout-sider {
+          background-color: #0F244B; 
+        > .ant-layout-sider-children {
+          z-index: 1; 
+          background-color: #0F244B; 
+        }
+        &-bg {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          top: 560px;
+          // background: url(~images/sider.png) repeat top;
+        }
+      }
+      .ant-layout-sider-trigger {
+        position: absolute;
+      }
+      .ant-menu {
+        &-root {
+          padding-top: 22px;
+        }
+        background-color: transparent;
+        &-sub {
+          background-color: #0B1A36;
+        }
+        &-inline-collapsed {
+          .iconfont+span {
+            max-width: 0;
+            display: inline-block;
+            opacity: 0;
+          }
+        }
+        &-submenu-title, &-item {
+          i {
+            display: inline-block;
+            min-width: 14px;
+            margin-right: 10px;
+            font-size: 14px;
+          }
+          background-color: #0F244B;
+        }
+        &-item-selected {
+          background-color: #1A3363;
+        }
+        &-submenu-title, &-item-selected, &-item {
+          margin-bottom: 0px;
+          margin-top: 0px;
+        }
+        &-inline-collapsed {
+          .ant-menu-submenu .ant-menu-submenu-title {
+            &:before {
+              content: "";
+              position: absolute;
+              left: 0;
+              top: 0;
+              bottom: 0;
+              border-left: 3px solid #4986F2;
+              transform: scaleY(0.0001);
+              opacity: 0;
+              transition: transform 0.15s cubic-bezier(0.215, 0.61, 0.355, 1),
+                opacity 0.15s cubic-bezier(0.215, 0.61, 0.355, 1);
+            }
+          }
+          .ant-menu-submenu-selected .ant-menu-submenu-title {
+            position: relative;
+            background-color: #1A3363;
+            &:before {
+              opacity: 1;
+              transform: scaleY(1);
+              transition: transform 0.15s cubic-bezier(0.645, 0.045, 0.355, 1),
+                opacity 0.15s cubic-bezier(0.645, 0.045, 0.355, 1);
+            }
+          }
+        }
+        // &-item {
+        //   .selectItem();
+        // }
+      }
+    }
+    .basic-layout-container {
+      padding: 24px 24px;
+      .basic-content {
+        min-height: 100%;
+        padding: 24px 24px 0 24px;
+        background-color: #FFFFFF;
+        &-parameterSet {
+          background-color: initial;
+          padding: 0;
+          height: 100%;
+        }
+      }
+    }
+    .modal-content {
+      position: 'relative';
+      left: '40px';
+    }
+  }
+}
