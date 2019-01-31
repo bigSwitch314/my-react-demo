@@ -43,21 +43,16 @@ class BasicLayout extends React.Component {
       return { userList: props.userList }
     }
 
-    return null
+    const { routeMap, routesData } = getRoutesData(menuCodes)
+    return {
+      menuData: getMenus('!/user', routesData),
+      normalRoutes: getRoutes(/^(?!user)/, routesData),
+      routeMap,
+    }
   }
 
   componentDidMount() {
-    const { routeMap, routesData } = getRoutesData(menuCodes)
-    const menuData = getMenus('!/user', routesData)
-    const normalRoutes = getRoutes(/^(?!user)/, routesData)
-
-    console.log(menuData)
-    console.log(normalRoutes)
-    this.setState({
-      menuData,
-      normalRoutes,
-      routeMap,
-    })
+    
   }
 
   onCollapse = (collapsed) => {
@@ -78,12 +73,15 @@ class BasicLayout extends React.Component {
   }
 
   render() {
-    const { menuData, routeMap, collapsed, openkeys } = this.state
+    const { menuData, normalRoutes, routeMap, collapsed, openkeys } = this.state
     const { location } = this.props
     const currentRoute = getCurrentRoute(location.pathname, routeMap)
     const { key, parentPath } = currentRoute
     let selectkeys = parentPath ? [parentPath, key] : [key]
     selectkeys = collapsed ? selectkeys : [key]
+
+    console.log('1')
+    console.log(normalRoutes)
 
     return (
       <Layout className="basic-layout">
@@ -127,7 +125,7 @@ class BasicLayout extends React.Component {
             </Sider>
             <Content className="basic-layout-container">
               <Switch>
-                {/* {normalRoutes.map(routes => routes.children.length > 0 ?
+                {normalRoutes.map(routes => routes.children.length > 0 ?
                   routes.children.map(route => (
                     <Route
                       extra
@@ -143,7 +141,7 @@ class BasicLayout extends React.Component {
                     component={routes.component}
                   />,
                 )}
-                <Redirect to={normalRoutes[0].children[0].fullPath} /> */}
+                <Redirect to={normalRoutes[0].children[0].fullPath} />
               </Switch>
             </Content>
           </Layout>
