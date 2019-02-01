@@ -15,7 +15,10 @@ module.exports = {
     rules: [
       {
         test: /\.(js|jsx)$/,
-        use: "babel-loader",
+        use: [
+          { loader: 'babel-loader' },
+          { loader: 'eslint-loader' }
+        ],
         include: SRC_PATH,
       }
     ]

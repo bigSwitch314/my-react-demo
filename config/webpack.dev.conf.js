@@ -3,6 +3,7 @@ const merge = require('webpack-merge')
 const baseWebpackConfig = require('./webpack.base.conf.js')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const webpack = require('webpack')
+// var FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin')
 
 module.exports = merge(baseWebpackConfig, {
   mode: 'development',
@@ -19,7 +20,8 @@ module.exports = merge(baseWebpackConfig, {
       },
       hash: false
     }),
-    new webpack.HotModuleReplacementPlugin()
+    new webpack.HotModuleReplacementPlugin(),
+    // new FriendlyErrorsWebpackPlugin()
   ],
   module: {
     rules: [
@@ -35,19 +37,23 @@ module.exports = merge(baseWebpackConfig, {
           {
             loader: 'less-loader',
           },
-        ]
+        ],
       }
     ]
   },
   devServer: {
     port: '9080',
     contentBase: path.join(__dirname, '../public'),
-    compress: true,
+    compress: false,
     historyApiFallback: true,
     hot: true,
     https: false,
     noInfo: true,
     open: true,
+    overlay: {
+      warnings: false,
+      errors: true
+    },
     proxy: {}
   }
 })
