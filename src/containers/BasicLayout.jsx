@@ -52,7 +52,7 @@ class BasicLayout extends React.Component {
   }
 
   componentDidMount() {
-    uu()
+
   }
 
   onCollapse = (collapsed) => {
@@ -124,25 +124,27 @@ class BasicLayout extends React.Component {
               </div>
             </Sider>
             <Content className="basic-layout-container">
-              <Switch>
-                {normalRoutes.map(routes => routes.children.length > 0 ?
-                  routes.children.map(route => (
+              <div className="basic-content">
+                <Switch>
+                  {normalRoutes.map(routes => routes.children.length > 0 ?
+                    routes.children.map(route => (
+                      <Route
+                        extra
+                        key={route.key}
+                        path={route.fullPath}
+                        component={route.component}
+                      />
+                    )) :
                     <Route
                       extra
-                      key={route.key}
-                      path={route.fullPath}
-                      component={route.component}
-                    />
-                  )) :
-                  <Route
-                    extra
-                    key={routes.key}
-                    path={routes.fullPath}
-                    component={routes.component}
-                  />,
-                )}
-                <Redirect to={normalRoutes[0].children[0].fullPath} />
-              </Switch>
+                      key={routes.key}
+                      path={routes.fullPath}
+                      component={routes.component}
+                    />,
+                  )}
+                  <Redirect to={normalRoutes[0].children[0].fullPath} />
+                </Switch>
+              </div>
             </Content>
           </Layout>
         </Content>

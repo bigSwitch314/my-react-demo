@@ -1,0 +1,17 @@
+/**
+ * 圆点
+ * 长方形
+ */
+
+@import "./size.less";
+
+.dot(@radius, @color) {
+  display: inline-block;
+  .square(@radius);
+  border-radius: 50%;
+  background-color: @color;
+}
+
+.strip(@width, @direction, @color) {
+  border-@{direction}: @width solid @color;
+}

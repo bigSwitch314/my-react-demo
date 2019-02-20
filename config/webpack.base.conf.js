@@ -29,6 +29,8 @@ module.exports = {
     alias: {
       pages: path.resolve(SRC_PATH, 'pages'),
       images: path.resolve(SRC_PATH, 'assets/images'),
+      styles: path.resolve(SRC_PATH, 'styles'),
+      commponents: path.resolve(SRC_PATH, 'commponents'),
       modules: path.resolve(SRC_PATH, 'modules'),
       utils: path.resolve(SRC_PATH, 'utils'),
       components: path.resolve(SRC_PATH, 'components'),

@@ -1,0 +1,31 @@
+.text-overflow(@maxwidth) {
+  display: inline-block;
+  max-width: @maxwidth;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text-overflow-multi-row(@maxwidth, @lineclamp, @height) {
+  display: inline-block;
+  word-break:break-all;
+  max-width: @maxwidth;
+  overflow : hidden;
+  text-overflow: ellipsis;
+  // webkit适用
+  display: -webkit-box;
+  -webkit-line-clamp: @lineclamp;
+  -webkit-box-orient: vertical;
+  // 其他内核适用
+  position: relative;
+  line-height: 1.5em;
+  max-height: @height;
+  // &:after {
+  //   content: "...";
+  //   position: absolute;
+  //   bottom: 0;
+  //   right: 0;
+  //   padding: 0 5px;
+  //   background-color: #fff;
+  // }
+}
