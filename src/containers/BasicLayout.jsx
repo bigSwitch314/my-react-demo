@@ -52,7 +52,7 @@ class BasicLayout extends React.Component {
   }
 
   componentDidMount() {
-
+    // uu();
   }
 
   onCollapse = (collapsed) => {
@@ -79,9 +79,6 @@ class BasicLayout extends React.Component {
     const { key, parentPath } = currentRoute
     let selectkeys = parentPath ? [parentPath, key] : [key]
     selectkeys = collapsed ? selectkeys : [key]
-
-    console.log('1')
-    // console.log(normalRoutes)
 
     return (
       <Layout className="basic-layout">

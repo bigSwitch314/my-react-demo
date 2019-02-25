@@ -3,7 +3,7 @@ const merge = require('webpack-merge')
 const baseWebpackConfig = require('./webpack.base.conf.js')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const webpack = require('webpack')
-// var FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin')
+const ErrorOverlayPlugin = require('error-overlay-webpack-plugin')
 
 module.exports = merge(baseWebpackConfig, {
   mode: 'development',
@@ -21,8 +21,9 @@ module.exports = merge(baseWebpackConfig, {
       hash: false
     }),
     new webpack.HotModuleReplacementPlugin(),
-    // new FriendlyErrorsWebpackPlugin()
+    new ErrorOverlayPlugin(),
   ],
+  devtool: 'cheap-module-source-map', // 'eval' is not supported by error-overlay-webpack-plugin
   module: {
     rules: [
       {
@@ -50,10 +51,6 @@ module.exports = merge(baseWebpackConfig, {
     https: false,
     noInfo: true,
     open: true,
-    overlay: {
-      warnings: false,
-      errors: true
-    },
     proxy: {}
   }
 })

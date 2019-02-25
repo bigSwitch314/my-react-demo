@@ -5,7 +5,7 @@ const DIST_PATH = path.resolve(__dirname, '../dist')
 module.exports = {
   entry: {
     app: './src/index.js',
-    framework: ['react', 'react-dom']
+    // framework: ['react', 'react-dom'] // 若不注释，则error-overlay-webpack-plugin插件不生效
   },
   output: {
     filename: "js/bundle.js",
