@@ -1,9 +1,12 @@
 import React from 'react'
-import { Table, Form, Switch, Row, Col, Input } from 'antd'
+import { Table, Form, Switch, Row, Col, Input, Button, Select, DatePicker } from 'antd'
 import OperatorIcons from 'components/shared/OperatorIcon'
 import Pagination from 'components/shared/Pagination'
 
 const FormItem = Form.Item
+const Option = Select.Option;
+const InputGroup = Input.Group;
+const { RangePicker } = DatePicker
 
 // @Form.create()
 
@@ -100,23 +103,74 @@ class OriginalArticle extends React.Component {
       'createTime': '2019-01-07',
     }]
 
+    const children = [];
+    for (let i = 10; i < 36; i++) {
+      children.push(<Option key={i.toString(36) + i.toString()}>{i.toString(36) + i.toString()}</Option>);
+    }
 
     return (
       <React.Fragment>
         <div className="role-manage">
           <div className="serchArea">
-            <Row>
-              <Col span={8}>
-                <FormItem label="标题" lableCol={{ span: 0}} wrapperCol={{ span: 6}} >
+            <Row style={{ width: '1000px'}}>
+              <Col span={5}>
+                <FormItem labelCol={{ span: 4}} wrapperCol={{ span: 12}} >
                   {getFieldDecorator('title', {
                     rules: [{}],
                   })(
-                    <Input style={{ width: '200px' }} />,
+                    <Input placeholder="请输入标题" style={{ width: '180px' }} />,
                   )}
                 </FormItem>
               </Col>
-              <Col span={8}>col-8</Col>
-              <Col span={8}>col-8</Col>
+              <Col span={5} style={{ left: '-2px' }}>
+                <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 12 }} >
+                  {getFieldDecorator('category', {
+                    rules: [{}],
+                  })(
+                    <Select placeholder="请选择分类" style={{ width: '180px' }}>
+                      <Option value="Zhejiang">php</Option>
+                      <Option value="Jiangsu">js</Option>
+                      <Option value="Jiangsu">redis</Option>
+                    </Select>
+                  )}
+                </FormItem>
+              </Col>
+              <Col span={5} style={{ left: '-4px' }}>
+                <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 12 }} >
+                  {getFieldDecorator('label', {
+                    rules: [],
+                  })(
+                    <Select
+                      mode="multiple"
+                      style={{ width: '180px' }}
+                      placeholder='请选择标签'
+                      onChange={this.handleChange}
+                    >
+                      {children}
+                    </Select>,
+                  )}
+                </FormItem>
+              </Col>
+              <Col span={8} style={{ left: '-6px', top: '4px' }}>
+                <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 12 }} >
+                  {getFieldDecorator('time', {
+                    rules: [{}],
+                  })(
+                    <InputGroup compact style={{ width: '310px' }}>
+                      <RangePicker style={{ width: '210px' }} />
+                      <Select defaultValue="1" style={{ width: '100px' }}>
+                        <Option value="1">创建时间</Option>
+                        <Option value="2">更新时间</Option>
+                      </Select>
+                    </InputGroup>
+                  )}
+                </FormItem>
+              </Col>
+              <Col span={1}>
+                <FormItem>
+                  <Button type="primary" onClick={this.handleQuery}>查询</Button>
+                </FormItem>
+              </Col>
             </Row>
           </div>
           <Table
