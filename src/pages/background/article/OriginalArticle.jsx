@@ -2,6 +2,8 @@ import React from 'react'
 import { Table, Form, Switch, Row, Col, Input, Button, Select, DatePicker } from 'antd'
 import OperatorIcons from 'components/shared/OperatorIcon'
 import Pagination from 'components/shared/Pagination'
+import HeaderBar from 'components/shared/HeaderBar'
+import './style/OriginalArticle.less'
 
 const FormItem = Form.Item
 const Option = Select.Option;
@@ -16,6 +18,7 @@ class OriginalArticle extends React.Component {
     this.state = {
       currentPage: 1,
       pageSize: 10,
+      selectedRowKeys: [],
     }
   }
 
@@ -31,8 +34,21 @@ class OriginalArticle extends React.Component {
 
   }
 
+  /** 表格复选框选中 */
+  onSelectChange = (selectedRowKeys) => {
+    this.setState({
+      selectedRowKeys,
+      delLength: selectedRowKeys.length,
+    })
+  }
+
+  getCheckboxProps = record => ({
+    disabled: record.name === 'system',
+    name: record.name,
+  })
+
   render() {
-    const { currentPage, pageSize } = this.state
+    const { currentPage, pageSize, selectedRowKeys } = this.state
     const { getFieldDecorator } = this.props.form
 
     const columns = [{
@@ -109,88 +125,100 @@ class OriginalArticle extends React.Component {
     }
 
     return (
-      <React.Fragment>
-        <div className="role-manage">
-          <div className="serchArea">
-            <Row style={{ width: '1000px'}}>
-              <Col span={5}>
-                <FormItem labelCol={{ span: 4}} wrapperCol={{ span: 12}} >
-                  {getFieldDecorator('title', {
-                    rules: [{}],
-                  })(
-                    <Input placeholder="请输入标题" style={{ width: '180px' }} />,
-                  )}
-                </FormItem>
-              </Col>
-              <Col span={5} style={{ left: '-2px' }}>
-                <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 12 }} >
-                  {getFieldDecorator('category', {
-                    rules: [{}],
-                  })(
-                    <Select placeholder="请选择分类" style={{ width: '180px' }}>
-                      <Option value="Zhejiang">php</Option>
-                      <Option value="Jiangsu">js</Option>
-                      <Option value="Jiangsu">redis</Option>
+      <div className="origin-article">
+        <div className="serchArea">
+          <Row style={{ width: '1000px'}}>
+            <Col span={5}>
+              <FormItem labelCol={{ span: 4}} wrapperCol={{ span: 12}} >
+                {getFieldDecorator('title', {
+                  rules: [{}],
+                })(
+                  <Input placeholder="请输入标题" style={{ width: '180px' }} />,
+                )}
+              </FormItem>
+            </Col>
+            <Col span={5} style={{ left: '-2px' }}>
+              <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 12 }} >
+                {getFieldDecorator('category', {
+                  rules: [{}],
+                })(
+                  <Select placeholder="请选择分类" style={{ width: '180px' }}>
+                    <Option value="Zhejiang">php</Option>
+                    <Option value="Jiangsu">js</Option>
+                    <Option value="Jiangsu">redis</Option>
+                  </Select>
+                )}
+              </FormItem>
+            </Col>
+            <Col span={5} style={{ left: '-4px' }}>
+              <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 12 }} >
+                {getFieldDecorator('label', {
+                  rules: [],
+                })(
+                  <Select
+                    mode="multiple"
+                    style={{ width: '180px' }}
+                    placeholder='请选择标签'
+                    onChange={this.handleChange}
+                  >
+                    {children}
+                  </Select>,
+                )}
+              </FormItem>
+            </Col>
+            <Col span={8} style={{ left: '-6px', top: '4px' }}>
+              <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 12 }} >
+                {getFieldDecorator('time', {
+                  rules: [{}],
+                })(
+                  <InputGroup compact style={{ width: '310px' }}>
+                    <RangePicker style={{ width: '210px' }} />
+                    <Select defaultValue="1" style={{ width: '100px' }}>
+                      <Option value="1">创建时间</Option>
+                      <Option value="2">更新时间</Option>
                     </Select>
-                  )}
-                </FormItem>
-              </Col>
-              <Col span={5} style={{ left: '-4px' }}>
-                <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 12 }} >
-                  {getFieldDecorator('label', {
-                    rules: [],
-                  })(
-                    <Select
-                      mode="multiple"
-                      style={{ width: '180px' }}
-                      placeholder='请选择标签'
-                      onChange={this.handleChange}
-                    >
-                      {children}
-                    </Select>,
-                  )}
-                </FormItem>
-              </Col>
-              <Col span={8} style={{ left: '-6px', top: '4px' }}>
-                <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 12 }} >
-                  {getFieldDecorator('time', {
-                    rules: [{}],
-                  })(
-                    <InputGroup compact style={{ width: '310px' }}>
-                      <RangePicker style={{ width: '210px' }} />
-                      <Select defaultValue="1" style={{ width: '100px' }}>
-                        <Option value="1">创建时间</Option>
-                        <Option value="2">更新时间</Option>
-                      </Select>
-                    </InputGroup>
-                  )}
-                </FormItem>
-              </Col>
-              <Col span={1}>
-                <FormItem>
-                  <Button type="primary" onClick={this.handleQuery}>查询</Button>
-                </FormItem>
-              </Col>
-            </Row>
-          </div>
-          <Table
-            rowKey={record => record.id}
-            // loading={loading}
-            columns={columns}
-            dataSource={data}
-            // rowSelection={rowSelection}
-            pagination={false}
-          />
-          <Pagination
-            current={currentPage}
-            pageSize={pageSize}
-            pageSizeOptions={['5', '10', '15', '20']}
-            total={20}
-            onChange={this.changePage}
-            onShowSizeChange={this.onShowSizeChange}
-          />
+                  </InputGroup>
+                )}
+              </FormItem>
+            </Col>
+            <Col span={1}>
+              <FormItem>
+                <Button type="primary" onClick={this.handleQuery}>查询</Button>
+              </FormItem>
+            </Col>
+          </Row>
         </div>
-      </React.Fragment>
+        <hr className="line-hr" />
+        <HeaderBar>
+          <HeaderBar.Left>
+            <Button type="primary" onClick={null}>添加</Button>
+          </HeaderBar.Left>
+          <HeaderBar.Left>
+            <Button onClick={null}>批量删除</Button>
+          </HeaderBar.Left>
+        </HeaderBar>
+        <Table
+          rowSelection={{
+            selectedRowKeys,
+            onChange: this.onSelectChange,
+            getCheckboxProps: this.getCheckboxProps,
+          }}
+          rowKey={record => record.id}
+          // loading={loading}
+          columns={columns}
+          dataSource={data}
+          // rowSelection={rowSelection}
+          pagination={false}
+        />
+        <Pagination
+          current={currentPage}
+          pageSize={pageSize}
+          pageSizeOptions={['5', '10', '15', '20']}
+          total={20}
+          onChange={this.changePage}
+          onShowSizeChange={this.onShowSizeChange}
+        />
+      </div>
     )
   }
 }
