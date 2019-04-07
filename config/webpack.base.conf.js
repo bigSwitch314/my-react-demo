@@ -28,6 +28,7 @@ module.exports = {
     extensions: ['.js', '.jsx', 'json'],
     alias: {
       pages: path.resolve(SRC_PATH, 'pages'),
+      store: path.resolve(SRC_PATH, 'store'),
       images: path.resolve(SRC_PATH, 'assets/images'),
       styles: path.resolve(SRC_PATH, 'styles'),
       commponents: path.resolve(SRC_PATH, 'commponents'),
