@@ -1,26 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import store from 'store'
-
-// const mapStateToProps = (state) => {
-//   return {
-//     state: state,
-//   }
-// }
-
-// const mapDispatchToProps = (dispatch) => {
-//   return {
-//     add: () => {
-//       dispatch({ type: 'ADD_TODO', text: 'Learn about qiang' })
-//     },
-//   }
-// }
 
 @connect(
-  state => {
+  state => ({
     all: state
-  },
-  { }
+  })
 )
 
 class TransshipmentArticle extends React.Component {
@@ -29,6 +13,7 @@ class TransshipmentArticle extends React.Component {
     this.state = {
 
     }
+    this.add = this.add.bind(this)
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -39,38 +24,29 @@ class TransshipmentArticle extends React.Component {
     return null
   }
 
+  add() {
+    this.props.dispatch({ type: 'ADD_TODO', text: 'Learn about qiang' })
+  }
+
   componentDidMount() {
-    const { all } = this.props
-    console.log(all)
-    console.log(store.getState())
-    // ["@babel/plugin-proposal-decorators", { "legacy": true }],
+    // const { all } = this.props
+    // console.log(all)
+    // console.log(store.getState())
 
-    // add()
-
-    
-    console.log(all)
-    console.log(store.getState())
+    console.log(this.props.all)
 
   }
 
   render() {
-    console.log(this.props.state)
+    console.log(this.props)
     return (
       <div>
         转载文章
-        <div onClick={this.props.add}>添加</div>
+        <div onClick={this.add}>添加</div>
       </div>
 
     )
   }
 }
-
-
-
-
-// const Transshipment = connect(
-//   mapStateToProps,
-//   mapDispatchToProps,
-// )(TransshipmentArticle)
 
 export default TransshipmentArticle

@@ -1,6 +1,6 @@
 import React from "react"
 import ReactDOM from "react-dom"
-import store from './store'
+import store from './redux/store'
 import Routers from './routers'
 import { Provider } from 'react-redux'
 import { LocaleProvider } from 'antd'

@@ -1,5 +1,7 @@
+import { createStore, applyMiddleware, compose } from 'redux'
+import thunkMiddleware from 'redux-thunk'
+import monitorMiddleware from './middleware/monitorMiddleware'
 import reducer from './reducer'
-import { createStore } from 'redux'
 
 
 const initialState = {
@@ -12,7 +14,12 @@ const initialState = {
   ]
 }
 
-const store = createStore(reducer, initialState)
+const devtools = process.env.NODE_ENV !== 'production' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+const enhancer = (devtools || compose)(
+  applyMiddleware(monitorMiddleware, thunkMiddleware),
+)
+
+const store = createStore(reducer, initialState, enhancer)
 
 
 // // 打印初始状态
