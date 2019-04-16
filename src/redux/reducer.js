@@ -1,41 +1,40 @@
 import { combineReducers } from 'redux'
+import { extraReducer } from './middleware/monitor'
 
-function todos(state = [], action) {
-  switch (action.type) {
-    case 'ADD_TODO':
-      return [
-        ...state,
-        {
-          text: action.text,
-          completed: false
-        }
-      ]
-    case 'TOGGLE_TODO':
-      return state.map((todo, index) => {
-        if (index === action.index) {
-          return Object.assign({}, todo, {
-            completed: !todo.completed
-          })
-        }
-        return todo
-      })
-    default:
-      return state
+const context = require.context('../modules', false, /\/*\.js$/)
+
+const reducers = context.keys()
+  .filter(item => item !== './index.js')
+  .map(key => context(key).default)
+  .filter(item => item)
+
+
+function handleReducer(models) {
+  const {
+    namespace,
+    initState,
+    reducer,
+  } = models
+
+  return function (state = initState, action) {
+    const { type } = action
+    return Object.keys(reducer).reduce((nemo, key) => {
+      const newkey = `${namespace}/${key}`
+      const fn = reducer[key]
+      return newkey === type ? fn(state, action) : nemo
+    }, state)
   }
 }
 
-function visibilityFilter(state = 'SHOW_ALL', action) {
-  switch (action.type) {
-    case 'SET_VISIBILITY_FILTER':
-      return action.filter
-    default:
-      return state
-  }
-}
+const newReducers = reducers.reduce((obj, model) => {
+  const key = model.namespace
+  obj[key] = handleReducer(model)
+  return obj
+}, {})
 
-const reducer= combineReducers({
-  visibilityFilter,
-  todos
+const rootReducer = combineReducers({
+  ...newReducers,
+  loading: extraReducer,
 })
 
-export default reducer
+export default rootReducer

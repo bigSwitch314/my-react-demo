@@ -1,7 +1,7 @@
 import { createStore, applyMiddleware, compose } from 'redux'
 import thunkMiddleware from 'redux-thunk'
-import monitorMiddleware from './middleware/monitorMiddleware'
-import reducer from './reducer'
+import monitorMiddleware from './middleware/monitor'
+import rootReducer from './reducer'
 
 
 const initialState = {
@@ -19,21 +19,7 @@ const enhancer = (devtools || compose)(
   applyMiddleware(monitorMiddleware, thunkMiddleware),
 )
 
-const store = createStore(reducer, initialState, enhancer)
-
-
-// // 打印初始状态
-// console.log(store.getState())
-
-// // 每次 state 更新时，打印日志
-// // 注意 subscribe() 返回一个函数用来注销监听器
-// const unsubscribe = store.subscribe(() => console.log(store.getState()))
-
-// // 发起一系列 action
-// store.dispatch({ type: 'ADD_TODO', text: 'Learn about luo' })
-
-// // 停止监听 state 更新
-// unsubscribe()
+const store = createStore(rootReducer, initialState, enhancer)
 
 
 export default store

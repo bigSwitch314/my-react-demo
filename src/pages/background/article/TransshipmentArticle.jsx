@@ -1,10 +1,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { getUserList } from '../../../modules/userManage'
+
 
 @connect(
   state => ({
-    all: state
-  })
+    userList: state.user.userList,
+    loading: state.loading['user/getUserList'],
+  }),
+  { getUserList }
 )
 
 class TransshipmentArticle extends React.Component {
@@ -13,7 +17,6 @@ class TransshipmentArticle extends React.Component {
     this.state = {
 
     }
-    this.add = this.add.bind(this)
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -24,17 +27,18 @@ class TransshipmentArticle extends React.Component {
     return null
   }
 
-  add() {
-    this.props.dispatch({ type: 'ADD_TODO', text: 'Learn about qiang' })
+  // 获取用户列表
+  getUserList = () => {
+    const { currentPage, pageSize } = this.state
+    this.props.getUserList({
+      current: currentPage,
+      size: pageSize,
+    })
   }
 
   componentDidMount() {
-    // const { all } = this.props
-    // console.log(all)
-    // console.log(store.getState())
-
-    console.log(this.props.all)
-
+    this.getUserList()
+    console.log(this.props)
   }
 
   render() {
@@ -42,7 +46,7 @@ class TransshipmentArticle extends React.Component {
     return (
       <div>
         转载文章
-        <div onClick={this.add}>添加</div>
+        <div onClick={this.getUserList}>添加</div>
       </div>
 
     )
