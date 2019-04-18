@@ -2,8 +2,8 @@ import 'whatwg-fetch'
 import { message } from 'antd'
 // import { removeLogin } from '../components/Authentication/util'
 
-const baseUrl = 'http://192.168.131.88:9082/api'
-// const baseUrl = ''
+const baseUrl = 'http://39.108.60.163:443'
+
 
 function fetchApi(url, options, timeout = 30000) {
   return new Promise((resolve, reject) => {
@@ -25,6 +25,7 @@ function checkStatus(res) {
     message.error(statusText)
     throw wrong
   }
+  // console.log(res.json())
   if (ok) { return res.json() }
   throw new Error(`${status} ${res.statusText}`)
 }
@@ -105,7 +106,7 @@ function request(url, options, shouldValidate = true) {
     .then(checkStatus)
     .then(result => {
       if (!shouldValidate) return result
-      const { result_code: code, result_desc: desc, result_data: data } = result
+      const { errcode: code, errmsg: desc, data } = result
       handleCode(code, desc)
       return data
     })

@@ -4,15 +4,7 @@ import monitorMiddleware from './middleware/monitor'
 import rootReducer from './reducer'
 
 
-const initialState = {
-  visibilityFilter: 'SHOW_ALL',
-  todos: [
-    {
-      text: 'Consider using Redux',
-      completed: true,
-    },
-  ]
-}
+const initialState = {}
 
 const devtools = process.env.NODE_ENV !== 'production' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
 const enhancer = (devtools || compose)(
