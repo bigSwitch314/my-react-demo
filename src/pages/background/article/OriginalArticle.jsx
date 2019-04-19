@@ -3,6 +3,7 @@ import { Table, Form, Switch, Row, Col, Input, Button, Select, DatePicker } from
 import OperatorIcons from 'components/shared/OperatorIcon'
 import Pagination from 'components/shared/Pagination'
 import HeaderBar from 'components/shared/HeaderBar'
+import ArticleModal from './modal/ArticleModal'
 import './style/OriginalArticle.less'
 
 const FormItem = Form.Item
@@ -19,6 +20,7 @@ class OriginalArticle extends React.Component {
       currentPage: 1,
       pageSize: 10,
       selectedRowKeys: [],
+      visible: false,
     }
   }
 
@@ -47,8 +49,23 @@ class OriginalArticle extends React.Component {
     name: record.name,
   })
 
+  /** 文章弹窗显隐 */
+  addArticle = () => {
+    this.setState({ visible: true })
+  }
+
+  /** 保存文章  */
+  handleOk = () => {
+
+  }
+
+  /** 关闭文章弹窗 */
+  handleCancel = () => {
+    
+  }
+
   render() {
-    const { currentPage, pageSize, selectedRowKeys } = this.state
+    const { currentPage, pageSize, selectedRowKeys, visible } = this.state
     const { getFieldDecorator } = this.props.form
 
     const columns = [{
@@ -191,7 +208,7 @@ class OriginalArticle extends React.Component {
         <hr className="line-hr" />
         <HeaderBar>
           <HeaderBar.Left>
-            <Button type="primary" onClick={null}>添加</Button>
+            <Button type="primary" onClick={() => this.addArticle}>添加</Button>
           </HeaderBar.Left>
           <HeaderBar.Left>
             <Button onClick={null}>批量删除</Button>
@@ -217,6 +234,12 @@ class OriginalArticle extends React.Component {
           total={20}
           onChange={this.changePage}
           onShowSizeChange={this.onShowSizeChange}
+        />
+        <ArticleModal
+          isEdit={false}
+          visible={visible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
         />
       </div>
     )
