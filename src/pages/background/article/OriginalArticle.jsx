@@ -56,12 +56,12 @@ class OriginalArticle extends React.Component {
 
   /** 保存文章  */
   handleOk = () => {
-
+    this.setState({ visible: false })
   }
 
   /** 关闭文章弹窗 */
   handleCancel = () => {
-    
+    this.setState({ visible: false })
   }
 
   render() {
@@ -208,7 +208,7 @@ class OriginalArticle extends React.Component {
         <hr className="line-hr" />
         <HeaderBar>
           <HeaderBar.Left>
-            <Button type="primary" onClick={() => this.addArticle}>添加</Button>
+            <Button type="primary" onClick={() => this.addArticle()}>添加</Button>
           </HeaderBar.Left>
           <HeaderBar.Left>
             <Button onClick={null}>批量删除</Button>
