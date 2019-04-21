@@ -39,7 +39,7 @@ module.exports = merge(baseWebpackConfig, {
             loader: 'less-loader',
           },
         ],
-      }
+      },
     ]
   },
   devServer: {
