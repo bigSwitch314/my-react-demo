@@ -8,7 +8,7 @@ import './style/OriginalArticle.less'
 
 const FormItem = Form.Item
 const Option = Select.Option;
-const InputGroup = Input.Group;
+// const InputGroup = Input.Group;
 const { RangePicker } = DatePicker
 
 // @Form.create()
@@ -119,21 +119,23 @@ class OriginalArticle extends React.Component {
     }]
 
     const data = [{
-      'title': 'php函数进阶',
-      'category': 'php',
-      'label': 'fn',
-      'readNumber': 21,
-      'release': 1,
-      'updateTime': '2019-01-15',
-      'createTime': '2019-01-11',
+      id: 1,
+      title: 'php函数进阶',
+      category: 'php',
+      label: 'fn',
+      readNumber: 21,
+      release: 1,
+      updateTime: '2019-01-15',
+      createTime: '2019-01-11',
     }, {
-      'title': 'redis锁应用',
-      'category': 'redis',
-      'label': 'ssa',
-      'readNumber': 9,
-      'release': 0,
-      'updateTime': '2019-01-24',
-      'createTime': '2019-01-07',
+      id: 2,
+      title: 'redis锁应用',
+      category: 'redis',
+      label: 'ssa',
+      readNumber: 9,
+      release: 0,
+      updateTime: '2019-01-24',
+      createTime: '2019-01-07',
     }]
 
     const children = [];
@@ -188,13 +190,14 @@ class OriginalArticle extends React.Component {
                 {getFieldDecorator('time', {
                   rules: [{}],
                 })(
-                  <InputGroup compact style={{ width: '310px' }}>
-                    <RangePicker style={{ width: '210px' }} />
-                    <Select defaultValue="1" style={{ width: '100px' }}>
-                      <Option value="1">创建时间</Option>
-                      <Option value="2">更新时间</Option>
-                    </Select>
-                  </InputGroup>
+                  <RangePicker style={{ width: '210px' }} />
+                  // <InputGroup compact style={{ width: '310px' }}>
+                  //   <RangePicker style={{ width: '210px' }} />
+                  //   <Select defaultValue="1" style={{ width: '100px' }}>
+                  //     <Option value="1">创建时间</Option>
+                  //     <Option value="2">更新时间</Option>
+                  //   </Select>
+                  // </InputGroup>
                 )}
               </FormItem>
             </Col>

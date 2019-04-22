@@ -5,7 +5,6 @@ import marked from '../helpers/marked'
 import textInsert from '../helpers/insertText'
 import keydownListen from '../helpers/keydownListen'
 import 'highlight.js/styles/tomorrow.css'
-import '../fonts/iconfont.css'
 
 class MdEditor extends React.Component {
   constructor(props) {
@@ -34,7 +33,7 @@ class MdEditor extends React.Component {
     keydownListen(this)
   }
 
-  componentWillUpdate(props, state) {
+  getSnapshotBeforeUpdate(props, state) {
     const { f_history } = this.state
     if (props.value && state.f_history.length === 0) {
       f_history.push(props.value)
@@ -184,10 +183,10 @@ class MdEditor extends React.Component {
         <div className="for-controlbar">
           <ul>
             <li onClick={this.undo} title="上一步 (ctrl+z)">
-              <i className="foricon for-undo" />
+              <i className="iconfont icon-undo" />
             </li>
             <li onClick={this.redo} title="下一步 (ctrl+y)">
-              <i className="foricon for-redo" />
+              <i className="iconfont icon-redo" />
             </li>
             <li data-type="h1" onClick={this.insert} title="一级标题">
               H1
@@ -202,32 +201,32 @@ class MdEditor extends React.Component {
               H4
             </li>
             <li data-type="image" onClick={this.insert} title="图片">
-              {/* <i className="foricon for-image" /> */}
+              <i className="iconfont icon-image" />
             </li>
             <li data-type="link" onClick={this.insert} title="超链接">
-              {/* <i className="foricon for-link" /> */}
+              <i className="iconfont icon-link" />
             </li>
             <li data-type="code" onClick={this.insert} title="代码块">
-              {/* <i className="foricon for-code" /> */}
+              <i className="iconfont icon-code"/>
             </li>
             <li onClick={this.save} title="保存 (ctrl+s)">
-              {/* <i className="foricon for-save" /> */}
+              <i className="iconfont icon-save" />
             </li>
           </ul>
           <ul>
             <li className={expandActive} onClick={this.expand}>
-              {/* {expandActive ? (
-                <i className="foricon for-contract" />
+              {expandActive ? (
+                <i className="iconfont icon-contract" />
               ) : (
-                <i className="foricon for-expand" />
-              )} */}
+                <i className="iconfont icon-expand" />
+              )}
             </li>
             <li className={previewActive} onClick={this.preview}>
-              {/* {previewActive ? (
-                <i className="foricon for-eye-off" />
+              {previewActive ? (
+                <i className="iconfont icon-eye-off" />
               ) : (
-                <i className="foricon for-eye" />
-              )} */}
+                <i className="iconfont icon-eye" />
+              )}
             </li>
           </ul>
         </div>

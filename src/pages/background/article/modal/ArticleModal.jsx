@@ -1,5 +1,6 @@
 import React from 'react'
-import { Form, Modal, Input, Radio, Row, Col, Checkbox, Button } from 'antd'
+import { Form, Modal, Input, Radio, Row, Col, Checkbox } from 'antd'
+import Editor from '../../../../components/markdown'
 import '../style/ArticleModal.less'
 
 const FormItem = Form.Item
@@ -44,7 +45,9 @@ class AddArticle extends React.Component {
       currentPage: 1,
       pageSize: 10,
       selectedRowKeys: [],
-      category: null
+      category: null,
+      editorValue: null,
+      editorVisible: false,
     }
   }
 
@@ -57,7 +60,6 @@ class AddArticle extends React.Component {
   }
 
   componentDidMount() {
-    
   }
 
   onRadioChange = (e) => {
@@ -67,8 +69,23 @@ class AddArticle extends React.Component {
     });
   }
 
+  
+  handleEditorChange = value => {
+    this.setState({
+      value
+    })
+  }
+
+  handleEditorSave = () => {
+    console.log('触发保存事件')
+  }
+
+  showEditor = () => {
+    this.setState({ editorVisible: true }, () => console.log(this.state.editorValue))
+  }
+
   render() {
-    const { category, type} = this.state
+    const { category, type, editorValue, editorVisible } = this.state
     const { visible, onOk, onCancel } = this.props
     const { getFieldDecorator } = this.props.form
 
@@ -108,130 +125,145 @@ class AddArticle extends React.Component {
       { label: 'labelJ4', value: 13 },
     ]
 
+    console.log(editorVisible)
+
     return (
-      <Modal
-        width={920}
-        title="添加文章"
-        visible={visible}
-        onOk={onOk}
-        onCancel={onCancel}
-        okText="保存"
-      >
-        <div className="article-modal">
-          <FormItem
-            label="标题"
-            {...formItemLayout}
-          >
-            {getFieldDecorator('title', {
-              rules: [{
-                required: true,
-                message: '请输入标题',
-                whitespace: true,
-              }, {
-                // validator: this.validateOldPassword,
-              }],
-            })(
-              <Input />,
-            )}
-          </FormItem>
-          <FormItem
-            label="分类"
-            {...formItemLayoutRadio}
-          >
-            {getFieldDecorator('category', {
-              rules: [{
-                required: true,
-                message: '请选择分类',
-                whitespace: true,
-              }, {
-                // validator: this.validateToNextPassword,
-              }],
-            })(
-              <RadioGroup
-                onChange={this.onRadioChange}
-                value={category}
-              >
-                <Row align="center">
-                  {CategoryOptions.map(item => (
-                    <Col key={item.value} span={4} style={{ height: 30 }}>
-                      <Radio value={item.value}>{item.label}</Radio>
-                    </Col>
-                  ))}
-                </Row>
-              </RadioGroup>,
-            )}
-          </FormItem>
-          <FormItem
-            label="标签"
-            {...formItemLayoutRadio}
-          >
-            {getFieldDecorator('label', {
-              rules: [{
-                required: false,
-                // message: '请选择标签',
-                // whitespace: true,
-              }, {
-                //  validator: this.compareToFirstPassword
-              }],
-            })(
-              <CheckboxGroup
-                // options={acsOptions}
-                value={[1,3]}
-                onChange={this.onLabelChange}
-              >
-                <Row align="center">
-                  {labelOptions.map(item => (
-                    <Col key={item.value} span={4} style={{ height: 30 }}>
-                      <Checkbox value={item.value}>
-                        {item.label}
-                      </Checkbox>
-                    </Col>
-                  ))}
-                </Row>
-              </CheckboxGroup>,
-            )}
-          </FormItem>
-          <FormItem
-            label="发布"
-            {...formItemLayoutRadio}
-          >
-            {getFieldDecorator('category', {
-              rules: [{
-                required: true,
-                message: '请选择类型',
-                whitespace: true,
-              }, {
-                // validator: this.validateToNextPassword,
-              }],
-            })(
-              <RadioGroup
-                onChange={this.onTypeChange}
-                value={type}
-              >
-                <Radio value={1}>是</Radio>
-                <Radio value={2}>否</Radio>
-              </RadioGroup>,
-            )}
-          </FormItem> 
-          <span className="edit">编辑</span>
-          <FormItem
-            label="内容"
-            {...formItemLayoutContent}
-          >
-            {getFieldDecorator('content', {
-              rules: [{
-                required: true,
-                message: '请输入标题',
-                whitespace: true,
-              }, {
-                // validator: this.validateOldPassword,
-              }],
-            })(
-              <TextArea autosize={{ minRows: 4 }}/>,
-            )}
-          </FormItem>
-        </div>
-      </Modal>
+      <React.Fragment>
+        {/* 编辑文章弹窗 */}
+        <Modal
+          width={920}
+          title="添加文章"
+          visible={visible}
+          onOk={onOk}
+          onCancel={onCancel}
+          okText="保存"
+        >
+          <div className="article-modal">
+            <FormItem
+              label="标题"
+              {...formItemLayout}
+            >
+              {getFieldDecorator('title', {
+                rules: [{
+                  required: true,
+                  message: '请输入标题',
+                  whitespace: true,
+                }, {
+                  // validator: this.validateOldPassword,
+                }],
+              })(
+                <Input />,
+              )}
+            </FormItem>
+            <FormItem
+              label="分类"
+              {...formItemLayoutRadio}
+            >
+              {getFieldDecorator('category', {
+                rules: [{
+                  required: true,
+                  message: '请选择分类',
+                  whitespace: true,
+                }, {
+                  // validator: this.validateToNextPassword,
+                }],
+              })(
+                <RadioGroup
+                  onChange={this.onRadioChange}
+                  value={category}
+                >
+                  <Row>
+                    {CategoryOptions.map(item => (
+                      <Col key={item.value} span={4} style={{ height: 30 }}>
+                        <Radio value={item.value}>{item.label}</Radio>
+                      </Col>
+                    ))}
+                  </Row>
+                </RadioGroup>,
+              )}
+            </FormItem>
+            <FormItem
+              label="标签"
+              {...formItemLayoutRadio}
+            >
+              {getFieldDecorator('label', {
+                rules: [{
+                  required: false,
+                }],
+              })(
+                <CheckboxGroup
+                  value={[1,3]}
+                  onChange={this.onLabelChange}
+                >
+                  <Row>
+                    {labelOptions.map(item => (
+                      <Col key={item.value} span={4} style={{ height: 30 }}>
+                        <Checkbox value={item.value}>
+                          {item.label}
+                        </Checkbox>
+                      </Col>
+                    ))}
+                  </Row>
+                </CheckboxGroup>,
+              )}
+            </FormItem>
+            <FormItem
+              label="发布"
+              {...formItemLayoutRadio}
+            >
+              {getFieldDecorator('category', {
+                rules: [{
+                  required: true,
+                  message: '请选择类型',
+                  whitespace: true,
+                }],
+                initialValue: 2,
+              })(
+                <RadioGroup
+                  onChange={this.onTypeChange}
+                  value={type}
+                >
+                  <Radio value={1}>是</Radio>
+                  <Radio value={2}>否</Radio>
+                </RadioGroup>,
+              )}
+            </FormItem> 
+            <span className="edit" onClick={() => this.showEditor()}>编辑</span>
+            <FormItem
+              label="内容"
+              {...formItemLayoutContent}
+            >
+              {getFieldDecorator('content', {
+                rules: [{
+                  required: true,
+                  message: '请输入标题',
+                  whitespace: true,
+                }, {
+                  // validator: this.validateOldPassword,
+                }],
+              })(
+                <TextArea autosize={{ minRows: 4 }}/>,
+              )}
+            </FormItem>
+          </div>
+        </Modal>
+
+        {/* markdown编辑器弹窗 */}
+        {console.log('uuuuuu',editorVisible)}
+        <Modal
+          width={920}
+          visible={editorVisible}
+          onOk={onOk}
+          onCancel={onCancel}
+          okText="保存"
+        >
+          <Editor
+            value={editorValue}
+            onChange={this.handleEditorChange}
+            onSave={this.handleEditorSave}
+          />
+        </Modal>
+      </React.Fragment>
     )
   }
 }
