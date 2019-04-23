@@ -1,12 +1,13 @@
 import React from 'react'
 import { Form, Modal, Input, Radio, Row, Col, Checkbox } from 'antd'
 import Editor from '../../../../components/markdown'
+import marked from '../../../../components/markdown/helpers/marked'
 import '../style/ArticleModal.less'
+import '../../../../components/markdown/editor/index.less'
 
 const FormItem = Form.Item
 const RadioGroup = Radio.Group
 const CheckboxGroup = Checkbox.Group
-const { TextArea } = Input;
 
 
 const formItemLayout = {
@@ -48,6 +49,7 @@ class AddArticle extends React.Component {
       category: null,
       editorValue: null,
       editorVisible: false,
+      htmlValue: null
     }
   }
 
@@ -71,13 +73,19 @@ class AddArticle extends React.Component {
 
   
   onEditorChange(value) {
-    this.setState({
-      value
-    })
+    this.setState({ editorValue: value })
   }
 
-  onEditorSave() {
-    console.log('触发保存事件')
+  onEditorSave(value) {
+    console.log(value)
+    const htmlValue = marked(value)
+    // const encode = htmlEncode(htmlValue)
+    // this.props.form.setFieldsValue({ content: encode })
+    
+    this.setState({
+      editorVisible: false,
+      htmlValue,
+    })
   }
 
   showEditor() {
@@ -89,7 +97,7 @@ class AddArticle extends React.Component {
   }
 
   render() {
-    const { category, type, editorValue, editorVisible } = this.state
+    const { category, type, editorValue, editorVisible, htmlValue } = this.state
     const { visible, onOk, onCancel } = this.props
     const { getFieldDecorator } = this.props.form
 
@@ -241,12 +249,12 @@ class AddArticle extends React.Component {
                 rules: [{
                   required: true,
                   message: '请输入标题',
-                  whitespace: true,
-                }, {
-                  // validator: this.validateOldPassword,
                 }],
               })(
-                <TextArea autosize={{ minRows: 4 }}/>,
+                <div 
+                  className="content for-preview for-markdown-preview"
+                  dangerouslySetInnerHTML={{__html: htmlValue}}
+                />
               )}
             </FormItem>
           </div>
@@ -254,7 +262,9 @@ class AddArticle extends React.Component {
 
         {/* markdown编辑器弹窗 */}
         <Modal
-          width={1220}
+          // width={1220}
+          width={'100%'}
+          height={'100%'}
           visible={editorVisible}
           onCancel={this.onEditorCancel}
           footer={null}

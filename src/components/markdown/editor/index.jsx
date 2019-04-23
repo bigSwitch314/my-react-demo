@@ -136,7 +136,8 @@ class MdEditor extends React.Component {
 
   // 保存
   save = () => {
-    this.props.onSave()
+    const { value } = this.props
+    this.props.onSave(value)
   }
 
   // 退出
@@ -217,9 +218,9 @@ class MdEditor extends React.Component {
             <li onClick={this.save} title="保存 (ctrl+s)">
               <i className="iconfont icon-save" />
             </li>
-            <li onClick={this.exit} title="退出 (Ecs)">
+            {/* <li onClick={this.exit} title="退出 (Ecs)">
               <i className="iconfont icon-cancel" />
-            </li>
+            </li> */}
           </ul>
           <ul>
             <li className={expandActive} onClick={this.expand}>
