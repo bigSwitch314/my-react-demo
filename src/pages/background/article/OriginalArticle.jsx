@@ -8,7 +8,7 @@ import './style/OriginalArticle.less'
 
 const FormItem = Form.Item
 const Option = Select.Option;
-// const InputGroup = Input.Group;
+const InputGroup = Input.Group;
 const { RangePicker } = DatePicker
 
 // @Form.create()
@@ -190,14 +190,13 @@ class OriginalArticle extends React.Component {
                 {getFieldDecorator('time', {
                   rules: [{}],
                 })(
-                  <RangePicker style={{ width: '210px' }} />
-                  // <InputGroup compact style={{ width: '310px' }}>
-                  //   <RangePicker style={{ width: '210px' }} />
-                  //   <Select defaultValue="1" style={{ width: '100px' }}>
-                  //     <Option value="1">创建时间</Option>
-                  //     <Option value="2">更新时间</Option>
-                  //   </Select>
-                  // </InputGroup>
+                  <InputGroup compact style={{ width: '310px' }}>
+                    <RangePicker style={{ width: '210px' }} />
+                    <Select defaultValue="1" style={{ width: '100px' }}>
+                      <Option value="1">创建时间</Option>
+                      <Option value="2">更新时间</Option>
+                    </Select>
+                  </InputGroup>
                 )}
               </FormItem>
             </Col>

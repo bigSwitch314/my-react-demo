@@ -70,18 +70,22 @@ class AddArticle extends React.Component {
   }
 
   
-  handleEditorChange = value => {
+  onEditorChange(value) {
     this.setState({
       value
     })
   }
 
-  handleEditorSave = () => {
+  onEditorSave() {
     console.log('触发保存事件')
   }
 
-  showEditor = () => {
-    this.setState({ editorVisible: true }, () => console.log(this.state.editorValue))
+  showEditor() {
+    this.setState({ editorVisible: true })
+  }
+
+  handleEditorExit() {
+    this.setState({ editorVisible: false })
   }
 
   render() {
@@ -249,18 +253,19 @@ class AddArticle extends React.Component {
         </Modal>
 
         {/* markdown编辑器弹窗 */}
-        {console.log('uuuuuu',editorVisible)}
         <Modal
-          width={920}
+          width={1220}
           visible={editorVisible}
-          onOk={onOk}
-          onCancel={onCancel}
-          okText="保存"
+          onCancel={this.onEditorCancel}
+          footer={null}
+          destroyOnClose
+          closable={false}
         >
           <Editor
             value={editorValue}
-            onChange={this.handleEditorChange}
-            onSave={this.handleEditorSave}
+            onChange={this.onEditorChange.bind(this)}
+            onSave={this.onEditorSave.bind(this)}
+            onExit={this.handleEditorExit.bind(this)}
           />
         </Modal>
       </React.Fragment>

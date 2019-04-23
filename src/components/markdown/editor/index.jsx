@@ -16,7 +16,7 @@ class MdEditor extends React.Component {
     }
 
     this.state = {
-      preview: false,
+      preview: true,
       expand: false,
       f_history: [],
       f_history_index: 0,
@@ -139,6 +139,11 @@ class MdEditor extends React.Component {
     this.props.onSave()
   }
 
+  // 退出
+  exit = () => {
+    this.props.onExit()
+  }
+
   // 左侧空白区点击后，textarea聚焦
   focusText = () => {
     const { $vm } = this
@@ -212,6 +217,9 @@ class MdEditor extends React.Component {
             <li onClick={this.save} title="保存 (ctrl+s)">
               <i className="iconfont icon-save" />
             </li>
+            <li onClick={this.exit} title="退出 (Ecs)">
+              <i className="iconfont icon-cancel" />
+            </li>
           </ul>
           <ul>
             <li className={expandActive} onClick={this.expand}>
@@ -223,9 +231,9 @@ class MdEditor extends React.Component {
             </li>
             <li className={previewActive} onClick={this.preview}>
               {previewActive ? (
-                <i className="iconfont icon-eye-off" />
+                 <i className="iconfont icon-eye" />
               ) : (
-                <i className="iconfont icon-eye" />
+                <i className="iconfont icon-eye-off" />
               )}
             </li>
           </ul>
