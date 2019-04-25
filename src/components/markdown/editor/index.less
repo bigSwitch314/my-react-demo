@@ -14,7 +14,7 @@
     height: 100%;
   }
 
-  ul, ol, li,  {
+  ul, ol, li  {
     margin: 0;
     padding: 0;
   }
@@ -155,23 +155,35 @@
 
 .for-markdown-preview {
   line-height: 2;
+  pre {
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
 
-  p,
+  p {
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
+
   blockquote,
   ul,
   ol,
-  dl,
-  pre {
+  dl {
     margin-top: 0;
     margin-bottom: .6em;
   }
 
-  h1,
-  h2 {
-    border-bottom: 1px solid #e2e2e2;
+  // h1, h2 {
+  //   border-bottom: 1px solid #e2e2e2;
+  // }
+
+  h1 {
+    padding: 10px 0 0 0;
+    margin: 20px 0px 10px 0px;
+    font-weight: 600;
+    text-indent: 0;
   }
 
-  h1,
   h2,
   h3,
   h4,
@@ -234,7 +246,7 @@
 
   blockquote {
     margin: 0;
-    margin-bottom: .6em;
+    margin-bottom: 25px;
     padding: 0 1em;
     color: #6a737d;
     border-left: 0.25em solid #dfe2e5;
