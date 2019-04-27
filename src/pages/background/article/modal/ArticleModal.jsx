@@ -2,13 +2,13 @@ import React from 'react'
 import { Form, Modal, Input, Radio, Row, Col, Checkbox } from 'antd'
 import Editor from '../../../../components/markdown'
 import marked from '../../../../components/markdown/helpers/marked'
+import handleCode from '../../../../components/markdown/helpers/handelCode'
 import '../style/ArticleModal.less'
 import '../../../../components/markdown/editor/index.less'
 
 const FormItem = Form.Item
 const RadioGroup = Radio.Group
 const CheckboxGroup = Checkbox.Group
-
 
 const formItemLayout = {
   labelCol: {
@@ -253,7 +253,7 @@ class AddArticle extends React.Component {
               })(
                 <div 
                   className="content for-preview for-markdown-preview"
-                  dangerouslySetInnerHTML={{__html: htmlValue}}
+                  dangerouslySetInnerHTML={{ __html: handleCode(htmlValue) }}
                 />
               )}
             </FormItem>

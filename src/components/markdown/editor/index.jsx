@@ -4,6 +4,7 @@ import classNames from 'classnames'
 import marked from '../helpers/marked'
 import textInsert from '../helpers/insertText'
 import keydownListen from '../helpers/keydownListen'
+import handleCode from '../helpers/handelCode'
 import 'highlight.js/styles/tomorrow.css'
 
 class MdEditor extends React.Component {
@@ -259,7 +260,7 @@ class MdEditor extends React.Component {
           <div className={previewClass}>
             <div
               className="for-preview for-markdown-preview"
-              dangerouslySetInnerHTML={{ __html: marked(value) }}
+              dangerouslySetInnerHTML={{ __html: handleCode(marked(value)) }}
             />
           </div>
         </div>
