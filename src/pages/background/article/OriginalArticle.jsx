@@ -1,10 +1,14 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import { Table, Form, Switch, Row, Col, Input, Button, Select, DatePicker } from 'antd'
 import OperatorIcons from 'components/shared/OperatorIcon'
 import Pagination from 'components/shared/Pagination'
 import HeaderBar from 'components/shared/HeaderBar'
 import ArticleModal from './modal/ArticleModal'
 import './style/OriginalArticle.less'
+
+import { getCategoryList } from '../../../modules/category'
+import { getLabelList } from '../../../modules/label'
 
 const FormItem = Form.Item
 const Option = Select.Option;
@@ -13,6 +17,13 @@ const { RangePicker } = DatePicker
 
 // @Form.create()
 
+@connect(
+  state => ({
+    categoryList: state.article.categoryList,
+    loading: state.loading['user/getCategoryList'],
+  }),
+  { getCategoryList, getLabelList}
+)
 class OriginalArticle extends React.Component {
   constructor(props) {
     super(props)
@@ -52,6 +63,8 @@ class OriginalArticle extends React.Component {
   /** 文章弹窗显隐 */
   addArticle = () => {
     this.setState({ visible: true })
+    this.props.getCategoryList({})
+    this.props.getLabelList({})
   }
 
   /** 保存文章  */

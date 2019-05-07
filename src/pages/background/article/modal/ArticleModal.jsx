@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import { Form, Modal, Input, Radio, Row, Col, Checkbox } from 'antd'
 import Editor from '../../../../components/markdown'
 import marked from '../../../../components/markdown/helpers/marked'
@@ -38,6 +39,13 @@ const formItemLayoutContent = {
 }
 
 // @Form.create()
+@connect(
+  state => ({
+    categoryList: state.category.categoryList,
+    labelList: state.label.labelList,
+  }),
+  { }
+)
 
 class AddArticle extends React.Component {
   constructor(props) {
@@ -62,6 +70,7 @@ class AddArticle extends React.Component {
   }
 
   componentDidMount() {
+ 
   }
 
   onRadioChange = (e) => {
@@ -98,46 +107,19 @@ class AddArticle extends React.Component {
 
   render() {
     const { editorValue, editorVisible, htmlValue } = this.state
-    const { visible, onOk, onCancel } = this.props
+    const { visible, onOk, onCancel, categoryList, labelList } = this.props
     const { getFieldDecorator } = this.props.form
 
-    const CategoryOptions = [
-      { label: 'A', value: 1 },
-      { label: 'B', value: 2 },
-      { label: 'C', value: 3 },
-      { label: 'D', value: 4 },
-      { label: 'E', value: 5 },
-      { label: 'F', value: 6 },
-      // { label: 'G', value: 7 },
-      // { label: 'H', value: 8 },
-      // { label: 'I', value: 9 },
-      // { label: 'J1', value: 10 },
-      // { label: 'J2', value: 11 },
-      // { label: 'J3', value: 12 },
-      // { label: 'J4', value: 13 },
-      // { label: 'J5', value: 10 },
-      // { label: 'J6', value: 11 },
-      // { label: 'J7', value: 12 },
-      // { label: 'J8', value: 13 },
-    ]
+    console.log('2222222222222222', categoryList)
+    let CategoryOptions = []
+    if(categoryList && categoryList.list) {
+      CategoryOptions = categoryList.list
+    }
 
-    const labelOptions = [
-      { label: 'labelB', value: 2 },
-      { label: 'labelC', value: 3 },
-      { label: 'labelD', value: 4 },
-      { label: 'labelE', value: 5 },
-      { label: 'labelF', value: 6 },
-      { label: 'labelA', value: 1 },
-      { label: 'labelG', value: 7 },
-      { label: 'labelH', value: 8 },
-      { label: 'labelI', value: 9 },
-      { label: 'labelJ1', value: 10 },
-      { label: 'labelJ2', value: 11 },
-      { label: 'labelJ3', value: 12 },
-      { label: 'labelJ4', value: 13 },
-    ]
-
-    console.log(editorVisible)
+    let labelOptions = []
+    if(labelList && labelList.list) {
+      labelOptions = labelList.list
+    }
 
     return (
       <React.Fragment>
@@ -181,13 +163,11 @@ class AddArticle extends React.Component {
                 }],
                 initialValue: 2,
               })(
-                <RadioGroup
-                  onChange={this.onRadioChange}
-                >
+                <RadioGroup onChange={this.onRadioChange}>
                   <Row>
                     {CategoryOptions.map(item => (
-                      <Col key={item.value} span={4} style={{ height: 30 }}>
-                        <Radio value={item.value}>{item.label}</Radio>
+                      <Col key={item.id} span={4} style={{ height: 30 }}>
+                        <Radio value={item.id}>{item.name}</Radio>
                       </Col>
                     ))}
                   </Row>
@@ -209,9 +189,9 @@ class AddArticle extends React.Component {
                 >
                   <Row>
                     {labelOptions.map(item => (
-                      <Col key={item.value} span={4} style={{ height: 30 }}>
-                        <Checkbox value={item.value}>
-                          {item.label}
+                      <Col key={item.id} span={4} style={{ height: 30 }}>
+                        <Checkbox value={item.id}>
+                          {item.name}
                         </Checkbox>
                       </Col>
                     ))}
