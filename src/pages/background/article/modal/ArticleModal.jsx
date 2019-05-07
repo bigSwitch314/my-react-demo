@@ -97,7 +97,7 @@ class AddArticle extends React.Component {
   }
 
   render() {
-    const { category, type, editorValue, editorVisible, htmlValue } = this.state
+    const { editorValue, editorVisible, htmlValue } = this.state
     const { visible, onOk, onCancel } = this.props
     const { getFieldDecorator } = this.props.form
 
@@ -179,10 +179,10 @@ class AddArticle extends React.Component {
                 }, {
                   // validator: this.validateToNextPassword,
                 }],
+                initialValue: 2,
               })(
                 <RadioGroup
                   onChange={this.onRadioChange}
-                  value={category}
                 >
                   <Row>
                     {CategoryOptions.map(item => (
@@ -202,9 +202,9 @@ class AddArticle extends React.Component {
                 rules: [{
                   required: false,
                 }],
+                initialValue: [1, 3],
               })(
                 <CheckboxGroup
-                  value={[1,3]}
                   onChange={this.onLabelChange}
                 >
                   <Row>
@@ -233,7 +233,6 @@ class AddArticle extends React.Component {
               })(
                 <RadioGroup
                   onChange={this.onTypeChange}
-                  value={type}
                 >
                   <Radio value={1}>是</Radio>
                   <Radio value={2}>否</Radio>

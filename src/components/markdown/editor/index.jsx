@@ -45,6 +45,10 @@ class MdEditor extends React.Component {
     }
   }
 
+  componentDidUpdate() {
+
+  }
+
   // 输入框改变
   handleChange = e => {
     const value = e.target.value
@@ -249,7 +253,7 @@ class MdEditor extends React.Component {
                   <pre>{value} </pre>
                   <textarea
                     ref={this.handleEditorRef}
-                    value={value}
+                    value={value || ''}
                     onChange={this.handleChange}
                     placeholder={this.props.placeholder}
                   />

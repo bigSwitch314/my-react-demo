@@ -145,7 +145,7 @@ class OriginalArticle extends React.Component {
 
     return (
       <div className="origin-article">
-        <div className="serchArea">
+        <div className="serch-area">
           <Row style={{ width: '1000px'}}>
             <Col span={5}>
               <FormItem labelCol={{ span: 4}} wrapperCol={{ span: 12}} >
@@ -185,20 +185,27 @@ class OriginalArticle extends React.Component {
                 )}
               </FormItem>
             </Col>
-            <Col span={8} style={{ left: '-6px', top: '4px' }}>
-              <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 12 }} >
-                {getFieldDecorator('time', {
-                  rules: [{}],
-                })(
-                  <InputGroup compact style={{ width: '310px' }}>
+            <Col span={8} style={{ left: '-6px' }}>
+              <InputGroup compact style={{ width: '310px' }}>
+                <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 12 }} className='query-time' >
+                  {getFieldDecorator('time', {
+                    rules: [{}],
+                  })(
                     <RangePicker style={{ width: '210px' }} />
-                    <Select defaultValue="1" style={{ width: '100px' }}>
+                  )}
+                </FormItem>
+                <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 12 }} className='query-time-type' >
+                  {getFieldDecorator('time2', {
+                    rules: [{}],
+                    initialValue: '1'
+                  })(
+                    <Select style={{ width: '100px' }}>
                       <Option value="1">创建时间</Option>
                       <Option value="2">更新时间</Option>
                     </Select>
-                  </InputGroup>
-                )}
-              </FormItem>
+                  )}
+                </FormItem>
+              </InputGroup>
             </Col>
             <Col span={1}>
               <FormItem>
