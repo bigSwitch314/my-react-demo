@@ -57,7 +57,8 @@ class AddArticle extends React.Component {
       category: null,
       editorValue: null,
       editorVisible: false,
-      htmlValue: null
+      htmlValue: null,
+      hasContentMessage: false,
     }
   }
 
@@ -90,7 +91,9 @@ class AddArticle extends React.Component {
     const htmlValue = marked(value)
     // const encode = htmlEncode(htmlValue)
     // this.props.form.setFieldsValue({ content: encode })
-    
+    if(htmlValue) {
+      this.setState({ hasContentMessage: false })
+    }
     this.setState({
       editorVisible: false,
       htmlValue,
@@ -105,9 +108,28 @@ class AddArticle extends React.Component {
     this.setState({ editorVisible: false })
   }
 
+  onOk() {
+    this.props.form.validateFieldsAndScroll((err) => {
+      const { htmlValue } = this.state 
+      if (!err) {
+        // this.postUser(isEdit)
+        if(!htmlValue) {
+          this.setState({ hasContentMessage: true })
+          return
+        }
+        this.props.onOk()
+      } else {
+         if(!htmlValue) {
+          this.setState({ hasContentMessage: true })
+          return
+        }
+      }
+    })
+  }
+
   render() {
-    const { editorValue, editorVisible, htmlValue } = this.state
-    const { visible, onOk, onCancel, categoryList, labelList } = this.props
+    const { editorValue, editorVisible, htmlValue, hasContentMessage } = this.state
+    const { visible, onCancel, categoryList, labelList } = this.props
     const { getFieldDecorator } = this.props.form
 
     console.log('2222222222222222', categoryList)
@@ -128,7 +150,7 @@ class AddArticle extends React.Component {
           width={920}
           title="添加文章"
           visible={visible}
-          onOk={onOk}
+          onOk={() => this.onOk()}
           onCancel={onCancel}
           okText="保存"
         >
@@ -158,10 +180,8 @@ class AddArticle extends React.Component {
                   required: true,
                   message: '请选择分类',
                   whitespace: true,
-                }, {
-                  // validator: this.validateToNextPassword,
+                  type: 'number',
                 }],
-                initialValue: 2,
               })(
                 <RadioGroup onChange={this.onRadioChange}>
                   <Row>
@@ -203,11 +223,12 @@ class AddArticle extends React.Component {
               label="发布"
               {...formItemLayoutRadio}
             >
-              {getFieldDecorator('category', {
+              {getFieldDecorator('resease', {
                 rules: [{
                   required: true,
                   message: '请选择类型',
                   whitespace: true,
+                  type: 'number',
                 }],
                 initialValue: 2,
               })(
@@ -227,15 +248,18 @@ class AddArticle extends React.Component {
               {getFieldDecorator('content', {
                 rules: [{
                   required: true,
-                  message: '请输入标题',
+                  message: ' '
                 }],
+                initialValue: ' ',
               })(
                 <div 
                   className="content for-preview for-markdown-preview"
+                  style={{ borderColor: hasContentMessage ? '#f5222d' : '#d9d9d9' }}
                   dangerouslySetInnerHTML={{ __html: handleCode(htmlValue) }}
                 />
               )}
             </FormItem>
+            {hasContentMessage && <span className="content-message">请输入内容</span>}
           </div>
         </Modal>
 
