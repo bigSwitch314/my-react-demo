@@ -9,17 +9,22 @@ export default {
     getArticleList(state, { payload }) {
       return ({ ...state, articleList: payload })
     },
-    // postUser(state) {
-    //   return ({ ...state })
-    // },
-    // deleteUser(state) {
-    //   return ({ ...state })
-    // },
+    addArticle(state) {
+      return ({ ...state })
+    },
+    editArticle(state) {
+      return ({ ...state })
+    },
+    changeReleaseStatus(state) {
+      return ({ ...state })
+    },
   },
 }
 
 const n = (name) => `article/${name}`
 
 export const getArticleList = (params) => request.get('/blog/article/get', n('getArticleList'), params)
-// export const postUser = (params) => request.post('/user', n('postUser'), params)
-// export const deleteUser = (params) => request.delete('/user', n('deleteUser'), params)
+export const addArticle = (params) => request.post('/blog/article/add', n('addArticle'), params)
+export const editArticle = (params) => request.post('/blog/article/add', n('editArticle'), params)
+export const changeReleaseStatus = (params) => request.post('/blog/article/changeReleaseStatus', n('changeReleaseStatus'), params)
+

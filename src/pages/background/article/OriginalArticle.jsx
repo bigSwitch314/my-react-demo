@@ -9,6 +9,7 @@ import './style/OriginalArticle.less'
 
 import { getCategoryList } from '../../../modules/category'
 import { getLabelList } from '../../../modules/label'
+import { getArticleList, changeReleaseStatus } from '../../../modules/article'
 
 const FormItem = Form.Item
 const Option = Select.Option;
@@ -20,16 +21,21 @@ const { RangePicker } = DatePicker
 @connect(
   state => ({
     categoryList: state.article.categoryList,
-    loading: state.loading['user/getCategoryList'],
-  }),
-  { getCategoryList, getLabelList}
+    articleList: state.article.articleList,
+    loading: state.loading['article/getArticleList'],
+  }), {
+    getCategoryList,
+    getLabelList,
+    getArticleList,
+    changeReleaseStatus,
+  }
 )
 class OriginalArticle extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       currentPage: 1,
-      pageSize: 10,
+      pageSize: 5,
       selectedRowKeys: [],
       visible: false,
     }
@@ -44,7 +50,17 @@ class OriginalArticle extends React.Component {
   }
 
   componentDidMount() {
+    this.getArticleList()
+  }
 
+  // 获取文章列表
+  getArticleList = () => {
+    const { currentPage, pageSize } = this.state
+    this.props.getArticleList({
+      page_no: currentPage,
+      page_size: pageSize,
+      back_ground: 1,
+    })
   }
 
   /** 表格复选框选中 */
@@ -77,9 +93,32 @@ class OriginalArticle extends React.Component {
     this.setState({ visible: false })
   }
 
+  changeSwitchStatus = (checked, record) => {
+    this.props.changeReleaseStatus({
+      id: record.id,
+      release: Number(checked),
+    }).then(res => {
+      if (res instanceof Error) return
+      this.getArticleList()
+    })
+  }
+
+  onShowSizeChange = (currentPage, pageSize) => {
+    this.setState({ currentPage: 1, pageSize }, () => {
+      this.getArticleList()
+    })
+  }
+
+  changePage = (currentPage, pageSize) => {
+    this.setState({ currentPage, pageSize }, () => {
+      this.getArticleList()
+    })
+  }
+
   render() {
     const { currentPage, pageSize, selectedRowKeys, visible } = this.state
     const { getFieldDecorator } = this.props.form
+    const { articleList = {}, loading } = this.props
 
     const columns = [{
       title: '序号',
@@ -94,13 +133,13 @@ class OriginalArticle extends React.Component {
       dataIndex: 'title',
     }, {
       title: '分类',
-      dataIndex: 'category',
+      dataIndex: 'category_name',
     }, {
       title: '标签',
-      dataIndex: 'label',
+      dataIndex: 'label_name',
     }, {
       title: '阅读次数',
-      dataIndex: 'readNumber',
+      dataIndex: 'read_number',
     }, {
       title: '是否发布',
       dataIndex: 'release',
@@ -112,10 +151,10 @@ class OriginalArticle extends React.Component {
       ),
     }, {
       title: '更新时间',
-      dataIndex: 'updateTime',
+      dataIndex: 'edit_time',
     }, {
       title: '创建时间',
-      dataIndex: 'createTime',
+      dataIndex: 'create_time',
     },{
       title: '操作',
       key: 'operation',
@@ -131,30 +170,12 @@ class OriginalArticle extends React.Component {
       },
     }]
 
-    const data = [{
-      id: 1,
-      title: 'php函数进阶',
-      category: 'php',
-      label: 'fn',
-      readNumber: 21,
-      release: 1,
-      updateTime: '2019-01-15',
-      createTime: '2019-01-11',
-    }, {
-      id: 2,
-      title: 'redis锁应用',
-      category: 'redis',
-      label: 'ssa',
-      readNumber: 9,
-      release: 0,
-      updateTime: '2019-01-24',
-      createTime: '2019-01-07',
-    }]
-
     const children = [];
     for (let i = 10; i < 36; i++) {
       children.push(<Option key={i.toString(36) + i.toString()}>{i.toString(36) + i.toString()}</Option>);
     }
+
+    console.log(this.props.articleList)
 
     return (
       <div className="origin-article">
@@ -243,9 +264,9 @@ class OriginalArticle extends React.Component {
             getCheckboxProps: this.getCheckboxProps,
           }}
           rowKey={record => record.id}
-          // loading={loading}
+          loading={loading}
           columns={columns}
-          dataSource={data}
+          dataSource={articleList.list}
           // rowSelection={rowSelection}
           pagination={false}
         />
@@ -253,7 +274,7 @@ class OriginalArticle extends React.Component {
           current={currentPage}
           pageSize={pageSize}
           pageSizeOptions={['5', '10', '15', '20']}
-          total={20}
+          total={articleList.count}
           onChange={this.changePage}
           onShowSizeChange={this.onShowSizeChange}
         />

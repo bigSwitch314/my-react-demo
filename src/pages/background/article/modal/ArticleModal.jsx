@@ -4,6 +4,7 @@ import { Form, Modal, Input, Radio, Row, Col, Checkbox } from 'antd'
 import Editor from '../../../../components/markdown'
 import marked from '../../../../components/markdown/helpers/marked'
 import handleCode from '../../../../components/markdown/helpers/handelCode'
+import { addArticle } from '../../../../modules/article'
 import '../style/ArticleModal.less'
 import '../../../../components/markdown/editor/index.less'
 
@@ -44,7 +45,7 @@ const formItemLayoutContent = {
     categoryList: state.category.categoryList,
     labelList: state.label.labelList,
   }),
-  { }
+  { addArticle }
 )
 
 class AddArticle extends React.Component {
@@ -109,15 +110,28 @@ class AddArticle extends React.Component {
   }
 
   onOk() {
-    this.props.form.validateFieldsAndScroll((err) => {
-      const { htmlValue } = this.state 
+    const { validateFieldsAndScroll, getFieldsValue } = this.props.form
+    const { addArticle } = this.props
+    validateFieldsAndScroll((err) => {
+      const { htmlValue, editorValue } = this.state 
       if (!err) {
-        // this.postUser(isEdit)
         if(!htmlValue) {
           this.setState({ hasContentMessage: true })
           return
         }
         this.props.onOk()
+        
+        //保存文章
+        const { title, category, label, release } = getFieldsValue()
+        addArticle({
+          title,
+          category_id: category,
+          label_ids: label.join(','),
+          content_md: editorValue,
+          content_html: 'not_has_html',
+          release,
+          type: 1,
+        })
       } else {
          if(!htmlValue) {
           this.setState({ hasContentMessage: true })
@@ -223,7 +237,7 @@ class AddArticle extends React.Component {
               label="发布"
               {...formItemLayoutRadio}
             >
-              {getFieldDecorator('resease', {
+              {getFieldDecorator('release', {
                 rules: [{
                   required: true,
                   message: '请选择类型',
