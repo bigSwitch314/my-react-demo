@@ -143,10 +143,10 @@ class AddArticle extends React.Component {
 
   render() {
     const { editorValue, editorVisible, htmlValue, hasContentMessage } = this.state
-    const { visible, onCancel, categoryList, labelList } = this.props
+    const { visible, onCancel, categoryList, labelList, isEdit, record } = this.props
     const { getFieldDecorator } = this.props.form
 
-    console.log('2222222222222222', categoryList)
+    console.log('record@--------', record)
     let CategoryOptions = []
     if(categoryList && categoryList.list) {
       CategoryOptions = categoryList.list
@@ -162,7 +162,7 @@ class AddArticle extends React.Component {
         {/* 编辑文章弹窗 */}
         <Modal
           width={920}
-          title="添加文章"
+          title={isEdit ? "编辑文章" : "添加文章"}
           visible={visible}
           onOk={() => this.onOk()}
           onCancel={onCancel}

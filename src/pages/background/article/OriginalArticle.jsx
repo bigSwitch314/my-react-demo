@@ -38,6 +38,8 @@ class OriginalArticle extends React.Component {
       pageSize: 5,
       selectedRowKeys: [],
       visible: false,
+      isEdit: false,
+      record: null,
     }
   }
 
@@ -76,9 +78,20 @@ class OriginalArticle extends React.Component {
     name: record.name,
   })
 
-  /** 文章弹窗显隐 */
+  /** 文章弹窗显示（添加） */
   addArticle = () => {
     this.setState({ visible: true })
+    this.props.getCategoryList({})
+    this.props.getLabelList({})
+  }
+
+  /** 文章弹窗显显示（编辑） */
+  editArticle = (record) => {
+    this.setState({
+      visible: true,
+      isEdit: true,
+      record: record,
+    })
     this.props.getCategoryList({})
     this.props.getLabelList({})
   }
@@ -116,7 +129,14 @@ class OriginalArticle extends React.Component {
   }
 
   render() {
-    const { currentPage, pageSize, selectedRowKeys, visible } = this.state
+    const {
+      currentPage,
+      pageSize,
+      selectedRowKeys,
+      visible,
+      isEdit,
+      record,
+    } = this.state
     const { getFieldDecorator } = this.props.form
     const { articleList = {}, loading } = this.props
 
@@ -163,7 +183,7 @@ class OriginalArticle extends React.Component {
         return (
           <OperatorIcons>
             <OperatorIcons.Icon title="预览" type="eye" onClick={() => this.modalVisbileChange(record)} />
-            <OperatorIcons.Icon title="编辑" type="edit" onClick={() => this.modalVisbileChange(record)} />
+            <OperatorIcons.Icon title="编辑" type="edit" onClick={() => this.editArticle(record)} />
             <OperatorIcons.Icon title="删除" type="delete" onClick={() => this.showConfirm(record.id)} />
           </OperatorIcons>
         )
@@ -279,7 +299,8 @@ class OriginalArticle extends React.Component {
           onShowSizeChange={this.onShowSizeChange}
         />
         <ArticleModal
-          isEdit={false}
+          isEdit={isEdit}
+          record={record}
           visible={visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
