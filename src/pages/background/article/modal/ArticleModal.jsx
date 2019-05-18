@@ -143,10 +143,9 @@ class AddArticle extends React.Component {
 
   render() {
     const { editorValue, editorVisible, htmlValue, hasContentMessage } = this.state
-    const { visible, onCancel, categoryList, labelList, isEdit, record } = this.props
+    const { visible, onCancel, categoryList, labelList, isEdit } = this.props
     const { getFieldDecorator } = this.props.form
 
-    console.log('record@--------', record)
     let CategoryOptions = []
     if(categoryList && categoryList.list) {
       CategoryOptions = categoryList.list

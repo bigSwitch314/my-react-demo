@@ -9,7 +9,7 @@ import './style/OriginalArticle.less'
 
 import { getCategoryList } from '../../../modules/category'
 import { getLabelList } from '../../../modules/label'
-import { getArticleList, changeReleaseStatus } from '../../../modules/article'
+import { getArticleList, changeReleaseStatus, getArticle } from '../../../modules/article'
 
 const FormItem = Form.Item
 const Option = Select.Option;
@@ -28,6 +28,7 @@ const { RangePicker } = DatePicker
     getLabelList,
     getArticleList,
     changeReleaseStatus,
+    getArticle,
   }
 )
 class OriginalArticle extends React.Component {
@@ -39,7 +40,7 @@ class OriginalArticle extends React.Component {
       selectedRowKeys: [],
       visible: false,
       isEdit: false,
-      record: null,
+      editData: null,
     }
   }
 
@@ -53,6 +54,11 @@ class OriginalArticle extends React.Component {
 
   componentDidMount() {
     this.getArticleList()
+  }
+
+  // 获取文章
+  getArticle = (id) => {
+    return this.props.getArticle({ id })
   }
 
   // 获取文章列表
@@ -87,11 +93,15 @@ class OriginalArticle extends React.Component {
 
   /** 文章弹窗显显示（编辑） */
   editArticle = (record) => {
-    this.setState({
-      visible: true,
-      isEdit: true,
-      record: record,
+    this.getArticle(record.id).then(res => {
+      if (res instanceof Error) return
+      this.setState({
+        visible: true,
+        isEdit: true,
+        editData: res,
+      })
     })
+    
     this.props.getCategoryList({})
     this.props.getLabelList({})
   }
@@ -135,7 +145,7 @@ class OriginalArticle extends React.Component {
       selectedRowKeys,
       visible,
       isEdit,
-      record,
+      editData,
     } = this.state
     const { getFieldDecorator } = this.props.form
     const { articleList = {}, loading } = this.props
@@ -300,7 +310,7 @@ class OriginalArticle extends React.Component {
         />
         <ArticleModal
           isEdit={isEdit}
-          record={record}
+          editData={editData}
           visible={visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
