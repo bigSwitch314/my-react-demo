@@ -75,6 +75,20 @@ class AddArticle extends React.Component {
  
   }
 
+  componentDidUpdate(prevProps){
+    if ( prevProps.isEdit !== this.props.isEdit ) {
+      const { editData } = this.props
+      const { setFieldsValue } = this.props.form
+      debugger
+      setFieldsValue({
+        category: editData.category_id,
+        label: editData.label_ids,
+        title: editData.title,
+        release: editData.release,
+      })
+    }
+  }
+
   onRadioChange = (e) => {
     console.log('radio checked', e.target.value);
     this.setState({
@@ -143,7 +157,7 @@ class AddArticle extends React.Component {
 
   render() {
     const { editorValue, editorVisible, htmlValue, hasContentMessage } = this.state
-    const { visible, onCancel, categoryList, labelList, isEdit } = this.props
+    const { visible, onCancel, categoryList, labelList, isEdit, editData } = this.props
     const { getFieldDecorator } = this.props.form
 
     let CategoryOptions = []
@@ -155,6 +169,8 @@ class AddArticle extends React.Component {
     if(labelList && labelList.list) {
       labelOptions = labelList.list
     }
+
+    console.log(editData)
 
     return (
       <React.Fragment>

@@ -98,7 +98,7 @@ class OriginalArticle extends React.Component {
       this.setState({
         visible: true,
         isEdit: true,
-        editData: res,
+        editData: res.payload,
       })
     })
     
