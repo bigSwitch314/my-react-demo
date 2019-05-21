@@ -45,10 +45,12 @@ const formItemLayoutContent = {
     categoryList: state.category.categoryList,
     labelList: state.label.labelList,
   }),
-  { addArticle }
+  { addArticle },
+  null,
+  { forwardRef: true },
 )
 
-class AddArticle extends React.Component {
+class ArticleModal extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -60,6 +62,7 @@ class AddArticle extends React.Component {
       editorVisible: false,
       htmlValue: null,
       hasContentMessage: false,
+      editData: null,
     }
   }
 
@@ -75,17 +78,30 @@ class AddArticle extends React.Component {
  
   }
 
-  componentDidUpdate(prevProps){
-    if ( prevProps.isEdit !== this.props.isEdit ) {
-      const { editData } = this.props
-      const { setFieldsValue } = this.props.form
-      debugger
+  setFieldsValue = (isEdit, editData) => {
+    const { setFieldsValue } = this.props.form
+    console.log(isEdit)
+    console.log(editData)
+    if(isEdit) {
       setFieldsValue({
         category: editData.category_id,
         label: editData.label_ids,
         title: editData.title,
         release: editData.release,
       })
+      this.setState({
+        htmlValue: marked(editData.content_md),
+        editorValue: editData.content_md,
+        editData,
+      })
+    } else {
+      setFieldsValue({
+        category: undefined,
+        label: [],
+        title: '',
+        release: 0,
+      })
+      this.setState({ htmlValue: '' })
     }
   }
 
@@ -125,19 +141,18 @@ class AddArticle extends React.Component {
 
   onOk() {
     const { validateFieldsAndScroll, getFieldsValue } = this.props.form
-    const { addArticle } = this.props
+    const { addArticle, isEdit } = this.props
     validateFieldsAndScroll((err) => {
-      const { htmlValue, editorValue } = this.state 
+      const { htmlValue, editorValue, editData } = this.state 
       if (!err) {
         if(!htmlValue) {
           this.setState({ hasContentMessage: true })
           return
         }
-        this.props.onOk()
         
         //保存文章
         const { title, category, label, release } = getFieldsValue()
-        addArticle({
+        const param = {
           title,
           category_id: category,
           label_ids: label.join(','),
@@ -145,6 +160,15 @@ class AddArticle extends React.Component {
           content_html: 'not_has_html',
           release,
           type: 1,
+        }
+        if(isEdit) {
+          param.id = editData.id
+        }
+
+        addArticle(param).then((res) => {
+          if (res instanceof Error) return
+          this.props.onOk()
+          this.setState({ htmlValue: null })
         })
       } else {
          if(!htmlValue) {
@@ -157,7 +181,7 @@ class AddArticle extends React.Component {
 
   render() {
     const { editorValue, editorVisible, htmlValue, hasContentMessage } = this.state
-    const { visible, onCancel, categoryList, labelList, isEdit, editData } = this.props
+    const { visible, onCancel, categoryList, labelList, isEdit } = this.props
     const { getFieldDecorator } = this.props.form
 
     let CategoryOptions = []
@@ -169,8 +193,6 @@ class AddArticle extends React.Component {
     if(labelList && labelList.list) {
       labelOptions = labelList.list
     }
-
-    console.log(editData)
 
     return (
       <React.Fragment>
@@ -231,7 +253,6 @@ class AddArticle extends React.Component {
                 rules: [{
                   required: false,
                 }],
-                initialValue: [1, 3],
               })(
                 <CheckboxGroup
                   onChange={this.onLabelChange}
@@ -259,13 +280,12 @@ class AddArticle extends React.Component {
                   whitespace: true,
                   type: 'number',
                 }],
-                initialValue: 2,
               })(
                 <RadioGroup
                   onChange={this.onTypeChange}
                 >
                   <Radio value={1}>是</Radio>
-                  <Radio value={2}>否</Radio>
+                  <Radio value={0}>否</Radio>
                 </RadioGroup>,
               )}
             </FormItem> 
@@ -300,7 +320,6 @@ class AddArticle extends React.Component {
           visible={editorVisible}
           onCancel={this.onEditorCancel}
           footer={null}
-          destroyOnClose
           closable={false}
         >
           <Editor
@@ -315,5 +334,5 @@ class AddArticle extends React.Component {
   }
 }
 
-export default Form.create()(AddArticle)
+export default Form.create()(ArticleModal)
 

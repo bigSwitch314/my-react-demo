@@ -40,8 +40,8 @@ class OriginalArticle extends React.Component {
       selectedRowKeys: [],
       visible: false,
       isEdit: false,
-      editData: null,
     }
+    this.articleModelRef = React.createRef()
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -86,9 +86,14 @@ class OriginalArticle extends React.Component {
 
   /** 文章弹窗显示（添加） */
   addArticle = () => {
-    this.setState({ visible: true })
+    this.setState({
+      visible: true,
+      isEdit: false,
+    })
     this.props.getCategoryList({})
     this.props.getLabelList({})
+
+    this.articleModelRef.setFieldsValue(false, null)
   }
 
   /** 文章弹窗显显示（编辑） */
@@ -98,17 +103,19 @@ class OriginalArticle extends React.Component {
       this.setState({
         visible: true,
         isEdit: true,
-        editData: res.payload,
       })
+      this.articleModelRef.setFieldsValue(true, res.payload)
     })
-    
     this.props.getCategoryList({})
     this.props.getLabelList({})
   }
 
   /** 保存文章  */
   handleOk = () => {
-    this.setState({ visible: false })
+    this.setState({
+      currentPage: 1,
+      visible: false,
+    }, this.getArticleList)
   }
 
   /** 关闭文章弹窗 */
@@ -145,7 +152,6 @@ class OriginalArticle extends React.Component {
       selectedRowKeys,
       visible,
       isEdit,
-      editData,
     } = this.state
     const { getFieldDecorator } = this.props.form
     const { articleList = {}, loading } = this.props
@@ -204,8 +210,6 @@ class OriginalArticle extends React.Component {
     for (let i = 10; i < 36; i++) {
       children.push(<Option key={i.toString(36) + i.toString()}>{i.toString(36) + i.toString()}</Option>);
     }
-
-    console.log(this.props.articleList)
 
     return (
       <div className="origin-article">
@@ -310,10 +314,10 @@ class OriginalArticle extends React.Component {
         />
         <ArticleModal
           isEdit={isEdit}
-          editData={editData}
           visible={visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
+          wrappedComponentRef={(node) => this.articleModelRef = node}
         />
       </div>
     )
