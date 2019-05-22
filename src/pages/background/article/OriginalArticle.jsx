@@ -6,6 +6,7 @@ import Pagination from 'components/shared/Pagination'
 import HeaderBar from 'components/shared/HeaderBar'
 import { deleteConfirm, deleteBatchConfirm, removeArr } from 'components/shared/Confirm'
 import ArticleModal from './modal/ArticleModal'
+import PreviewModal from './modal/PreviewModal'
 import './style/OriginalArticle.less'
 
 import { getCategoryList } from '../../../modules/category'
@@ -42,8 +43,10 @@ class OriginalArticle extends React.Component {
       selectedRowKeys: [],
       visible: false,
       isEdit: false,
+      previewVisible: false,
     }
     this.articleModelRef = React.createRef()
+    this.previewModelRef = React.createRef()
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -125,6 +128,18 @@ class OriginalArticle extends React.Component {
     this.articleModelRef.setFieldsValue(false, null)
   }
 
+  /** 预览文章 */
+  preview(record) {
+    this.getArticle(record.id).then(res => {
+      if (res instanceof Error) return
+      this.setState({
+        visible: true,
+        isEdit: true,
+      })
+      this.articleModelRef.setFieldsValue(true, res.payload)
+    })
+  }
+
   /** 文章弹窗显显示（编辑） */
   editArticle = (record) => {
     this.getArticle(record.id).then(res => {
@@ -150,6 +165,16 @@ class OriginalArticle extends React.Component {
   /** 关闭文章弹窗 */
   handleCancel = () => {
     this.setState({ visible: false })
+  }
+
+   /** 文章预览关闭  */
+  handlePreviewOk = () => {
+    this.setState({ previewVisible: false })
+  }
+
+  /** 文章预览关闭 */
+  handlePreviewCancel = () => {
+    this.setState({ previewVisible: false })
   }
 
   changeSwitchStatus = (checked, record) => {
@@ -181,6 +206,7 @@ class OriginalArticle extends React.Component {
       selectedRowKeys,
       visible,
       isEdit,
+      previewVisible,
     } = this.state
     const { getFieldDecorator } = this.props.form
     const { articleList = {}, loading } = this.props
@@ -227,7 +253,7 @@ class OriginalArticle extends React.Component {
       render: (text, record) => {
         return (
           <OperatorIcons>
-            <OperatorIcons.Icon title="预览" type="eye" onClick={() => this.modalVisbileChange(record)} />
+            <OperatorIcons.Icon title="预览" type="eye" onClick={() => this.preview(record)} />
             <OperatorIcons.Icon title="编辑" type="edit" onClick={() => this.editArticle(record)} />
             <OperatorIcons.Icon title="删除" type="delete" onClick={() => this.showConfirm(record.id)} />
           </OperatorIcons>
@@ -330,7 +356,6 @@ class OriginalArticle extends React.Component {
           loading={loading}
           columns={columns}
           dataSource={articleList.list}
-          // rowSelection={rowSelection}
           pagination={false}
         />
         <Pagination
@@ -347,6 +372,12 @@ class OriginalArticle extends React.Component {
           onOk={this.handleOk}
           onCancel={this.handleCancel}
           wrappedComponentRef={(node) => this.articleModelRef = node}
+        />
+        <PreviewModal
+          visible={previewVisible}
+          onOk={this.handlePreviewOk}
+          onCancel={this.handlePreviewCancel}
+          wrappedComponentRef={(node) => this.previewModelRef = node}
         />
       </div>
     )
