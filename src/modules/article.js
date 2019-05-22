@@ -21,6 +21,9 @@ export default {
     changeReleaseStatus(state) {
       return ({ ...state })
     },
+    deleteArticle(state) {
+      return ({ ...state })
+    },
   },
 }
 
@@ -29,6 +32,7 @@ const n = (name) => `article/${name}`
 export const getArticleList = (params) => request.get('/blog/article/get', n('getArticleList'), params)
 export const getArticle = (params) => request.get('/blog/article/get', n('getArticle'), params)
 export const addArticle = (params) => request.post('/blog/article/add', n('addArticle'), params)
-export const editArticle = (params) => request.post('/blog/article/add', n('editArticle'), params)
+export const editArticle = (params) => request.post('/blog/article/edit', n('editArticle'), params)
 export const changeReleaseStatus = (params) => request.post('/blog/article/changeReleaseStatus', n('changeReleaseStatus'), params)
+export const deleteArticle = (params) => request.post('/blog/article/delete', n('deleteArticle'), params)
 

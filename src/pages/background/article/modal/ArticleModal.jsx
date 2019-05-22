@@ -4,7 +4,7 @@ import { Form, Modal, Input, Radio, Row, Col, Checkbox } from 'antd'
 import Editor from '../../../../components/markdown'
 import marked from '../../../../components/markdown/helpers/marked'
 import handleCode from '../../../../components/markdown/helpers/handelCode'
-import { addArticle } from '../../../../modules/article'
+import { addArticle, editArticle } from '../../../../modules/article'
 import '../style/ArticleModal.less'
 import '../../../../components/markdown/editor/index.less'
 
@@ -45,7 +45,7 @@ const formItemLayoutContent = {
     categoryList: state.category.categoryList,
     labelList: state.label.labelList,
   }),
-  { addArticle },
+  { addArticle, editArticle },
   null,
   { forwardRef: true },
 )
@@ -141,7 +141,7 @@ class ArticleModal extends React.Component {
 
   onOk() {
     const { validateFieldsAndScroll, getFieldsValue } = this.props.form
-    const { addArticle, isEdit } = this.props
+    const { addArticle, isEdit, editArticle } = this.props
     validateFieldsAndScroll((err) => {
       const { htmlValue, editorValue, editData } = this.state 
       if (!err) {
@@ -161,15 +161,21 @@ class ArticleModal extends React.Component {
           release,
           type: 1,
         }
+
         if(isEdit) {
           param.id = editData.id
-        }
-
-        addArticle(param).then((res) => {
+          editArticle(param).then((res) => {
+            if (res instanceof Error) return
+            this.props.onOk()
+            this.setState({ htmlValue: null })
+          })
+        } else {
+          addArticle(param).then((res) => {
           if (res instanceof Error) return
           this.props.onOk()
           this.setState({ htmlValue: null })
         })
+        }
       } else {
          if(!htmlValue) {
           this.setState({ hasContentMessage: true })

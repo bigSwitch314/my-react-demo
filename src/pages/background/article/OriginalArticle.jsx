@@ -1,15 +1,16 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Table, Form, Switch, Row, Col, Input, Button, Select, DatePicker } from 'antd'
+import { Table, Form, Switch, Row, Col, Input, Button, Select, DatePicker, message } from 'antd'
 import OperatorIcons from 'components/shared/OperatorIcon'
 import Pagination from 'components/shared/Pagination'
 import HeaderBar from 'components/shared/HeaderBar'
+import { deleteConfirm, deleteBatchConfirm, removeArr } from 'components/shared/Confirm'
 import ArticleModal from './modal/ArticleModal'
 import './style/OriginalArticle.less'
 
 import { getCategoryList } from '../../../modules/category'
 import { getLabelList } from '../../../modules/label'
-import { getArticleList, changeReleaseStatus, getArticle } from '../../../modules/article'
+import { getArticleList, changeReleaseStatus, getArticle, deleteArticle } from '../../../modules/article'
 
 const FormItem = Form.Item
 const Option = Select.Option;
@@ -29,6 +30,7 @@ const { RangePicker } = DatePicker
     getArticleList,
     changeReleaseStatus,
     getArticle,
+    deleteArticle,
   }
 )
 class OriginalArticle extends React.Component {
@@ -83,6 +85,33 @@ class OriginalArticle extends React.Component {
     disabled: record.name === 'system',
     name: record.name,
   })
+
+   /** 批量删除 */
+  batchDelete = () => {
+    const { selectedRowKeys } = this.state;
+    deleteBatchConfirm(selectedRowKeys, () => this.deleteData(selectedRowKeys))
+  }
+
+  /** 删除弹框 */
+  showConfirm = (id) => {
+    deleteConfirm(() => this.deleteData(id))
+  }
+
+  /** 删除数据方法 */
+  deleteData = (id) => {
+    let idArr = []
+    id instanceof Array ? idArr = id : idArr.push(id)
+    this.props.deleteArticle({
+      id: idArr.join(','),
+    }).then((res) => {
+      if (res instanceof Error) return
+      message.success('删除成功', 1, () => {
+        this.getArticleList()
+      })
+      const selectedRowKeys = removeArr(this.state.selectedRowKeys, id)
+      this.setState({ selectedRowKeys })
+    })
+  }
 
   /** 文章弹窗显示（添加） */
   addArticle = () => {
@@ -285,10 +314,10 @@ class OriginalArticle extends React.Component {
         <hr className="line-hr" />
         <HeaderBar>
           <HeaderBar.Left>
-            <Button type="primary" onClick={() => this.addArticle()}>添加</Button>
+            <Button type="primary" onClick={this.addArticle.bind(this)}>添加</Button>
           </HeaderBar.Left>
           <HeaderBar.Left>
-            <Button onClick={null}>批量删除</Button>
+            <Button onClick={this.batchDelete.bind(this)}>批量删除</Button>
           </HeaderBar.Left>
         </HeaderBar>
         <Table
