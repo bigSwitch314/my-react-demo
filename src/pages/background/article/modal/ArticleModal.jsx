@@ -320,13 +320,13 @@ class ArticleModal extends React.Component {
 
         {/* markdown编辑器弹窗 */}
         <Modal
-          // width={1220}
           width={'100%'}
           height={'100%'}
           visible={editorVisible}
           onCancel={this.onEditorCancel}
           footer={null}
           closable={false}
+          maskClosable={false}
         >
           <Editor
             value={editorValue}

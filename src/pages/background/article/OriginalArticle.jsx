@@ -7,6 +7,7 @@ import HeaderBar from 'components/shared/HeaderBar'
 import { deleteConfirm, deleteBatchConfirm, removeArr } from 'components/shared/Confirm'
 import ArticleModal from './modal/ArticleModal'
 import PreviewModal from './modal/PreviewModal'
+import moment from 'moment'
 import './style/OriginalArticle.less'
 
 import { getCategoryList } from '../../../modules/category'
@@ -22,7 +23,8 @@ const { RangePicker } = DatePicker
 
 @connect(
   state => ({
-    categoryList: state.article.categoryList,
+    categoryList: state.category.categoryList,
+    labelList: state.label.labelList,
     articleList: state.article.articleList,
     loading: state.loading['article/getArticleList'],
   }), {
@@ -59,6 +61,8 @@ class OriginalArticle extends React.Component {
 
   componentDidMount() {
     this.getArticleList()
+    this.props.getCategoryList({})
+    this.props.getLabelList({})
   }
 
   // 获取文章
@@ -69,11 +73,38 @@ class OriginalArticle extends React.Component {
   // 获取文章列表
   getArticleList = () => {
     const { currentPage, pageSize } = this.state
+    const { getFieldsValue } = this.props.form
+    const { title='', category='', label=[], time, timeType=1 } = getFieldsValue()
+
+    const beginTime = time ? time[0].format('YYYY-MM-DD HH:mm:ss') : ''
+    const endTime = time ? time[1].format('YYYY-MM-DD HH:mm:ss') : ''
+
+    if (beginTime && endTime && moment(beginTime).valueOf() >= moment(endTime).valueOf()) {
+      message.error('结束时间必须大于开始时间')
+      return
+    }
     this.props.getArticleList({
       page_no: currentPage,
       page_size: pageSize,
       back_ground: 1,
+      category_id: category,
+      label_ids: label.join(','),
+      begin_time: beginTime,
+      end_time: endTime,
+      time_type: timeType,
+      title,
     })
+  }
+
+  handleQuery = (e) => {
+    e && e.preventDefault()
+    this.setState({ currentPage: 1 }, () => this.getArticleList())
+  }
+
+  handleReset = () => {
+    const { resetFields } = this.props.form
+    resetFields()
+    this.handleQuery()
   }
 
   /** 表格复选框选中 */
@@ -122,9 +153,6 @@ class OriginalArticle extends React.Component {
       visible: true,
       isEdit: false,
     })
-    this.props.getCategoryList({})
-    this.props.getLabelList({})
-
     this.articleModelRef.setFieldsValue(false, null)
   }
 
@@ -133,10 +161,10 @@ class OriginalArticle extends React.Component {
     this.getArticle(record.id).then(res => {
       if (res instanceof Error) return
       this.setState({
-        visible: true,
-        isEdit: true,
+        previewVisible: true,
       })
-      this.articleModelRef.setFieldsValue(true, res.payload)
+      console.log(this.previewModelRef)
+      this.previewModelRef.getRecord(res.payload)
     })
   }
 
@@ -150,8 +178,6 @@ class OriginalArticle extends React.Component {
       })
       this.articleModelRef.setFieldsValue(true, res.payload)
     })
-    this.props.getCategoryList({})
-    this.props.getLabelList({})
   }
 
   /** 保存文章  */
@@ -209,7 +235,7 @@ class OriginalArticle extends React.Component {
       previewVisible,
     } = this.state
     const { getFieldDecorator } = this.props.form
-    const { articleList = {}, loading } = this.props
+    const { articleList = {}, loading, categoryList, labelList } = this.props
 
     const columns = [{
       title: '序号',
@@ -279,20 +305,19 @@ class OriginalArticle extends React.Component {
                 )}
               </FormItem>
             </Col>
-            <Col span={5} style={{ left: '-2px' }}>
+            <Col span={5} style={{ left: '-6px' }}>
               <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 12 }} >
                 {getFieldDecorator('category', {
-                  rules: [{}],
                 })(
                   <Select placeholder="请选择分类" style={{ width: '180px' }}>
-                    <Option value="Zhejiang">php</Option>
-                    <Option value="Jiangsu">js</Option>
-                    <Option value="Jiangsu">redis</Option>
+                    {Object.keys(categoryList).length && categoryList.list.map(item => (
+                      <Option key={item.id} value={item.id}>{item.name}</Option>
+                    ))}
                   </Select>
                 )}
               </FormItem>
             </Col>
-            <Col span={5} style={{ left: '-4px' }}>
+            <Col span={5} style={{ left: '-12px' }}>
               <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 12 }} >
                 {getFieldDecorator('label', {
                   rules: [],
@@ -303,23 +328,23 @@ class OriginalArticle extends React.Component {
                     placeholder='请选择标签'
                     onChange={this.handleChange}
                   >
-                    {children}
+                    {Object.keys(labelList).length && labelList.list.map(item => (
+                      <Option key={item.id} value={item.id}>{item.name}</Option>
+                    ))}
                   </Select>,
                 )}
               </FormItem>
             </Col>
-            <Col span={8} style={{ left: '-6px' }}>
+            <Col span={7} style={{ left: '-18px' }}>
               <InputGroup compact style={{ width: '310px' }}>
                 <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 12 }} className='query-time' >
                   {getFieldDecorator('time', {
-                    rules: [{}],
                   })(
                     <RangePicker style={{ width: '210px' }} />
                   )}
                 </FormItem>
                 <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 12 }} className='query-time-type' >
-                  {getFieldDecorator('time2', {
-                    rules: [{}],
+                  {getFieldDecorator('timeType', {
                     initialValue: '1'
                   })(
                     <Select style={{ width: '100px' }}>
@@ -330,9 +355,14 @@ class OriginalArticle extends React.Component {
                 </FormItem>
               </InputGroup>
             </Col>
-            <Col span={1}>
+            <Col span={1} style={{ left: '21px' }}>
               <FormItem>
                 <Button type="primary" onClick={this.handleQuery}>查询</Button>
+              </FormItem>
+            </Col>
+            <Col span={1} style={{ left: '65px' }}>
+              <FormItem>
+                <Button onClick={this.handleReset}>重置</Button>
               </FormItem>
             </Col>
           </Row>
@@ -377,7 +407,7 @@ class OriginalArticle extends React.Component {
           visible={previewVisible}
           onOk={this.handlePreviewOk}
           onCancel={this.handlePreviewCancel}
-          wrappedComponentRef={(node) => this.previewModelRef = node}
+          ref={(node) => this.previewModelRef = node}
         />
       </div>
     )
