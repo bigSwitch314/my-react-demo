@@ -1,12 +1,12 @@
-import React from 'react'
-import { connect } from 'react-redux'
-import { Form, Modal, Input, Radio, Row, Col, Checkbox } from 'antd'
-import Editor from '../../../../components/markdown'
-import marked from '../../../../components/markdown/helpers/marked'
-import handleCode from '../../../../components/markdown/helpers/handelCode'
-import { addArticle, editArticle } from '../../../../modules/article'
-import '../style/ArticleModal.less'
-import '../../../../components/markdown/editor/index.less'
+import { Checkbox, Col, Form, Input, Modal, Radio, Row } from 'antd';
+import React from 'react';
+import { connect } from 'react-redux';
+import Editor from '@/components/markdown';
+import '@/components/markdown/editor/index.less';
+import handleCode from '@/components/markdown/helpers/handelCode';
+import marked from '@/components/markdown/helpers/marked';
+import { addArticle, editArticle } from '@/modules/article';
+import '../style/ArticleModal.less';
 
 const FormItem = Form.Item
 const RadioGroup = Radio.Group

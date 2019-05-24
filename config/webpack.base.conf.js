@@ -27,6 +27,7 @@ module.exports = {
     symlinks: false,
     extensions: ['.js', '.jsx', 'json'],
     alias: {
+      '@': SRC_PATH,
       pages: path.resolve(SRC_PATH, 'pages'),
       store: path.resolve(SRC_PATH, 'store'),
       images: path.resolve(SRC_PATH, 'assets/images'),

@@ -1,5 +1,21 @@
 {
   "compilerOptions": {
-    "experimentalDecorators": true
-  }
+    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "target": "es6",
+    "jsx": "react",
+    "module": "commonjs",
+    "paths": {
+      "@*": ["./src/*"],
+    }
+  },
+  "include": [
+    "src/**/*",
+    "public",
+  ],
+  "exclude": [
+      "node_modules",
+      "dist",
+      "config",
+  ]
 }
