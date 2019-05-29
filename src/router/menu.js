@@ -27,8 +27,8 @@ export const routerConfig = [
     children: [
       { path: 'originalArticle', name: '原创文章', component: OriginalArticle },
       { path: 'transshipmentArticle', name: '转载文章', component: TransshipmentArticle },
-      { path: 'authorIntroduction', name: '个人简介', component: AuthorIntroduction },
       { path: 'openSourceProject', name: '开源项目', component: OpenSourceProject },
+      { path: 'authorIntroduction', name: '个人简介', component: AuthorIntroduction },
     ],
   },
   {

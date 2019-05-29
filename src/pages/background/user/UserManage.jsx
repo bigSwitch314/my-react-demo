@@ -1,6 +1,8 @@
 import React from 'react'
 // import { Icon, Avatar } from 'antd'
+import TitleTabs from '@/components/shared/TitleTabs'
 
+const TabPane = TitleTabs.TabPane
 
 class UserManage extends React.Component {
   constructor(props) {
@@ -24,7 +26,16 @@ class UserManage extends React.Component {
 
   render() {
     return (
-      <div>用户管理</div>
+      <div className="container">
+        <TitleTabs type="card">
+          <TabPane tab="用户列表" key="1">
+            用户列表
+          </TabPane>
+          <TabPane tab="角色" key="2">
+            角色
+          </TabPane>
+        </TitleTabs>
+      </div>
     )
   }
 }

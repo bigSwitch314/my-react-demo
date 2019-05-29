@@ -39,7 +39,7 @@ const formItemLayoutContent = {
   },
 }
 
-// @Form.create()
+@Form.create()
 @connect(
   state => ({
     categoryList: state.category.categoryList,
@@ -80,8 +80,6 @@ class ArticleModal extends React.Component {
 
   setFieldsValue = (isEdit, editData) => {
     const { setFieldsValue } = this.props.form
-    console.log(isEdit)
-    console.log(editData)
     if(isEdit) {
       setFieldsValue({
         category: editData.category_id,
@@ -340,5 +338,6 @@ class ArticleModal extends React.Component {
   }
 }
 
-export default Form.create()(ArticleModal)
+// export default Form.create()(ArticleModal)
+export default ArticleModal
 

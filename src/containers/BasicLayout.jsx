@@ -45,8 +45,8 @@ class BasicLayout extends React.Component {
 
     const { routeMap, routesData } = getRoutesData(menuCodes)
     return {
-      menuData: getMenus('!/user', routesData),
-      normalRoutes: getRoutes(/^(?!user)/, routesData),
+      menuData: getMenus('!/userTest', routesData),
+      normalRoutes: getRoutes(/^(?!userTest)/, routesData),
       routeMap,
     }
   }

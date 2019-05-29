@@ -62,13 +62,11 @@ export function getRouteStack(url, routes) {
 
 export function getRoutes(path, routerData) {
   const newPath = typeof path === 'string' ? new RegExp(path) : path
-
   // remove the same path, root route has used  eg. has use path='/user' remove '/user'
   // Replace path to '' eg. path='user' /user/name => name
   const routes = routerData
     .filter(route => newPath.test(route.path))
     .map(item => item.path)
-
   // Get the route to be rendered to remove the deep rendering
   // getRenderArr(routes)
   // Conversion and stitching parameters
@@ -92,8 +90,7 @@ export function getMenus(path, routes) {
   } else {
     routes = routes.filter(items => items.path !== matchedPath)
   }
-
-  return routes.map(route => {
+  const res = routes.map(route => {
     if (!route.name) return null // 这里需要抛出警告
     if (!route.component) {
       return (
@@ -113,4 +110,6 @@ export function getMenus(path, routes) {
       </Menu.Item>
     )
   })
+
+  return res
 }
