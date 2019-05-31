@@ -1,6 +1,8 @@
 import React from 'react'
-// import { Icon, Avatar } from 'antd'
 import TitleTabs from '@/components/shared/TitleTabs'
+import './style/UserManage.less'
+import TabUser from './tabUser'
+import TabRole from './tabRole'
 
 const TabPane = TitleTabs.TabPane
 
@@ -29,10 +31,10 @@ class UserManage extends React.Component {
       <div className="container">
         <TitleTabs type="card">
           <TabPane tab="用户列表" key="1">
-            用户列表
+            <TabUser />
           </TabPane>
           <TabPane tab="角色" key="2">
-            角色
+            <TabRole />
           </TabPane>
         </TitleTabs>
       </div>
