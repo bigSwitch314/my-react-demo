@@ -2,7 +2,7 @@
  * @author fengyu
  */
 import React from 'react'
-import { Table, Button, Modal, Input, message, Form, Select } from 'antd'
+import { Table, Switch, Button, Modal, Input, message, Form, Select } from 'antd'
 // import { getUserList, postUser, deleteUser } from '../../modules/userManage'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -268,6 +268,12 @@ class UserList extends React.Component {
   render() {
     const { isEdit } = this.state
 
+    const testData = [
+      {name: 'admin', role: '管理员', mail: '280784436@qq.com', 'last_login_time': '2019-05-12 13:48'},
+      {name: 'admin2', role: '普通用户', mail: '222299999@qq.com', 'last_login_time': '2019-05-19 08:51'},
+      {name: 'system', role: '管理员', mail: '280784436@qq.com', 'last_login_time': '2019-05-12 13:48'},
+    ]
+
     const columns = [
       {
         title: '序号',
@@ -282,22 +288,26 @@ class UserList extends React.Component {
         dataIndex: 'name',
         key: 'name',
       }, {
-        title: '电话',
-        dataIndex: 'phone',
-        key: 'phone',
+        title: '角色',
+        dataIndex: 'role',
+        key: 'role',
       }, {
         title: '邮箱',
         dataIndex: 'mail',
         key: 'mail',
       }, {
-        title: '用户类型',
-        dataIndex: 'type',
-        key: 'type',
-        render: (type) => {
-          if (type === 0) return '管理员'
-          if (type === 1) return '操作员'
-          return ''
-        },
+        title: '最近登录时间',
+        dataIndex: 'last_login_time',
+        key: 'last_login_time',
+      }, {
+        title: '禁用/启用',
+        dataIndex: 'status',
+        render: (text, record) => (
+          <Switch
+            checked={!!record.status}
+            onChange={(checked) => this.changeSwitchStatus(checked, record)}
+          />
+        ),
       }, {
         title: '操作',
         dataIndex: 'operation',
@@ -352,7 +362,8 @@ class UserList extends React.Component {
             }}
             // loading={loading}
             columns={columns}
-            dataSource={records}
+            // dataSource={records}
+            dataSource={testData}
             rowKey={record => record.id}
             pagination={false}
           />

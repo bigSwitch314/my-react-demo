@@ -27,10 +27,12 @@ class OpenSourceProject extends React.Component {
 
   render() {
     return (
-      <Tabs defaultActiveKey="1" onChange={null}>
-        <TabPane tab="Tab 1" key="1">Content of Tab Pane 1</TabPane>
-        <TabPane tab="Tab 2" key="2">Content of Tab Pane 2</TabPane>
-      </Tabs>
+      <div className="container">
+        <Tabs defaultActiveKey="1" onChange={null}>
+          <TabPane tab="Tab 1" key="1">Content of Tab Pane 1</TabPane>
+          <TabPane tab="Tab 2" key="2">Content of Tab Pane 2</TabPane>
+        </Tabs>
+      </div>
     )
   }
 }

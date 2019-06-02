@@ -3,8 +3,10 @@ import TitleTabs from '@/components/shared/TitleTabs'
 import './style/UserManage.less'
 import TabUser from './tabUser'
 import TabRole from './tabRole'
+import { Tabs } from 'antd'
 
-const TabPane = TitleTabs.TabPane
+
+const TabPane = Tabs.TabPane
 
 class UserManage extends React.Component {
   constructor(props) {
@@ -29,14 +31,14 @@ class UserManage extends React.Component {
   render() {
     return (
       <div className="container">
-        <TitleTabs type="card">
-          <TabPane tab="用户列表" key="1">
+        <Tabs defaultActiveKey="1">
+          <TabPane tab="用户列表(12)" key="1">
             <TabUser />
           </TabPane>
-          <TabPane tab="角色" key="2">
+          <TabPane tab="角色(9)" key="2">
             <TabRole />
           </TabPane>
-        </TitleTabs>
+        </Tabs>
       </div>
     )
   }
