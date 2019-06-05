@@ -2,7 +2,7 @@
  * @author fengyu
  */
 import React from 'react'
-import { Table, Switch, Button, Modal, Input, message, Form, Checkbox, Col, Row, Radio } from 'antd'
+import { Table, Switch, Button, Modal, Input, message, Form, Select } from 'antd'
 // import { getUserList, postUser, deleteUser } from '../../modules/userManage'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -10,33 +10,22 @@ import OperatorIcons from '@/components/shared/OperatorIcon'
 import Pagination from '@/components/shared/Pagination'
 import HeaderBar from '@/components/shared/HeaderBar'
 import { deleteConfirm, deleteBatchConfirm, removeArr } from 'components/shared/Confirm'
-import { noSpecialChar, passwordValidate, REGEXP_MAIL } from '@/utils/validator'
+import { REGEXP_MAIL, REGEXP_YD_PHONE, REGEXP_GD_PHONE, passwordValidate, noSpecialChar } from '@/utils/validator'
 import './index.less'
 
-const CheckboxGroup = Checkbox.Group
-const RadioGroup = Radio.Group
-
 const formItemLayout = {
-  labelCol: { span: 4, offset: 0 },
-  wrapperCol: { span: 20, offset: 0 },
+  labelCol: {
+    xs: { span: 24 },
+    sm: { span: 7 },
+  },
+  wrapperCol: {
+    xs: { span: 24 },
+    sm: { span: 12 },
+  },
 }
 
-const roleOptions = [
-  {id: 1, name: '超级管理员'},
-  {id: 2, name: '普通管理员'},
-  {id: 3, name: '运营'},
-  {id: 4, name: '游客'},
-  {id: 5, name: '游客5'},
-  {id: 6, name: '游客6'},
-  {id: 7, name: '游客7'},
-  {id: 9, name: '游客9'},
-  {id: 10, name: '游客10'},
-  {id: 11, name: '游客11'},
-  {id: 12, name: '游客12'},
- 
-]
-
 const FormItem = Form.Item
+const Option = Select.Option
 
 @Form.create()
 @connect(
@@ -80,6 +69,17 @@ class UserList extends React.Component {
 
   componentDidMount() {
     this.getUserList()
+  }
+
+  // 操作员类型用户，无增删改用户权限
+  getCurrentUserAuth = () => {
+    const { type } = this.props.currentUser
+    if (Number(type) === 0) {
+      return true
+    } else {
+      message.error('没有操作权限')
+      return false
+    }
   }
 
   // 获取用户列表
@@ -134,6 +134,10 @@ class UserList extends React.Component {
   }
 
   editHandler = (record) => {
+    const auth = this.getCurrentUserAuth()
+    if (auth === false) {
+      return
+    }
     this.editData = record
     const { type, name, mail, phone } = record
     this.props.form.setFieldsValue({
@@ -152,6 +156,10 @@ class UserList extends React.Component {
   }
 
   addHandler = () => {
+    const auth = this.getCurrentUserAuth()
+    if (auth === false) {
+      return
+    }
     this.props.form.resetFields()
     this.setState({
       isEdit: false,
@@ -261,9 +269,9 @@ class UserList extends React.Component {
     const { isEdit } = this.state
 
     const testData = [
-      {id: 1, name: 'admin', role: '管理员', mail: '280784436@qq.com', 'last_login_time': '2019-05-12 13:48'},
-      {id: 2, name: 'admin2', role: '普通用户', mail: '222299999@qq.com', 'last_login_time': '2019-05-19 08:51'},
-      {id: 3, name: 'system', role: '管理员', mail: '280784436@qq.com', 'last_login_time': '2019-05-12 13:48'},
+      {name: 'admin', role: '管理员', mail: '280784436@qq.com', 'last_login_time': '2019-05-12 13:48'},
+      {name: 'admin2', role: '普通用户', mail: '222299999@qq.com', 'last_login_time': '2019-05-19 08:51'},
+      {name: 'system', role: '管理员', mail: '280784436@qq.com', 'last_login_time': '2019-05-12 13:48'},
     ]
 
     const columns = [
@@ -334,7 +342,6 @@ class UserList extends React.Component {
       records = userList.records
       total = userList.total
     }
-    console.log(loading, records)
 
     return (
       <React.Fragment>
@@ -371,20 +378,46 @@ class UserList extends React.Component {
           <Modal
             title={isEdit ? '用户管理-编辑' : '用户管理-添加'}
             visible={visible}
-            width={740}
+            width={560}
             maskClosable={false}
             onCancel={this.onCancel}
             onOk={() => this.onOk(isEdit)}
+            className="userModalSty"
           >
-            <div>
+            <div style={{ position: 'relative', paddingLeft: '38px' }}>
               <FormItem
-                label="账号"
+                label="用户类型"
                 {...formItemLayout}
+                className="form-item"
+                style={{ marginBottom: '14px' }}
+              >
+                {getFieldDecorator('userType', {
+                  rules: [{
+                    type: 'number',
+                    required: true,
+                    message: '请选择用户类型!',
+                    whitespace: true,
+                  }],
+                })(
+                  <Select
+                    placeholder="请选择"
+                    style={{ width: '224px' }}
+                    disabled={isEdit && this.editData.name === 'system'}
+                  >
+                    <Option value={0}>管理员</Option>
+                    <Option value={1}>操作员</Option>
+                  </Select>,
+                )}
+              </FormItem>
+              <FormItem
+                label="用户姓名"
+                {...formItemLayout}
+                style={{ marginBottom: '14px' }}
               >
                 {getFieldDecorator('userName', {
                   rules: [{
                     required: true,
-                    message: '请输入账号',
+                    message: '请输入用户姓名',
                     whitespace: true,
                   }, {
                     message: '不能超过50个字符',
@@ -393,7 +426,7 @@ class UserList extends React.Component {
                 })(
                   <Input
                     type="text"
-                    style={{ width: 360 }}
+                    style={{ width: '224px' }}
                     disabled={isEdit && this.editData.name === 'system'}
                   />,
                 )}
@@ -401,6 +434,7 @@ class UserList extends React.Component {
               <FormItem
                 label="登录密码"
                 {...formItemLayout}
+                style={{ marginBottom: '14px' }}
               >
                 {getFieldDecorator('password', {
                   rules: [
@@ -411,12 +445,13 @@ class UserList extends React.Component {
                   ],
                   initialValue: '',
                 })(
-                  <Input type="password" style={{ width: 360 }} />,
+                  <Input type="password" style={{ width: '224px' }} />,
                 )}
               </FormItem>
               <FormItem
                 label="确认密码"
                 {...formItemLayout}
+                style={{ marginBottom: '14px' }}
               >
                 {getFieldDecorator('confirm', {
                   rules: [
@@ -425,12 +460,13 @@ class UserList extends React.Component {
                   ],
                   initialValue: '',
                 })(
-                  <Input type="password" style={{ width: 360 }} onBlur={this.handleConfirmBlur} />,
+                  <Input type="password" style={{ width: '224px' }} onBlur={this.handleConfirmBlur} />,
                 )}
               </FormItem>
               <FormItem
                 label="电子邮箱"
                 {...formItemLayout}
+                style={{ marginBottom: '14px' }}
               >
                 {getFieldDecorator('mail', {
                   rules: [
@@ -438,53 +474,24 @@ class UserList extends React.Component {
                   ],
                   initialValue: '',
                 })(
-                  <Input type="text" style={{ width: 360 }} maxLength="200" />,
+                  <Input type="text" style={{ width: '224px' }} maxLength="200" />,
                 )}
               </FormItem>
               <FormItem
-              label="角色"
-              {...formItemLayout}
-            >
-              {getFieldDecorator('label', {
-                rules: [{
-                  required: false,
-                }],
-              })(
-                <CheckboxGroup
-                  onChange={this.onLabelChange}
-                >
-                  <Row>
-                    {roleOptions.map(item => (
-                      <Col key={item.id} span={5} style={{ height: 30 }}>
-                        <Checkbox value={item.id}>
-                          {item.name}
-                        </Checkbox>
-                      </Col>
-                    ))}
-                  </Row>
-                </CheckboxGroup>,
-              )}
-            </FormItem>
-            <FormItem
-              label="是否启用"
-              {...formItemLayout}
-            >
-              {getFieldDecorator('release', {
-                rules: [{
-                  required: true,
-                  message: '请选择类型',
-                  whitespace: true,
-                  type: 'number',
-                }],
-              })(
-                <RadioGroup
-                  onChange={this.onTypeChange}
-                >
-                  <Radio value={1}>是</Radio>
-                  <Radio value={0}>否</Radio>
-                </RadioGroup>,
-              )}
-            </FormItem> 
+                label="联系电话"
+                {...formItemLayout}
+                style={{ marginBottom: '14px' }}
+              >
+                {getFieldDecorator('phone', {
+                  rules: [{
+                    pattern: REGEXP_YD_PHONE || REGEXP_GD_PHONE,
+                    message: '请输入11位手机号码或固定电话（区号-电话，如010-88888888）',
+                  }],
+                  initialValue: '',
+                })(
+                  <Input type="text" style={{ width: '224px' }} />,
+                )}
+              </FormItem>
             </div>
           </Modal>
         </div>

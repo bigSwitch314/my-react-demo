@@ -1,5 +1,4 @@
 import React from 'react'
-import TitleTabs from '@/components/shared/TitleTabs'
 import './style/UserManage.less'
 import TabUser from './tabUser'
 import TabRole from './tabRole'
