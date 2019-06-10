@@ -34,11 +34,11 @@ class UserManage extends React.Component {
   }
 
   render() {
-    const { count = '' } = this.props.userList
+    const { count = 0 } = this.props.userList
     return (
       <div className="container">
         <Tabs defaultActiveKey="1">
-          <TabPane tab={`用户列表${count}`} key="1">
+          <TabPane tab={`用户列表(${count})`} key="1">
             <TabUser />
           </TabPane>
           <TabPane tab="角色(9)" key="2">

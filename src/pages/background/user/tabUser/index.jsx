@@ -1,9 +1,6 @@
-/**
- * @author fengyu
- */
 import React from 'react'
 import { Table, Switch, Button, Modal, Input, message, Form, Checkbox, Col, Row, Radio } from 'antd'
-import { addUser, getUserList, changeStatus, deleteUser } from '@/modules/user'
+import { addUser, getUserList, changeStatus, deleteUser, editUser } from '@/modules/user'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import OperatorIcons from '@/components/shared/OperatorIcon'
@@ -48,6 +45,7 @@ const FormItem = Form.Item
   dispatch => bindActionCreators({
     getUserList,
     addUser,
+    editUser,
     changeStatus,
     deleteUser,
   }, dispatch),
@@ -110,35 +108,35 @@ class UserList extends React.Component {
    
     if(isEdit) {
       param.id = this.editData.id
+      this.props.editUser(param).then((res) => {
+        if (res instanceof Error) return
+        message.success('修改成功', 1, () => {
+          this.setState({ currentPage: 1 }, this.getUserList)
+          this.setState({ visible: false })
+          this.editData = {}
+        })
+      })
+    } else {
+      this.props.addUser(param).then((res) => {
+        if (res instanceof Error) return
+        message.success('修改成功', 1, () => {
+          this.setState({ currentPage: 1 }, this.getUserList)
+          this.setState({ visible: false })
+        })
+      })
     }
-    
-    this.props.addUser(param).then((res) => {
-      if (res instanceof Error) return
-      this.setState({ currentPage: 1 }, this.getUserList)
-      this.setState({ visible: false })
-      this.editData = {}
-    })
-  }
-
-  // 删除用户
-  deleteUser = () => {
-    // const { currentPage, pageSize } = this.state
-    // this.props.deleteUser({
-    //   current: currentPage,
-    //   size: pageSize,
-    // })
   }
 
   editHandler = (record) => {
     this.editData = record
-    const { type, name, mail, phone } = record
+    const { username: userName, email: mail, role=[1, 2], status } = record
     this.props.form.setFieldsValue({
-      userType: type,
-      userName: name,
+      userName,
+      password: null,
+      confirm: null,
       mail,
-      phone,
-      password: '',
-      confirm: '',
+      role,
+      status,
     })
   
     this.setState({
@@ -299,7 +297,7 @@ class UserList extends React.Component {
         dataIndex: 'last_login_time',
         key: 'last_login_time',
       }, {
-        title: '禁用/启用',
+        title: '启用/禁用',
         dataIndex: 'status',
         render: (text, record) => (
           <Switch
@@ -313,7 +311,7 @@ class UserList extends React.Component {
         key: 'operation',
         width: 150,
         render: (text, record) => (
-          record.name === 'system' ?
+          record.username === 'system' ?
             <OperatorIcons>
               <OperatorIcons.Icon title="编辑" type="edit" onClick={() => this.editHandler(record)} />
             </OperatorIcons> :
@@ -356,7 +354,7 @@ class UserList extends React.Component {
             onShowSizeChange={this.onShowSizeChange}
           />
           <Modal
-            title={isEdit ? '用户管理-编辑' : '用户管理-添加'}
+            title={isEdit ? '编辑用户' : '添加用户'}
             visible={visible}
             width={740}
             maskClosable={false}
