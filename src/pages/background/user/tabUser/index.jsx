@@ -3,7 +3,7 @@
  */
 import React from 'react'
 import { Table, Switch, Button, Modal, Input, message, Form, Checkbox, Col, Row, Radio } from 'antd'
-// import { getUserList, postUser, deleteUser } from '../../modules/userManage'
+import { addUser, getUserList, changeStatus, deleteUser } from '@/modules/user'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import OperatorIcons from '@/components/shared/OperatorIcon'
@@ -41,15 +41,15 @@ const FormItem = Form.Item
 @Form.create()
 @connect(
   state => ({
-    userList: [],
-    loading: true,
+    userList: state.user.userList,
+    loading: state.loading['user/getUserList'],
     currentUser: [state],
   }),
   dispatch => bindActionCreators({
-    // getUserList,
-    // postUser,
-    // deleteUser,
-    // fetSelectData,
+    getUserList,
+    addUser,
+    changeStatus,
+    deleteUser,
   }, dispatch),
 )
 
@@ -84,44 +84,40 @@ class UserList extends React.Component {
 
   // 获取用户列表
   getUserList = () => {
-    // const { currentPage, pageSize } = this.state
-    // this.props.getUserList({
-    //   current: currentPage,
-    //   size: pageSize,
-    // })
+    const { currentPage, pageSize } = this.state
+    this.props.getUserList({
+      page_no: currentPage,
+      page_size: pageSize,
+    })
   }
 
   // 添加或编辑用户
-  postUser = () => {
-    // const { getFieldsValue } = this.props.form
-    // const { userType, userName, password, confirm: confirmPassword, mail, phone } = getFieldsValue()
-    // const divisionValue = this.state.divisionValue
-    // if (password && password !== confirmPassword) {
-    //   message.error('登录密码与确认密码不一致')
-    //   return
-    // }
-    // let code = ''
-    // for (let i = 2; i >= 0; i--) {
-    //   if (divisionValue && divisionValue[i] && divisionValue[i].selected) {
-    //     code = divisionValue[i].code
-    //     break
-    //   }
-    // }
-    // const id = this.editData.id
-    // this.props.postUser({
-    //   id,
-    //   type: userType,
-    //   name: userName,
-    //   password: password || '',
-    //   xzqhdm: code,
-    //   mail: mail || '',
-    //   phone: phone || '',
-    // }).then((res) => {
-    //   if (res instanceof Error) return
-    //   this.setState({ currentPage: 1 }, this.getUserList)
-    //   this.setState({ visible: false })
-    //   this.editData = {}
-    // })
+  addUser = (isEdit) => {
+    const { getFieldsValue } = this.props.form
+    const { userName, password, confirm: confirmPassword, mail, role, status } = getFieldsValue()
+    if (password && password !== confirmPassword) {
+      message.error('登录密码与确认密码不一致')
+      return
+    }
+
+    const param = {
+      username: userName,
+      password,
+      email: mail,
+      role,
+      status,
+    }
+   
+    if(isEdit) {
+      param.id = this.editData.id
+    }
+    
+    this.props.addUser(param).then((res) => {
+      if (res instanceof Error) return
+      this.setState({ currentPage: 1 }, this.getUserList)
+      this.setState({ visible: false })
+      this.editData = {}
+    })
   }
 
   // 删除用户
@@ -152,7 +148,10 @@ class UserList extends React.Component {
   }
 
   addHandler = () => {
-    this.props.form.resetFields()
+    const { resetFields, setFieldsValue } = this.props.form
+    resetFields()
+    setFieldsValue({ status: 1 })
+
     this.setState({
       isEdit: false,
       visible: true,
@@ -168,7 +167,7 @@ class UserList extends React.Component {
   onOk = (isEdit) => {
     this.props.form.validateFieldsAndScroll((err) => {
       if (!err) {
-        this.postUser(isEdit)
+        this.addUser(isEdit)
       }
     })
   }
@@ -194,22 +193,24 @@ class UserList extends React.Component {
     name: record.name,
   })
 
+  changeSwitchStatus = (checked, record) => {
+    this.props.changeStatus({
+      id: record.id,
+      status: Number(checked),
+    }).then(res => {
+      if (res instanceof Error) return
+      this.getUserList()
+    })
+  }
+
   /** 批量删除 */
   batchDelete = () => {
-    const auth = this.getCurrentUserAuth()
-    if (auth === false) {
-      return
-    }
     const { selectedRowKeys } = this.state;
     deleteBatchConfirm(selectedRowKeys, () => this.deleteData(selectedRowKeys))
   }
 
   /** 删除弹框 */
   showConfirm = (id) => {
-    const auth = this.getCurrentUserAuth()
-    if (auth === false) {
-      return
-    }
     deleteConfirm(() => this.deleteData(id))
   }
 
@@ -218,7 +219,7 @@ class UserList extends React.Component {
     let idArr = []
     id instanceof Array ? idArr = id : idArr.push(id)
     this.props.deleteUser({
-      ids: idArr,
+      id: idArr.join(','),
     }).then((res) => {
       if (res instanceof Error) return
       message.success('删除成功', 1, () => {
@@ -258,13 +259,16 @@ class UserList extends React.Component {
   }
 
   render() {
-    const { isEdit } = this.state
+    const {
+      visible,
+      currentPage,
+      pageSize,
+      selectedRowKeys,
+      isEdit,
+    } = this.state
 
-    const testData = [
-      {id: 1, name: 'admin', role: '管理员', mail: '280784436@qq.com', 'last_login_time': '2019-05-12 13:48'},
-      {id: 2, name: 'admin2', role: '普通用户', mail: '222299999@qq.com', 'last_login_time': '2019-05-19 08:51'},
-      {id: 3, name: 'system', role: '管理员', mail: '280784436@qq.com', 'last_login_time': '2019-05-12 13:48'},
-    ]
+    const { userList, loading } = this.props
+    const { getFieldDecorator } = this.props.form
 
     const columns = [
       {
@@ -277,15 +281,18 @@ class UserList extends React.Component {
         },
       }, {
         title: '姓名',
-        dataIndex: 'name',
+        dataIndex: 'username',
         key: 'name',
       }, {
         title: '角色',
         dataIndex: 'role',
         key: 'role',
+        render() {
+          return ('管理员')
+        },
       }, {
         title: '邮箱',
-        dataIndex: 'mail',
+        dataIndex: 'email',
         key: 'mail',
       }, {
         title: '最近登录时间',
@@ -317,25 +324,6 @@ class UserList extends React.Component {
         ),
       }]
 
-    const {
-      visible,
-      currentPage,
-      pageSize,
-      selectedRowKeys,
-      userList,
-    } = this.state
-
-    const { loading } = this.props
-    const { getFieldDecorator } = this.props.form
-
-    let records = []
-    let total = 0
-    if (Object.keys(userList)) {
-      records = userList.records
-      total = userList.total
-    }
-    console.log(loading, records)
-
     return (
       <React.Fragment>
         <div className="content-div">
@@ -353,10 +341,9 @@ class UserList extends React.Component {
               onChange: this.onSelectChange,
               getCheckboxProps: this.getCheckboxProps,
             }}
-            // loading={loading}
+            loading={loading}
             columns={columns}
-            // dataSource={records}
-            dataSource={testData}
+            dataSource={userList.list || []}
             rowKey={record => record.id}
             pagination={false}
           />
@@ -364,7 +351,7 @@ class UserList extends React.Component {
             current={currentPage}
             pageSize={pageSize}
             pageSizeOptions={['5', '10', '15', '20']}
-            total={total}
+            total={userList.count || 0}
             onChange={this.changePage}
             onShowSizeChange={this.onShowSizeChange}
           />
@@ -438,14 +425,14 @@ class UserList extends React.Component {
                   ],
                   initialValue: '',
                 })(
-                  <Input type="text" style={{ width: 360 }} maxLength="200" />,
+                  <Input type="text" style={{ width: 360 }} maxLength={200} />,
                 )}
               </FormItem>
               <FormItem
               label="角色"
               {...formItemLayout}
             >
-              {getFieldDecorator('label', {
+              {getFieldDecorator('role', {
                 rules: [{
                   required: false,
                 }],
@@ -469,7 +456,7 @@ class UserList extends React.Component {
               label="是否启用"
               {...formItemLayout}
             >
-              {getFieldDecorator('release', {
+              {getFieldDecorator('status', {
                 rules: [{
                   required: true,
                   message: '请选择类型',
