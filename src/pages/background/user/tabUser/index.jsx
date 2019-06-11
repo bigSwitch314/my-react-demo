@@ -119,7 +119,7 @@ class UserList extends React.Component {
     } else {
       this.props.addUser(param).then((res) => {
         if (res instanceof Error) return
-        message.success('修改成功', 1, () => {
+        message.success('添加成功', 1, () => {
           this.setState({ currentPage: 1 }, this.getUserList)
           this.setState({ visible: false })
         })
@@ -187,8 +187,8 @@ class UserList extends React.Component {
   }
 
   getCheckboxProps = record => ({
-    disabled: record.name === 'system',
-    name: record.name,
+    disabled: record.username === 'system',
+    name: record.username,
   })
 
   changeSwitchStatus = (checked, record) => {
@@ -221,7 +221,15 @@ class UserList extends React.Component {
     }).then((res) => {
       if (res instanceof Error) return
       message.success('删除成功', 1, () => {
-        this.getUserList()
+        const { currentPage, pageSize, userList = {} } = this.state
+        const totalPage = Math.ceil((userList.count - idArr.length) / pageSize)
+        if (currentPage > totalPage) {
+          this.setState({ currentPage: 1 }, () => {
+            this.getUserList()
+          })
+        } else {
+          this.getUserList()
+        }
       })
       const selectedRowKeys = removeArr(this.state.selectedRowKeys, id)
       this.setState({ selectedRowKeys })
@@ -418,8 +426,14 @@ class UserList extends React.Component {
                 {...formItemLayout}
               >
                 {getFieldDecorator('mail', {
-                  rules: [
-                    { pattern: new RegExp(REGEXP_MAIL), message: '请输入正确电子邮件' },
+                  rules: [{
+                      required: true,
+                      message: '请输入账号',
+                      whitespace: true,
+                    }, { 
+                      pattern: new RegExp(REGEXP_MAIL), 
+                      message: '请输入正确电子邮件'
+                    },
                   ],
                   initialValue: '',
                 })(

@@ -72,32 +72,39 @@ const methods = ['POST', 'PUT', 'DELETE', 'GET']
 
 function handleCode(code, desc) {
   let msg = ''
-  switch (code) {
-    case -1: {
-      msg = desc || '返回失败'
-      const error = new Error(msg)
-      error.name = 'request error'
-      message.error(desc)
-      throw error
-    }
-    case -2: {
-      msg = desc || '缺少必传参数'
-      const error = new Error(msg)
-      error.name = 'request error'
-      message.error(desc)
-      throw error
-    }
-    case -3: {
-      msg = desc || '服务器内部错误'
-      const error = new Error(msg)
-      error.name = 'request error'
-      message.error(desc)
-      throw error
-    }
-    default: {
-      break
-    }
+  if (code !==0) {
+    msg = desc || '网络错误'
+    const error = new Error(msg)
+    error.name = 'request error'
+    message.error(desc)
+    throw error
   }
+  // switch (code) {
+  //   case -1: {
+  //     msg = desc || '返回失败'
+  //     const error = new Error(msg)
+  //     error.name = 'request error'
+  //     message.error(desc)
+  //     throw error
+  //   }
+  //   case -2: {
+  //     msg = desc || '缺少必传参数'
+  //     const error = new Error(msg)
+  //     error.name = 'request error'
+  //     message.error(desc)
+  //     throw error
+  //   }
+  //   case -3: {
+  //     msg = desc || '服务器内部错误'
+  //     const error = new Error(msg)
+  //     error.name = 'request error'
+  //     message.error(desc)
+  //     throw error
+  //   }
+  //   default: {
+  //     break
+  //   }
+  // }
 }
 
 function request(url, options, shouldValidate = true) {
