@@ -9,17 +9,21 @@ export default {
     getCategoryList(state, { payload }) {
       return ({ ...state, categoryList: payload })
     },
-    // postUser(state) {
-    //   return ({ ...state })
-    // },
-    // deleteUser(state) {
-    //   return ({ ...state })
-    // },
+    addCategory(state) {
+      return ({ ...state })
+    },
+    editCategory(state) {
+      return ({ ...state })
+    },
+    deleteCategory(state) {
+      return ({ ...state })
+    },
   },
 }
 
 const n = (name) => `category/${name}`
 
 export const getCategoryList = (params) => request.get('/blog/category/get', n('getCategoryList'), params)
-// export const postUser = (params) => request.post('/user', n('postUser'), params)
-// export const deleteUser = (params) => request.delete('/user', n('deleteUser'), params)
+export const addCategory = (params) => request.post('/blog/category/add', n('addCategory'), params)
+export const editCategory = (params) => request.post('/blog/category/edit', n('editCategory'), params)
+export const deleteCategory = (params) => request.post('/blog/category/delete', n('deleteCategory'), params)

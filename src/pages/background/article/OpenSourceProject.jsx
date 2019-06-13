@@ -1,8 +1,6 @@
 import React from 'react'
-import { Tabs } from 'antd'
+// import { Tabs } from 'antd'
 import './style/OpenSourceProject.less'
-
-const TabPane = Tabs.TabPane;
 
 
 class OpenSourceProject extends React.Component {
@@ -28,10 +26,7 @@ class OpenSourceProject extends React.Component {
   render() {
     return (
       <div className="container">
-        <Tabs defaultActiveKey="1" onChange={null}>
-          <TabPane tab="Tab 1" key="1">Content of Tab Pane 1</TabPane>
-          <TabPane tab="Tab 2" key="2">Content of Tab Pane 2</TabPane>
-        </Tabs>
+        开源项目
       </div>
     )
   }
