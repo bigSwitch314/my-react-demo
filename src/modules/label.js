@@ -9,17 +9,21 @@ export default {
     getLabelList(state, { payload }) {
       return ({ ...state, labelList: payload })
     },
-    // postUser(state) {
-    //   return ({ ...state })
-    // },
-    // deleteUser(state) {
-    //   return ({ ...state })
-    // },
+    addLabel(state) {
+      return ({ ...state })
+    },
+    editLabel(state) {
+      return ({ ...state })
+    },
+    deleteLabel(state) {
+      return ({ ...state })
+    },
   },
 }
 
 const n = (name) => `label/${name}`
 
 export const getLabelList = (params) => request.get('/blog/label/get', n('getLabelList'), params)
-// export const postUser = (params) => request.post('/user', n('postUser'), params)
-// export const deleteUser = (params) => request.delete('/user', n('deleteUser'), params)
+export const addLabel = (params) => request.post('/blog/label/add', n('addLabel'), params)
+export const editLabel = (params) => request.post('/blog/label/edit', n('editLabel'), params)
+export const deleteLabel = (params) => request.post('/blog/label/delete', n('deleteLabel'), params)
