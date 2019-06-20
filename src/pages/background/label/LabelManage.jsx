@@ -1,5 +1,5 @@
 import React from 'react'
-import { Table, Button, Modal, Input, message, Form } from 'antd'
+import { Table, Button, Modal, Input, message, Form, Select } from 'antd'
 import { getLabelList, addLabel, editLabel, deleteLabel } from '@/modules/label'
 import { connect } from 'react-redux'
 import OperatorIcons from '@/components/shared/OperatorIcon'
@@ -15,6 +15,7 @@ const formItemLayout = {
 }
 
 const FormItem = Form.Item
+const Option = Select.Option;
 
 @Form.create()
 @connect(
@@ -71,9 +72,9 @@ class LabelManage extends React.Component {
   // 添加或编辑分类
   addLabel = (isEdit) => {
     const { getFieldsValue } = this.props.form
-    const { name } = getFieldsValue()
+    const { name, labelSizeLevel } = getFieldsValue()
 
-    const param = { name }
+    const param = { name, size: labelSizeLevel }
    
     if(isEdit) {
       param.id = this.editData.id
@@ -99,8 +100,8 @@ class LabelManage extends React.Component {
   editHandler = (record) => {
     this.editData = record
     console.log(record)
-    const { name } = record
-    this.props.form.setFieldsValue({ name })
+    const { name, size } = record
+    this.props.form.setFieldsValue({ name, labelSizeLevel: size })
   
     this.setState({
       isEdit: true,
@@ -286,6 +287,27 @@ class LabelManage extends React.Component {
                     type="text"
                     style={{ width: 360 }}
                   />,
+                )}
+              </FormItem>
+              <FormItem
+                label="显示级别"
+                {...formItemLayout}
+              >
+                {getFieldDecorator('labelSizeLevel', {
+                   rules: [{
+                    required: true,
+                    message: '请选择显示级别',
+                    whitespace: true,
+                    type: 'number',
+                  }],
+                })(
+                  <Select placeholder="请选择显示级别" style={{ width: 360 }}>
+                    <Option key={1} value={1}>size_level_1</Option>
+                    <Option key={2} value={2}>size_level_2</Option>
+                    <Option key={3} value={3}>size_level_3</Option>
+                    <Option key={4} value={4}>size_level_4</Option>
+                    <Option key={5} value={5}>size_level_5</Option>
+                  </Select>
                 )}
               </FormItem>
             </div>
