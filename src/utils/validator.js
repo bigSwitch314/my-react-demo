@@ -65,7 +65,7 @@ export const REGEXP_IDCARD = /^(\d{18,18}|\d{15,15}|\d{17,17}x)$/
 // }
 
 export const noSpecialChar = {
-  pattern: /^[a-zA-Z0-9\u4e00-\u9fa5_.]+$/, 
+  pattern: /^[a-zA-Z0-9\u4e00-\u9fa5_.]+$/,
   message: '中英文，数字，点和下划线',
 }
 

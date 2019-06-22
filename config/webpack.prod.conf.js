@@ -3,14 +3,14 @@ const baseWebpackConfig = require('./webpack.base.conf')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
-const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 
 
 module.exports = merge(baseWebpackConfig, {
   mode: 'production',
   output: {
-    filename: "js/[name].[chunkhash:16].js",
+    filename: 'js/[name].[chunkhash:16].js',
   },
   plugins: [
     new HtmlWebpackPlugin({

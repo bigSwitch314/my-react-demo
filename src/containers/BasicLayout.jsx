@@ -1,6 +1,6 @@
 import React from 'react'
 import {Route, Link, Switch, Redirect} from 'react-router-dom'
-import { Layout, Menu,  Avatar } from 'antd'
+import { Layout, Menu, Avatar } from 'antd'
 import { getRoutesData } from '../router/menu'
 import { getMenus, getRoutes, getParentKey, getCurrentRoute } from '../router/utils'
 

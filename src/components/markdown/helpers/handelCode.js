@@ -11,8 +11,8 @@ function handleCode(str) {
       code.push('<div class="line">' + '&nbsp;' + item + '</div>');
       gutter.push('<div class="line">' + ++index + '</div>');
     });
-  
-    return  '<code>' +
+
+    return '<code>' +
               '<table style="background:#f7f7f7;width:100%">' +
                   '<tr style="border: none">'+
                     '<td style="border:none; background-color: #eff2f3; text-align: center; width: 24px">' +

@@ -75,7 +75,7 @@ class ArticleModal extends React.Component {
   }
 
   componentDidMount() {
- 
+
   }
 
   setFieldsValue = (isEdit, editData) => {
@@ -110,7 +110,6 @@ class ArticleModal extends React.Component {
     });
   }
 
-  
   onEditorChange(value) {
     this.setState({ editorValue: value })
   }
@@ -141,13 +140,13 @@ class ArticleModal extends React.Component {
     const { validateFieldsAndScroll, getFieldsValue } = this.props.form
     const { addArticle, isEdit, editArticle } = this.props
     validateFieldsAndScroll((err) => {
-      const { htmlValue, editorValue, editData } = this.state 
+      const { htmlValue, editorValue, editData } = this.state
       if (!err) {
         if(!htmlValue) {
           this.setState({ hasContentMessage: true })
           return
         }
-        
+
         // 保存文章
         const { title, category, label, release } = getFieldsValue()
         const param = {
@@ -292,7 +291,7 @@ class ArticleModal extends React.Component {
                   <Radio value={0}>否</Radio>
                 </RadioGroup>,
               )}
-            </FormItem> 
+            </FormItem>
             <span className='edit' onClick={() => this.showEditor()}>编辑</span>
             <FormItem
               label='内容'
@@ -305,7 +304,7 @@ class ArticleModal extends React.Component {
                 }],
                 initialValue: ' ',
               })(
-                <div 
+                <div
                   className='content for-preview for-markdown-preview'
                   style={{ borderColor: hasContentMessage ? '#f5222d' : '#d9d9d9' }}
                   dangerouslySetInnerHTML={{ __html: handleCode(htmlValue) }}

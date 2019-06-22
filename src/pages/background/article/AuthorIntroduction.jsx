@@ -26,7 +26,7 @@ class AuthorIntroduction extends React.Component {
   }
 
   componentDidMount() {
-    const value = 
+    const value =
 `# 个人简介
 罗强<br/>
 QQ：2807884436<br/>
@@ -57,8 +57,8 @@ Email: luoqiang314@gmail.com<br/>
 * Ubuntu
 `
     this.setState({
-      value, 
-      htmlValue: handleCode(marked(value)) 
+      value,
+      htmlValue: handleCode(marked(value))
     })
   }
 
@@ -93,7 +93,7 @@ Email: luoqiang314@gmail.com<br/>
           </HeaderBar>
         </div>
 
-        <div 
+        <div
           className="content for-preview for-markdown-preview"
           dangerouslySetInnerHTML={{ __html: handleCode(htmlValue) }}
         />

@@ -159,7 +159,7 @@ class OriginalArticle extends React.Component {
   /** 预览文章 */
   preview(record) {
     this.getArticle(record.id).then(res => {
-      if (res instanceof Error) { return } 
+      if (res instanceof Error) { return }
       this.setState({
         previewVisible: true,
       })

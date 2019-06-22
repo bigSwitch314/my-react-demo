@@ -74,7 +74,7 @@ class CategoryManage extends React.Component {
     const { name } = getFieldsValue()
 
     const param = { name }
-   
+
     if(isEdit) {
       param.id = this.editData.id
       this.props.editCategory(param).then((res) => {
@@ -101,7 +101,7 @@ class CategoryManage extends React.Component {
     console.log(record)
     const { name } = record
     this.props.form.setFieldsValue({ name })
-  
+
     this.setState({
       isEdit: true,
       visible: true,

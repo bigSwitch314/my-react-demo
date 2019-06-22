@@ -30,7 +30,6 @@ const roleOptions = [
   {id: 10, name: '游客10'},
   {id: 11, name: '游客11'},
   {id: 12, name: '游客12'},
- 
 ]
 
 const FormItem = Form.Item
@@ -105,7 +104,7 @@ class UserList extends React.Component {
       role,
       status,
     }
-   
+
     if(isEdit) {
       param.id = this.editData.id
       this.props.editUser(param).then((res) => {
@@ -138,7 +137,7 @@ class UserList extends React.Component {
       role,
       status,
     })
-  
+
     this.setState({
       isEdit: true,
       visible: true,

@@ -75,7 +75,7 @@ class LabelManage extends React.Component {
     const { name, labelSizeLevel } = getFieldsValue()
 
     const param = { name, size: labelSizeLevel }
-   
+
     if(isEdit) {
       param.id = this.editData.id
       this.props.editLabel(param).then((res) => {
@@ -102,7 +102,7 @@ class LabelManage extends React.Component {
     console.log(record)
     const { name, size } = record
     this.props.form.setFieldsValue({ name, labelSizeLevel: size })
-  
+
     this.setState({
       isEdit: true,
       visible: true,

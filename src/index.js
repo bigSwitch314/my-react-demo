@@ -6,6 +6,8 @@ import { Provider } from 'react-redux'
 import { LocaleProvider } from 'antd'
 import zhCN from 'antd/lib/locale-provider/zh_CN'
 
+window.log = window.console.log
+
 ReactDOM.render(
   <Provider store={store}>
     <LocaleProvider locale={zhCN}>

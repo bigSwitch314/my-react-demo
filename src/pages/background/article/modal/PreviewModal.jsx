@@ -33,7 +33,6 @@ class PreviewModal extends React.Component {
   }
 
   componentDidMount() {
- 
   }
 
   getRecord(record) {
