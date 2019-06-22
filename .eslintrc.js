@@ -35,6 +35,12 @@ module.exports = {
     "key-spacing": [2, { "beforeColon": false, "afterColon": true }],  // 强制在对象字面量的属性中键和值之间使用一致的间距
     "space-unary-ops": [2, { "words": true, "nonwords": false }],  // 强制在一元操作符前后使用一致的空格
     "no-mixed-spaces-and-tabs": 2,  // 不允许空格和 tab 混合缩进
+    "no-multi-spaces": 1, // 不能用多余的空格
+    "no-multiple-empty-lines": [1, {"max": 2}], // 空行最多不能超过2行
+    "no-spaced-func": 1, // 函数调用时 函数名与()之间不能有空格
+    "no-trailing-spaces": 1, // 一行结束后面不要有空格
+    "no-unneeded-ternary": 1, // 禁止不必要的嵌套 var isYes = answer === 1 ? true : false
+
   },
   "env": {
     "es6": true,
