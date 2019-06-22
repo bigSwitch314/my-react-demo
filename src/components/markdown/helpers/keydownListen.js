@@ -46,6 +46,7 @@ export default ins => {
           ins.insert('tab')
           break
         }
+        default:
       }
     } else if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey) {
       // ctrl +
@@ -68,6 +69,7 @@ export default ins => {
           ins.save()
           break
         }
+        default:
       }
     }
   })

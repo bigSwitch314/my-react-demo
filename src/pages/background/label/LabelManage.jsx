@@ -79,7 +79,7 @@ class LabelManage extends React.Component {
     if(isEdit) {
       param.id = this.editData.id
       this.props.editLabel(param).then((res) => {
-        if (res instanceof Error) return
+        if (res instanceof Error) { return }
         message.success('修改成功', 1, () => {
           this.setState({ currentPage: 1 }, this.getLabelList)
           this.setState({ visible: false })
@@ -88,7 +88,7 @@ class LabelManage extends React.Component {
       })
     } else {
       this.props.addLabel(param).then((res) => {
-        if (res instanceof Error) return
+        if (res instanceof Error) { return }
         message.success('添加成功', 1, () => {
           this.setState({ currentPage: 1 }, this.getLabelList)
           this.setState({ visible: false })
@@ -167,7 +167,7 @@ class LabelManage extends React.Component {
     this.props.deleteLabel({
       id: idArr.join(','),
     }).then((res) => {
-      if (res instanceof Error) return
+      if (res instanceof Error) { return }
       message.success('删除成功', 1, () => {
         const { currentPage, pageSize, userList = {} } = this.state
         const totalPage = Math.ceil((userList.count - idArr.length) / pageSize)
@@ -294,7 +294,7 @@ class LabelManage extends React.Component {
                 {...formItemLayout}
               >
                 {getFieldDecorator('labelSizeLevel', {
-                   rules: [{
+                  rules: [{
                     required: true,
                     message: '请选择显示级别',
                     whitespace: true,

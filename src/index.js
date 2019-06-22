@@ -1,5 +1,5 @@
-import React from "react"
-import ReactDOM from "react-dom"
+import React from 'react'
+import ReactDOM from 'react-dom'
 import store from './redux/store'
 import Routers from './routers'
 import { Provider } from 'react-redux'
@@ -12,5 +12,5 @@ ReactDOM.render(
       <Routers />
     </LocaleProvider>
   </Provider>,
-  document.getElementById("root")
+  document.getElementById('root')
 )

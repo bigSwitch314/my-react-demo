@@ -427,13 +427,13 @@ class UserList extends React.Component {
               >
                 {getFieldDecorator('mail', {
                   rules: [{
-                      required: true,
-                      message: '请输入账号',
-                      whitespace: true,
-                    }, { 
-                      pattern: new RegExp(REGEXP_MAIL), 
-                      message: '请输入正确电子邮件'
-                    },
+                    required: true,
+                    message: '请输入账号',
+                    whitespace: true,
+                  }, {
+                    pattern: new RegExp(REGEXP_MAIL),
+                    message: '请输入正确电子邮件'
+                  },
                   ],
                   initialValue: '',
                 })(
@@ -441,49 +441,49 @@ class UserList extends React.Component {
                 )}
               </FormItem>
               <FormItem
-              label="角色"
-              {...formItemLayout}
-            >
-              {getFieldDecorator('role', {
-                rules: [{
-                  required: false,
-                }],
-              })(
-                <CheckboxGroup
-                  onChange={this.onLabelChange}
-                >
-                  <Row>
-                    {roleOptions.map(item => (
-                      <Col key={item.id} span={5} style={{ height: 30 }}>
-                        <Checkbox value={item.id}>
-                          {item.name}
-                        </Checkbox>
-                      </Col>
-                    ))}
-                  </Row>
-                </CheckboxGroup>,
-              )}
-            </FormItem>
-            <FormItem
-              label="是否启用"
-              {...formItemLayout}
-            >
-              {getFieldDecorator('status', {
-                rules: [{
-                  required: true,
-                  message: '请选择类型',
-                  whitespace: true,
-                  type: 'number',
-                }],
-              })(
-                <RadioGroup
-                  onChange={this.onTypeChange}
-                >
-                  <Radio value={1}>是</Radio>
-                  <Radio value={0}>否</Radio>
-                </RadioGroup>,
-              )}
-            </FormItem> 
+                label="角色"
+                {...formItemLayout}
+              >
+                {getFieldDecorator('role', {
+                  rules: [{
+                    required: false,
+                  }],
+                })(
+                  <CheckboxGroup
+                    onChange={this.onLabelChange}
+                  >
+                    <Row>
+                      {roleOptions.map(item => (
+                        <Col key={item.id} span={5} style={{ height: 30 }}>
+                          <Checkbox value={item.id}>
+                            {item.name}
+                          </Checkbox>
+                        </Col>
+                      ))}
+                    </Row>
+                  </CheckboxGroup>,
+                )}
+              </FormItem>
+              <FormItem
+                label="是否启用"
+                {...formItemLayout}
+              >
+                {getFieldDecorator('status', {
+                  rules: [{
+                    required: true,
+                    message: '请选择类型',
+                    whitespace: true,
+                    type: 'number',
+                  }],
+                })(
+                  <RadioGroup
+                    onChange={this.onTypeChange}
+                  >
+                    <Radio value={1}>是</Radio>
+                    <Radio value={0}>否</Radio>
+                  </RadioGroup>,
+                )}
+              </FormItem>
             </div>
           </Modal>
         </div>

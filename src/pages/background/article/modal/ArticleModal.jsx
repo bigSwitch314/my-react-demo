@@ -148,7 +148,7 @@ class ArticleModal extends React.Component {
           return
         }
         
-        //保存文章
+        // 保存文章
         const { title, category, label, release } = getFieldsValue()
         const param = {
           title,
@@ -163,19 +163,19 @@ class ArticleModal extends React.Component {
         if(isEdit) {
           param.id = editData.id
           editArticle(param).then((res) => {
-            if (res instanceof Error) return
+            if (res instanceof Error) { return }
             this.props.onOk()
             this.setState({ htmlValue: null })
           })
         } else {
           addArticle(param).then((res) => {
-          if (res instanceof Error) return
-          this.props.onOk()
-          this.setState({ htmlValue: null })
-        })
+            if (res instanceof Error) { return }
+            this.props.onOk()
+            this.setState({ htmlValue: null })
+          })
         }
       } else {
-         if(!htmlValue) {
+        if (!htmlValue) {
           this.setState({ hasContentMessage: true })
           return
         }
@@ -203,15 +203,15 @@ class ArticleModal extends React.Component {
         {/* 编辑文章弹窗 */}
         <Modal
           width={920}
-          title={isEdit ? "编辑文章" : "添加文章"}
+          title={isEdit ? '编辑文章' : '添加文章'}
           visible={visible}
           onOk={() => this.onOk()}
           onCancel={onCancel}
-          okText="保存"
+          okText='保存'
         >
-          <div className="article-modal">
+          <div className='article-modal'>
             <FormItem
-              label="标题"
+              label='标题'
               {...formItemLayout}
             >
               {getFieldDecorator('title', {
@@ -227,7 +227,7 @@ class ArticleModal extends React.Component {
               )}
             </FormItem>
             <FormItem
-              label="分类"
+              label='分类'
               {...formItemLayoutRadio}
             >
               {getFieldDecorator('category', {
@@ -250,7 +250,7 @@ class ArticleModal extends React.Component {
               )}
             </FormItem>
             <FormItem
-              label="标签"
+              label='标签'
               {...formItemLayoutRadio}
             >
               {getFieldDecorator('label', {
@@ -274,7 +274,7 @@ class ArticleModal extends React.Component {
               )}
             </FormItem>
             <FormItem
-              label="发布"
+              label='发布'
               {...formItemLayoutRadio}
             >
               {getFieldDecorator('release', {
@@ -293,9 +293,9 @@ class ArticleModal extends React.Component {
                 </RadioGroup>,
               )}
             </FormItem> 
-            <span className="edit" onClick={() => this.showEditor()}>编辑</span>
+            <span className='edit' onClick={() => this.showEditor()}>编辑</span>
             <FormItem
-              label="内容"
+              label='内容'
               {...formItemLayoutContent}
             >
               {getFieldDecorator('content', {
@@ -306,13 +306,13 @@ class ArticleModal extends React.Component {
                 initialValue: ' ',
               })(
                 <div 
-                  className="content for-preview for-markdown-preview"
+                  className='content for-preview for-markdown-preview'
                   style={{ borderColor: hasContentMessage ? '#f5222d' : '#d9d9d9' }}
                   dangerouslySetInnerHTML={{ __html: handleCode(htmlValue) }}
                 />
               )}
             </FormItem>
-            {hasContentMessage && <span className="content-message">请输入内容</span>}
+            {hasContentMessage && <span className='content-message'>请输入内容</span>}
           </div>
         </Modal>
 

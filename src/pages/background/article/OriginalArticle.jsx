@@ -120,7 +120,7 @@ class OriginalArticle extends React.Component {
     name: record.name,
   })
 
-   /** 批量删除 */
+  /** 批量删除 */
   batchDelete = () => {
     const { selectedRowKeys } = this.state;
     deleteBatchConfirm(selectedRowKeys, () => this.deleteData(selectedRowKeys))
@@ -138,7 +138,7 @@ class OriginalArticle extends React.Component {
     this.props.deleteArticle({
       id: idArr.join(','),
     }).then((res) => {
-      if (res instanceof Error) return
+      if (res instanceof Error) { return }
       message.success('删除成功', 1, () => {
         this.getArticleList()
       })
@@ -159,7 +159,7 @@ class OriginalArticle extends React.Component {
   /** 预览文章 */
   preview(record) {
     this.getArticle(record.id).then(res => {
-      if (res instanceof Error) return
+      if (res instanceof Error) { return } 
       this.setState({
         previewVisible: true,
       })
@@ -171,7 +171,7 @@ class OriginalArticle extends React.Component {
   /** 文章弹窗显显示（编辑） */
   editArticle = (record) => {
     this.getArticle(record.id).then(res => {
-      if (res instanceof Error) return
+      if (res instanceof Error) { return }
       this.setState({
         visible: true,
         isEdit: true,
@@ -193,7 +193,7 @@ class OriginalArticle extends React.Component {
     this.setState({ visible: false })
   }
 
-   /** 文章预览关闭  */
+  /** 文章预览关闭  */
   handlePreviewOk = () => {
     this.setState({ previewVisible: false })
   }

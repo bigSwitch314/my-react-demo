@@ -8,7 +8,7 @@ const ErrorOverlayPlugin = require('error-overlay-webpack-plugin')
 module.exports = merge(baseWebpackConfig, {
   mode: 'development',
   output: {
-    filename: "js/[name].[hash:16].js",
+    filename: 'js/[name].[hash:16].js',
   },
   plugins: [
     new HtmlWebpackPlugin({

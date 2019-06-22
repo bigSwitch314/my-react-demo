@@ -8,7 +8,7 @@ module.exports = {
     // framework: ['react', 'react-dom'] // 若不注释，则error-overlay-webpack-plugin插件不生效
   },
   output: {
-    filename: "js/bundle.js",
+    filename: 'js/bundle.js',
     path: DIST_PATH
   },
   module: {

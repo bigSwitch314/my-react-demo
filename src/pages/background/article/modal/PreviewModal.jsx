@@ -7,7 +7,7 @@ import handleCode from '../../../../components/markdown/helpers/handelCode'
 
 
 @connect(
-   state => ({
+  state => ({
     categoryList: state.category.categoryList,
   }),
   null,
@@ -50,37 +50,37 @@ class PreviewModal extends React.Component {
     const { article, categoryName } = this.state
 
     return (
-        <Modal
-          width={760}
-          visible={visible}
-          onCancel={onCancel}
-          title={"文章预览"}
-          footer={null}
-          maskClosable={false}
-        >
-          <div className="preview-modal">
-            {article ?
-              <React.Fragment>
-                <div className="title">{article.title}</div>
-                <div className="meta-info">
-                  <ul>
-                    <li>发表于{article.create_time}</li>
-                    <li>|</li>
-                    <li>分类于{categoryName}</li>
-                    <li>|</li>
-                    <li>阅读次数：{article.read_number}</li>
-                    <li>|</li>
-                    <li>复制次数：{article.read_number}</li>
-                  </ul>
-                </div>
-                <div 
-                  className="content for-preview for-markdown-preview"
-                  dangerouslySetInnerHTML={{ __html: handleCode(marked(article.content_md)) }}
-                />
-              </React.Fragment>
-             : null}
-          </div>
-        </Modal>
+      <Modal
+        width={760}
+        visible={visible}
+        onCancel={onCancel}
+        title={'文章预览'}
+        footer={null}
+        maskClosable={false}
+      >
+        <div className="preview-modal">
+          {article ?
+            <React.Fragment>
+              <div className="title">{article.title}</div>
+              <div className="meta-info">
+                <ul>
+                  <li>发表于{article.create_time}</li>
+                  <li>|</li>
+                  <li>分类于{categoryName}</li>
+                  <li>|</li>
+                  <li>阅读次数：{article.read_number}</li>
+                  <li>|</li>
+                  <li>复制次数：{article.read_number}</li>
+                </ul>
+              </div>
+              <div
+                className="content for-preview for-markdown-preview"
+                dangerouslySetInnerHTML={{ __html: handleCode(marked(article.content_md)) }}
+              />
+            </React.Fragment>
+            : null}
+        </div>
+      </Modal>
     )
   }
 }

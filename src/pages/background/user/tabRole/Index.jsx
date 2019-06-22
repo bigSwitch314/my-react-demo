@@ -30,4 +30,4 @@ class TabRole extends React.Component {
   }
 }
 
-export default TabRole
+export default TabRole 

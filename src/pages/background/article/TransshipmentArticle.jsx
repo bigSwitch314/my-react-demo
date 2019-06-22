@@ -120,7 +120,7 @@ class OriginalArticle extends React.Component {
     name: record.name,
   })
 
-   /** 批量删除 */
+  /** 批量删除 */
   batchDelete = () => {
     const { selectedRowKeys } = this.state;
     deleteBatchConfirm(selectedRowKeys, () => this.deleteData(selectedRowKeys))
@@ -138,7 +138,7 @@ class OriginalArticle extends React.Component {
     this.props.deleteArticle({
       id: idArr.join(','),
     }).then((res) => {
-      if (res instanceof Error) return
+      if (res instanceof Error) { return }
       message.success('删除成功', 1, () => {
         this.getArticleList()
       })
@@ -159,7 +159,7 @@ class OriginalArticle extends React.Component {
   /** 预览文章 */
   preview(record) {
     this.getArticle(record.id).then(res => {
-      if (res instanceof Error) return
+      if (res instanceof Error) { return }
       this.setState({
         previewVisible: true,
       })
@@ -171,7 +171,7 @@ class OriginalArticle extends React.Component {
   /** 文章弹窗显显示（编辑） */
   editArticle = (record) => {
     this.getArticle(record.id).then(res => {
-      if (res instanceof Error) return
+      if (res instanceof Error) { return }
       this.setState({
         visible: true,
         isEdit: true,
@@ -193,7 +193,7 @@ class OriginalArticle extends React.Component {
     this.setState({ visible: false })
   }
 
-   /** 文章预览关闭  */
+  /** 文章预览关闭  */
   handlePreviewOk = () => {
     this.setState({ previewVisible: false })
   }
@@ -208,7 +208,7 @@ class OriginalArticle extends React.Component {
       id: record.id,
       release: Number(checked),
     }).then(res => {
-      if (res instanceof Error) return
+      if (res instanceof Error) { return }
       this.getArticleList()
     })
   }
@@ -235,13 +235,13 @@ class OriginalArticle extends React.Component {
       previewVisible,
     } = this.state
     const { getFieldDecorator } = this.props.form
-    const { articleList = {}, loading, categoryList, labelList } = this.props
+    const { loading } = this.props
 
     const testData = [{
       id: 1,
       title: 'react进阶',
       author: '秋雨',
-      link: "https://www.cnblogs.com/gxp69/p/7251767.html",
+      link: 'https://www.cnblogs.com/gxp69/p/7251767.html',
       release: 1,
       edit_time: '2019-05-22 14:32',
       create_time: '2019-05-14 09:19',
@@ -249,7 +249,7 @@ class OriginalArticle extends React.Component {
       id: 2,
       title: 'react进阶2',
       author: '秋雨',
-      link: "https://www.cnblogs.com/gxp69/p/7251767.html",
+      link: 'https://www.cnblogs.com/gxp69/p/7251767.html',
       release: 1,
       edit_time: '2019-05-22 14:32',
       create_time: '2019-05-14 09:19'
@@ -257,7 +257,7 @@ class OriginalArticle extends React.Component {
       id: 3,
       title: 'react进阶3',
       author: '秋雨',
-      link: "https://www.cnblogs.com/gxp69/p/7251767.html",
+      link: 'https://www.cnblogs.com/gxp69/p/7251767.html',
       release: 1,
       edit_time: '2019-05-22 14:32',
       create_time: '2019-05-14 09:19'
@@ -265,7 +265,7 @@ class OriginalArticle extends React.Component {
       id: 4,
       title: 'react进阶4',
       author: '秋雨',
-      link: "https://www.cnblogs.com/gxp69/p/7251767.html",
+      link: 'https://www.cnblogs.com/gxp69/p/7251767.html',
       release: 1,
       edit_time: '2019-05-22 14:32',
       create_time: '2019-05-14 09:19'

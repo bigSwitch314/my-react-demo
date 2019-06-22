@@ -58,7 +58,7 @@ Email: luoqiang314@gmail.com<br/>
 `
     this.setState({
       value, 
-      htmlValue:  handleCode(marked(value)) 
+      htmlValue: handleCode(marked(value)) 
     })
   }
 

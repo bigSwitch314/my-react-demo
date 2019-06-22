@@ -9,7 +9,7 @@
     "start": "nohup npm run dev  > .nohup 2>&1 &",
     "stop": "netstat -aon | grep -E '9080.*LISTENING' | awk '{print $5}' | xargs tskill",
     "restart": "npm run stop && npm run start",
-    "eslint": "eslint ./src --fix -c=./config/.eslintrc.json --ignore-path=./config/.eslintignore",
+    "eslint": "eslint ./src --fix -c=./config/.eslintrc.js --ignore-path=./config/.eslintignore",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "config": {
