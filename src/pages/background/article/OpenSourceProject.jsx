@@ -1,5 +1,5 @@
 import React from 'react'
-import { Table, Switch, Row, Col, Form, Select, Input, DatePicker, Button } from 'antd'
+import { Table, Switch, Row, Col, Form, Select, Input, DatePicker, Button, List } from 'antd'
 import OperatorIcons from 'components/shared/OperatorIcon'
 import HeaderBar from 'components/shared/HeaderBar'
 import './style/OpenSourceProject.less'
@@ -7,7 +7,9 @@ import './style/OpenSourceProject.less'
 const FormItem = Form.Item
 const Option = Select.Option
 const InputGroup = Input.Group
-const { RangePicker } = DatePicker
+const RangePicker = DatePicker.RangePicker
+const ListItem = List.Item
+const ListItemMeta = List.Item.Meta
 
 @Form.create()
 class OpenSourceProject extends React.Component {
@@ -33,8 +35,43 @@ class OpenSourceProject extends React.Component {
   }
 
   expandedRowRender(record) {
+    const data = [
+      {
+        title: 'v_2.0.12  2019-06-29',
+      },
+      {
+        title: 'v_2.0.11  2019-06-21',
+      },
+      {
+        title: 'v_2.0.10  2019-06-18',
+      },
+    ]
+
+    const getDescription = (updateLog) => {
+      const log = updateLog || ['文章列表样式修正', '添加文章失败修复', '新增开源项目']
+      return (
+        <div>
+          <ul>
+            {log.map(item => <li key={item}>{item}</li>)}
+          </ul>
+        </div>
+      )
+    }
+
     return (
-      <p style={{ margin: 0 }}>{record.name}</p>
+      <List
+        header={<div>更新日志</div>}
+        itemLayout="horizontal"
+        dataSource={data}
+        renderItem={item => (
+          <List.Item>
+            <List.Item.Meta
+              title={item.title}
+              description={getDescription(item.updateLog)}
+            />
+          </List.Item>
+        )}
+      />
     )
   }
 
