@@ -1,7 +1,8 @@
 import React from 'react'
-import { Table, Switch, Row, Col, Form, Select, Input, DatePicker, Button, List } from 'antd'
+import { Table, Switch, Row, Col, Form, Select, Input, DatePicker, Button, List, Icon, Pagination } from 'antd'
 import OperatorIcons from 'components/shared/OperatorIcon'
 import HeaderBar from 'components/shared/HeaderBar'
+import UpdateLogModal from './modal/UpdateLogModal'
 import './style/OpenSourceProject.less'
 
 const FormItem = Form.Item
@@ -18,6 +19,7 @@ class OpenSourceProject extends React.Component {
     this.state = {
       currentPage: 1,
       pageSize: 5,
+      UpdateLogModalVisible: false,
     }
   }
 
@@ -32,6 +34,18 @@ class OpenSourceProject extends React.Component {
   componentDidMount() {
     log('4444444444444444444444444')
 
+  }
+
+  showUpdateLogModal() {
+    this.setState({ UpdateLogModalVisible: true })
+  }
+
+  onOkUpdateLogModal() {
+    this.setState({ UpdateLogModalVisible: false })
+  }
+
+  onCancelUpdateLogModal() {
+    this.setState({ UpdateLogModalVisible: false })
   }
 
   expandedRowRender(record) {
@@ -58,18 +72,32 @@ class OpenSourceProject extends React.Component {
       )
     }
 
+    const getHeadr = () => {
+      return (
+        <React.Fragment className="header">
+          <div>更新日志 </div>
+          <div className="add-log">
+            <Icon type="plus" title="添加" onClick={() => this.showUpdateLogModal()} />
+          </div>
+          <div>
+            <Pagination simple defaultCurrent={2} total={50} />
+          </div>
+        </React.Fragment>
+      )
+    }
+
     return (
       <List
-        header={<div>更新日志</div>}
+        header={getHeadr()}
         itemLayout="horizontal"
         dataSource={data}
         renderItem={item => (
-          <List.Item>
-            <List.Item.Meta
+          <ListItem>
+            <ListItemMeta
               title={item.title}
               description={getDescription(item.updateLog)}
             />
-          </List.Item>
+          </ListItem>
         )}
       />
     )
@@ -79,6 +107,7 @@ class OpenSourceProject extends React.Component {
     const {
       currentPage,
       pageSize,
+      UpdateLogModalVisible,
     } = this.state
 
     const { getFieldDecorator } = this.props.form
@@ -227,6 +256,13 @@ class OpenSourceProject extends React.Component {
           columns={columns}
           expandedRowRender={record => this.expandedRowRender(record)}
           dataSource={data}
+        />
+
+        {/* 更新日志弹窗 */}
+        <UpdateLogModal
+          onOk={() => this.onOkUpdateLogModal()}
+          onCancel={() => this.onCancelUpdateLogModal()}
+          visible={UpdateLogModalVisible}
         />
       </div>
     )
