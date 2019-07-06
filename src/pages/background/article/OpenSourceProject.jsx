@@ -1,13 +1,16 @@
 import React from 'react'
-import { Table, Switch, Row, Col, Form, Select, Input, DatePicker, Button } from 'antd'
+import { Table, Switch, Row, Col, Form, Select, Input, DatePicker, Button, List, Icon, Pagination } from 'antd'
 import OperatorIcons from 'components/shared/OperatorIcon'
 import HeaderBar from 'components/shared/HeaderBar'
+import UpdateLogModal from './modal/UpdateLogModal'
 import './style/OpenSourceProject.less'
 
 const FormItem = Form.Item
 const Option = Select.Option
 const InputGroup = Input.Group
-const { RangePicker } = DatePicker
+const RangePicker = DatePicker.RangePicker
+const ListItem = List.Item
+const ListItemMeta = List.Item.Meta
 
 @Form.create()
 class OpenSourceProject extends React.Component {
@@ -16,6 +19,7 @@ class OpenSourceProject extends React.Component {
     this.state = {
       currentPage: 1,
       pageSize: 5,
+      UpdateLogModalVisible: false,
     }
   }
 
@@ -32,9 +36,80 @@ class OpenSourceProject extends React.Component {
 
   }
 
+  showUpdateLogModal() {
+    this.setState({ UpdateLogModalVisible: true })
+  }
+
+  onOkUpdateLogModal() {
+    this.setState({ UpdateLogModalVisible: false })
+  }
+
+  onCancelUpdateLogModal() {
+    this.setState({ UpdateLogModalVisible: false })
+  }
+
   expandedRowRender(record) {
+    const data = [
+      {
+        title: 'v_2.0.12  2019-06-29',
+      },
+      {
+        title: 'v_2.0.11  2019-06-21',
+      },
+      {
+        title: 'v_2.0.10  2019-06-18',
+      },
+    ]
+
+    const getDescription = (updateLog) => {
+      const log = updateLog || ['文章列表样式修正', '添加文章失败修复', '新增开源项目']
+      return (
+        <div>
+          <ul>
+            {log.map(item => <li key={item}>{item}</li>)}
+          </ul>
+        </div>
+      )
+    }
+
+    const getHeadr = () => {
+      return (
+        <React.Fragment className="header">
+          <div>更新日志 </div>
+          <div className="add-log">
+            <Icon type="plus" title="添加" onClick={() => this.showUpdateLogModal()} />
+          </div>
+          <div className="pagination">
+            <Pagination simple defaultCurrent={2} total={50} />
+          </div>
+        </React.Fragment>
+      )
+    }
+
+    const getTitle = (title) => {
+      return (
+        <div className="title">
+          <span>{title}</span>
+          <Icon type="edit" title="添加" onClick={() => this.showUpdateLogModal()} style={{ margin: '0px 20px' }} className="title-icon"/>
+          <Icon type="delete" title="添加" onClick={null} className="title-icon"/>
+        </div>
+      )
+    }
+
     return (
-      <p style={{ margin: 0 }}>{record.name}</p>
+      <List
+        header={getHeadr()}
+        itemLayout="horizontal"
+        dataSource={data}
+        renderItem={item => (
+          <ListItem>
+            <ListItemMeta
+              title={getTitle(item.title)}
+              description={getDescription(item.updateLog)}
+            />
+          </ListItem>
+        )}
+      />
     )
   }
 
@@ -42,6 +117,7 @@ class OpenSourceProject extends React.Component {
     const {
       currentPage,
       pageSize,
+      UpdateLogModalVisible,
     } = this.state
 
     const { getFieldDecorator } = this.props.form
@@ -190,6 +266,13 @@ class OpenSourceProject extends React.Component {
           columns={columns}
           expandedRowRender={record => this.expandedRowRender(record)}
           dataSource={data}
+        />
+
+        {/* 更新日志弹窗 */}
+        <UpdateLogModal
+          onOk={() => this.onOkUpdateLogModal()}
+          onCancel={() => this.onCancelUpdateLogModal()}
+          visible={UpdateLogModalVisible}
         />
       </div>
     )
