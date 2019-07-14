@@ -6,19 +6,11 @@ import OperatorIcons from '@/components/shared/OperatorIcon'
 import Pagination from '@/components/shared/Pagination'
 import HeaderBar from '@/components/shared/HeaderBar'
 import { addRole, getRoleList, changeStatus, deleteRole, editRole } from '@/modules/role'
+import RoleModal from './RoleModal'
 
 import './index.less'
 
 const CheckboxGroup = Checkbox.Group;
-const plainOptions = [
-  { id: 1, name: 'name01' },
-  { id: 2, name: 'name02' },
-  { id: 3, name: 'name03' },
-  { id: 4, name: 'name04' },
-  { id: 5, name: 'name05' },
-  { id: 6, name: 'name06' },
-];
-const defaultCheckedList = [1, 2];
 
 @connect(
   state => ({
@@ -46,6 +38,8 @@ class TabRole extends React.Component {
       checkedList: [],
       indeterminate: true,
       checkAll: false,
+      roleVisible: false,
+      editData: {},
     }
   }
 
@@ -104,6 +98,26 @@ class TabRole extends React.Component {
     this.setState({ bindVisible: false })
   }
 
+
+  // 添加/编辑角色
+
+  showRoleModal(record={}){
+    this.setState({
+      roleVisible: true,
+      isEdit: record,
+    })
+  }
+
+  onOkRole(){
+    // lj
+
+    this.setState({ roleVisible: false })
+  }
+
+  onCancelRole(){
+    this.setState({ roleVisible: false })
+  }
+
   onChange = checkedList => {
     log(checkedList)
     log(checkedList.length, this.props.allUser.list.length)
@@ -125,7 +139,7 @@ class TabRole extends React.Component {
 
   render() {
     const { allUser } = this.props
-    const { currentPage, pageSize } = this.state
+    const { currentPage, pageSize, roleVisible, editData } = this.state
 
     const columns = [
       {
@@ -165,7 +179,7 @@ class TabRole extends React.Component {
         width: 150,
         render: (text, record) => (
           <OperatorIcons>
-            <OperatorIcons.Icon title="编辑" type="edit" onClick={() => this.editHandler(record)} />
+            <OperatorIcons.Icon title="编辑" type="edit" onClick={() => this.showRoleModal(record)} />
             <OperatorIcons.Icon title="绑定" type="info-circle" onClick={() => this.showBindModal(record)} />
             <OperatorIcons.Icon title="删除" type="delete" onClick={() => this.showConfirm(record.id)} />
           </OperatorIcons>
@@ -218,7 +232,7 @@ class TabRole extends React.Component {
       <div className="container">
         <HeaderBar>
           <HeaderBar.Left>
-            <Button type="primary" onClick={this.addHandler}>添加</Button>
+            <Button type="primary" onClick={() =>this.showRoleModal()}>添加</Button>
             <Button className="button" onClick={this.batchDelete}>批量删除</Button>
           </HeaderBar.Left>
         </HeaderBar>
@@ -272,6 +286,14 @@ class TabRole extends React.Component {
             </div>
           </div>
         </Modal>
+
+        {/* 添加/编辑角色弹窗 */}
+        <RoleModal
+          visible={roleVisible}
+          onOk={() => this.onOkRole()}
+          onCancel={() => this.onCancelRole()}>
+          value={editData}
+        </RoleModal>
       </div>
     )
   }
