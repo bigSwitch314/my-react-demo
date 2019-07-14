@@ -3,6 +3,7 @@ import { Table, Switch, Row, Col, Form, Select, Input, DatePicker, Button, List,
 import OperatorIcons from 'components/shared/OperatorIcon'
 import HeaderBar from 'components/shared/HeaderBar'
 import UpdateLogModal from './modal/UpdateLogModal'
+import ProjectModal from './modal/ProjectModal'
 import './style/OpenSourceProject.less'
 
 const FormItem = Form.Item
@@ -19,7 +20,9 @@ class OpenSourceProject extends React.Component {
     this.state = {
       currentPage: 1,
       pageSize: 5,
+      isEdit: false,
       UpdateLogModalVisible: false,
+      projectVisible: false,
     }
   }
 
@@ -46,6 +49,27 @@ class OpenSourceProject extends React.Component {
 
   onCancelUpdateLogModal() {
     this.setState({ UpdateLogModalVisible: false })
+  }
+
+  /** 开源项目弹窗显示（添加） */
+  addProject = () => {
+    this.setState({
+      projectVisible: true,
+      isEdit: false,
+    })
+  }
+
+  /** 保存开源项目  */
+  handleOk = () => {
+    this.setState({
+      currentPage: 1,
+      projectVisible: false,
+    }, {})
+  }
+
+  /** 关闭开源项目弹窗 */
+  handleCancel = () => {
+    this.setState({ projectVisible: false })
   }
 
   expandedRowRender(record) {
@@ -118,6 +142,8 @@ class OpenSourceProject extends React.Component {
       currentPage,
       pageSize,
       UpdateLogModalVisible,
+      projectVisible,
+      isEdit,
     } = this.state
 
     const { getFieldDecorator } = this.props.form
@@ -259,13 +285,22 @@ class OpenSourceProject extends React.Component {
         <hr className="line-hr" />
         <HeaderBar>
           <HeaderBar.Left>
-            <Button type="primary" onClick={() => this.addArticle()}>添加</Button>
+            <Button type="primary" onClick={() => this.addProject()}>添加</Button>
           </HeaderBar.Left>
         </HeaderBar>
         <Table
           columns={columns}
           expandedRowRender={record => this.expandedRowRender(record)}
           dataSource={data}
+        />
+
+        {/* 开源项目弹窗 */}
+        <ProjectModal
+          isEdit={isEdit}
+          visible={projectVisible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+          wrappedComponentRef={(node) => this.articleModelRef = node}
         />
 
         {/* 更新日志弹窗 */}

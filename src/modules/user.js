@@ -3,7 +3,7 @@ import request from '../utils/request'
 export default {
   namespace: 'user',
   initState: {
-    userList: {},
+    userList: { },
   },
   reducer: {
     getUserList(state, { payload }) {
@@ -21,6 +21,9 @@ export default {
     deleteUser(state) {
       return ({ ...state })
     },
+    getAllUser(state, { payload }) {
+      return ({ ...state, allUser: payload })
+    },
   },
 }
 
@@ -31,3 +34,4 @@ export const addUser = (params) => request.post('/blog/admin/add', n('addUser'),
 export const editUser = (params) => request.post('/blog/admin/edit', n('editUser'), params)
 export const deleteUser = (params) => request.post('/blog/admin/delete', n('deleteUser'), params)
 export const changeStatus = (params) => request.post('/blog/admin/changeStatus', n('changeStatus'), params)
+export const getAllUser = (params) => request.get('/blog/admin/get', n('getAllUser'), params)
