@@ -1,29 +1,19 @@
-import { Form, Input, Modal, Radio, } from 'antd';
+import { Form, Input, Modal, Radio, Select } from 'antd';
 import React from 'react';
 import { connect } from 'react-redux';
 import { addArticle, editArticle } from '@/modules/article';
+import { noSpecialChar } from '@/utils/validator'
 import '../style/ArticleModal.less';
 
 const FormItem = Form.Item
 const RadioGroup = Radio.Group
 
 const formItemLayout = {
-  labelCol: {
-    sm: { span: 2 },
-  },
-  wrapperCol: {
-    sm: { span: 20 },
-  },
+  labelCol: { span: 3, offset: 0 },
+  wrapperCol: { span: 21, offset: 0 },
 }
 
-const formItemLayoutRadio = {
-  labelCol: {
-    sm: { span: 2 },
-  },
-  wrapperCol: {
-    sm: { span: 20 },
-  },
-}
+const Option = Select.Option;
 
 @Form.create()
 @connect(
@@ -68,24 +58,20 @@ class ArticleModal extends React.Component {
     const { setFieldsValue } = this.props.form
     if(isEdit) {
       setFieldsValue({
-        category: editData.category_id,
-        label: editData.label_ids,
-        title: editData.title,
+        name: editData.name,
+        level: editData.level,
+        url: editData.url,
+        version: editData.version,
         release: editData.release,
-      })
-      this.setState({
-        htmlValue: marked(editData.content_md),
-        editorValue: editData.content_md,
-        editData,
       })
     } else {
       setFieldsValue({
-        category: undefined,
-        label: [],
-        title: '',
+        name: '',
+        level: '',
+        url: '',
+        version: '',
         release: 0,
       })
-      this.setState({ htmlValue: '' })
     }
   }
 
@@ -163,57 +149,117 @@ class ArticleModal extends React.Component {
       <React.Fragment>
         {/* 编辑文章弹窗 */}
         <Modal
-          width={920}
+          width={740}
           title={isEdit ? '编辑项目' : '添加项目'}
           visible={visible}
           onOk={() => this.onOk()}
           onCancel={onCancel}
           okText='保存'
         >
-          <div className='article-modal'>
-            <FormItem
-              label='项目名称'
-              {...formItemLayout}
-            >
-              {getFieldDecorator('name', {
-                rules: [{
-                  required: true,
-                  message: '请输入项目名称',
-                  whitespace: true,
-                }, {
-                  // validator: this.validateOldPassword,
-                }],
-              })(
-                <Input style={{ width: 30}}/>,
-              )}
-            </FormItem>
-            <FormItem
-              label='开源'
-              {...formItemLayoutRadio}
-            >
-              {getFieldDecorator('openSource', {
-                rules: [{
-                  required: true,
-                  message: '请选择类型',
-                  whitespace: true,
-                  type: 'number',
-                }],
-              })(
-                <RadioGroup
-                  onChange={this.onTypeChange}
-                >
-                  <Radio value={1}>是</Radio>
-                  <Radio value={0}>否</Radio>
-                </RadioGroup>,
-              )}
-            </FormItem>
-          </div>
+          <FormItem
+            label="名称"
+            {...formItemLayout}
+          >
+            {getFieldDecorator('name', {
+              rules: [{
+                required: true,
+                message: '请输入项目名称',
+                whitespace: true,
+              }, {
+                message: '不能超过50个字符',
+                max: 50,
+              }, noSpecialChar],
+            })(
+              <Input
+                type="text"
+                style={{ width: 360 }}
+              />,
+            )}
+          </FormItem>
+          <FormItem
+            label="级别"
+            {...formItemLayout}
+          >
+            {getFieldDecorator('level', {
+              rules: [{
+                required: true,
+                message: '请选择项目级别',
+                whitespace: true,
+                type: 'number',
+              }],
+            })(
+              <Select placeholder="请选择项目级别" style={{ width: 360 }}>
+                <Option key={1} value={1}>系统</Option>
+                <Option key={2} value={2}>插件</Option>
+                <Option key={3} value={3}>组件</Option>
+              </Select>
+            )}
+          </FormItem>
+          <FormItem
+            label="地址"
+            {...formItemLayout}
+          >
+            {getFieldDecorator('url', {
+              rules: [{
+                required: true,
+                message: '请输入项目地址',
+                whitespace: true,
+              }, {
+                message: '不能超过50个字符',
+                max: 50,
+              }, noSpecialChar],
+            })(
+              <Input
+                type="text"
+                style={{ width: 360 }}
+              />,
+            )}
+          </FormItem>
+          <FormItem
+            label="版本"
+            {...formItemLayout}
+          >
+            {getFieldDecorator('version', {
+              rules: [{
+                required: true,
+                message: '请输入项目版本',
+                whitespace: true,
+              }, {
+                message: '不能超过50个字符',
+                max: 50,
+              }, noSpecialChar],
+            })(
+              <Input
+                type="text"
+                style={{ width: 360 }}
+              />,
+            )}
+          </FormItem>
+          <FormItem
+            label='发布'
+            {...formItemLayout}
+          >
+            {getFieldDecorator('release', {
+              rules: [{
+                required: true,
+                message: '请选择类型',
+                whitespace: true,
+                type: 'number',
+              }],
+            })(
+              <RadioGroup
+                onChange={this.onTypeChange}
+              >
+                <Radio value={1}>是</Radio>
+                <Radio value={0}>否</Radio>
+              </RadioGroup>,
+            )}
+          </FormItem>
         </Modal>
       </React.Fragment>
     )
   }
 }
 
-// export default Form.create()(ArticleModal)
 export default ArticleModal
 

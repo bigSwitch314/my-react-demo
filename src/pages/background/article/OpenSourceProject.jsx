@@ -24,6 +24,7 @@ class OpenSourceProject extends React.Component {
       UpdateLogModalVisible: false,
       projectVisible: false,
     }
+    this.projectModelRef = React.createRef()
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -57,6 +58,16 @@ class OpenSourceProject extends React.Component {
       projectVisible: true,
       isEdit: false,
     })
+    this.projectModelRef.setFieldsValue(false, null)
+  }
+
+  /** 开源项目弹窗显示（编辑） */
+  editProject = (record) => {
+    this.setState({
+      projectVisible: true,
+      isEdit: true,
+    })
+    this.projectModelRef.setFieldsValue(true, record)
   }
 
   /** 保存开源项目  */
@@ -167,14 +178,14 @@ class OpenSourceProject extends React.Component {
         dataIndex: 'level',
         key: 'level',
         render: (text, record) => {
-          const index = record.level + 1
-          return levelArr.slice(index, index + 1)
+          const index = record.level - 1
+          return levelArr[index]
         },
       },
       { title: '地址', dataIndex: 'url', key: 'url', width: '30px' },
       { title: '版本', dataIndex: 'version', key: 'version' },
       {
-        title: '是否开源',
+        title: '是否发布',
         dataIndex: 'release',
         render: (text, record) => (
           <Switch
@@ -195,7 +206,7 @@ class OpenSourceProject extends React.Component {
         render: (text, record) => {
           return (
             <OperatorIcons>
-              <OperatorIcons.Icon title="编辑" type="edit" onClick={() => this.editArticle(record)} />
+              <OperatorIcons.Icon title="编辑" type="edit" onClick={() => this.editProject(record)} />
               <OperatorIcons.Icon title="删除" type="delete" onClick={() => this.showConfirm(record.id)} />
             </OperatorIcons>
           )
@@ -300,7 +311,7 @@ class OpenSourceProject extends React.Component {
           visible={projectVisible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
-          wrappedComponentRef={(node) => this.articleModelRef = node}
+          wrappedComponentRef={(node) => this.projectModelRef = node}
         />
 
         {/* 更新日志弹窗 */}
