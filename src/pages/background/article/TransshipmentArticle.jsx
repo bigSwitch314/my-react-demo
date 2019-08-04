@@ -5,8 +5,9 @@ import OperatorIcons from 'components/shared/OperatorIcon'
 import Pagination from 'components/shared/Pagination'
 import HeaderBar from 'components/shared/HeaderBar'
 import { deleteConfirm, deleteBatchConfirm, removeArr } from 'components/shared/Confirm'
-import ArticleModal from './modal/ArticleModal'
-import PreviewModal from './modal/PreviewModal'
+import TransshipmentModal from './modal/TransshipmentModal'
+import TransshipmentPreviewModal from './modal/TransshipmentPreviewModal'
+
 import moment from 'moment'
 import './style/TransshipmentArticle.less'
 
@@ -47,7 +48,7 @@ class OriginalArticle extends React.Component {
       isEdit: false,
       previewVisible: false,
     }
-    this.articleModelRef = React.createRef()
+    this.TransshipmentModalRef = React.createRef()
     this.previewModelRef = React.createRef()
   }
 
@@ -153,19 +154,25 @@ class OriginalArticle extends React.Component {
       visible: true,
       isEdit: false,
     })
-    this.articleModelRef.setFieldsValue(false, null)
+    this.TransshipmentModalRef.setFieldsValue(false, null)
   }
 
   /** 预览文章 */
   preview(record) {
-    this.getArticle(record.id).then(res => {
-      if (res instanceof Error) { return }
-      this.setState({
-        previewVisible: true,
-      })
-      console.log(this.previewModelRef)
-      this.previewModelRef.getRecord(res.payload)
+    // this.getArticle(record.id).then(res => {
+    //   if (res instanceof Error) { return }
+    //   this.setState({
+    //     previewVisible: true,
+    //   })
+    //   console.log(this.previewModelRef)
+    //   this.previewModelRef.getRecord(res.payload)
+    // })
+
+    this.setState({
+      previewVisible: true,
     })
+    console.log(this.previewModelRef)
+    this.previewModelRef.getRecord(record)
   }
 
   /** 文章弹窗显显示（编辑） */
@@ -176,7 +183,7 @@ class OriginalArticle extends React.Component {
         visible: true,
         isEdit: true,
       })
-      this.articleModelRef.setFieldsValue(true, res.payload)
+      this.TransshipmentModalRef.setFieldsValue(true, res.payload)
     })
   }
 
@@ -398,14 +405,16 @@ class OriginalArticle extends React.Component {
           onChange={this.changePage}
           onShowSizeChange={this.onShowSizeChange}
         />
-        <ArticleModal
+        <TransshipmentModal
           isEdit={isEdit}
           visible={visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
-          wrappedComponentRef={(node) => this.articleModelRef = node}
+          wrappedComponentRef={(node) => this.TransshipmentModalRef = node}
         />
-        <PreviewModal
+
+        {/* 文章预览弹窗 */}
+        <TransshipmentPreviewModal
           visible={previewVisible}
           onOk={this.handlePreviewOk}
           onCancel={this.handlePreviewCancel}
