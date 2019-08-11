@@ -264,9 +264,12 @@ class CategoryManage extends React.Component {
         title: '序号',
         key: 'xuhao',
         render(text, record, index) {
-          return (
-            <span>{(currentPage - 1) * pageSize + index + 1}</span>
-          )
+          const number = (currentPage - 1) * pageSize + index + 1
+          if (record.pId === 0) {
+            return number
+          } else {
+            return `${record.pId}-${number}`
+          }
         },
       }, {
         title: '名称',

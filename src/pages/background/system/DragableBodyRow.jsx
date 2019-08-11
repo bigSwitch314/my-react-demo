@@ -2,15 +2,15 @@ import React from 'react'
 import { DragSource, DropTarget } from 'react-dnd';
 
 let dragingIndex = -1;
-
+let dragingClassName = '';
 
 class BodyRow extends React.Component {
   render() {
-    const { isOver, connectDragSource, connectDropTarget, moveRow, ...restProps } = this.props;
+    const { isOver, connectDragSource, connectDropTarget, ...restProps } = this.props;
     const style = { ...restProps.style, cursor: 'move' };
 
     let { className } = restProps;
-    if (isOver) {
+    if (isOver && dragingClassName === className) {
       if (restProps.index > dragingIndex) {
         className += ' drop-over-downward';
       }
@@ -18,7 +18,6 @@ class BodyRow extends React.Component {
         className += ' drop-over-upward';
       }
     }
-
     return connectDragSource(
       connectDropTarget(<tr {...restProps} className={className} style={style} />),
     );
@@ -28,7 +27,7 @@ class BodyRow extends React.Component {
 const rowSource = {
   beginDrag(props) {
     dragingIndex = props.index;
-
+    dragingClassName = props.className;
     return {
       index: props.index,
       className: props.className,
@@ -43,7 +42,6 @@ const rowTarget = {
 
     const hoverIndex = props.index;
     const hoverClassName = props.className;
-
     // Don't replace items with themselves
     if (dragIndex === hoverIndex || dragClassName !== hoverClassName) {
       return;
