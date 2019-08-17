@@ -1,11 +1,10 @@
 import React from 'react'
-import { Table, Button, Modal, Input, message, Form } from 'antd'
+import { Table, Button, Modal, Input, message, Form, Select } from 'antd'
 import { getCategoryList, addCategory, editCategory, deleteCategory } from '@/modules/category'
 import { connect } from 'react-redux'
-import { DndProvider, DragSource, DropTarget } from 'react-dnd';
+import { DndProvider } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import update from 'immutability-helper';
-import { find } from 'lodash'
 
 import OperatorIcons from '@/components/shared/OperatorIcon'
 import HeaderBar from '@/components/shared/HeaderBar'
@@ -21,6 +20,7 @@ const formItemLayout = {
 }
 
 const FormItem = Form.Item
+const Option = Select.Option;
 
 @Form.create()
 @connect(
@@ -50,6 +50,7 @@ class CategoryManage extends React.Component {
       confirmDirty: false,
       divisionValue: [],
       data: [],
+      expandedRowKeys: [],
     }
     this.editData = {}
   }
@@ -78,7 +79,7 @@ class CategoryManage extends React.Component {
       { id: 3, name: '系统管理', pId: 0, pName: '顶级', sort: 3, children:
         [
           { id: 31, name: '导航列表', pId: 3, pName: '系统管理', sort: 1 },
-          { id: 32, name: '转载文章', pId: 3, pName: '系统管理', sort: 2 },
+          { id: 32, name: '节点管理', pId: 3, pName: '系统管理', sort: 2 },
         ],
       },
     ]
@@ -210,6 +211,24 @@ class CategoryManage extends React.Component {
     })
   }
 
+  setOrder(preData, data) {
+    const newOrder = []
+    data.forEach((item, index) => {
+      if (item.id !== preData[index].id) {
+        newOrder.push({
+          id: item.id,
+          order: index + 1,
+        })
+      }
+    })
+  }
+
+  onExpandHandler = (expanded, record) => {
+    this.setState({
+      expandedRowKeys: expanded ? [record.id] : [],
+    })
+  }
+
   /** 拖动组件 */
   components = {
     body: {
@@ -220,30 +239,31 @@ class CategoryManage extends React.Component {
   /** 拖动行 */
   moveRow = (dragIndex, hoverIndex, isChildrenDragable, record) => {
     const { data } = this.state;
+
     if (isChildrenDragable === false) {
       const dragRow = data[dragIndex];
-      this.setState(
-        update(this.state, {
-          data: {
-            $splice: [[dragIndex, 1], [hoverIndex, 0, dragRow]],
-          },
-        }),
-      )
+      const { data: newData } = update(this.state, {
+        data: {
+          $splice: [[dragIndex, 1], [hoverIndex, 0, dragRow]],
+        },
+      })
+      this.setState({ data: newData },
+        () => this.setOrder(data, this.state.data))
 
     } else {
       const pId = record.pId
       const index = data.findIndex(item => item.id === pId)
       const dragRow = data[index].children[dragIndex]
 
-      this.setState(
-        update(this.state, {
-          data: { [index]: { children: {
-            $splice: [[dragIndex, 1], [hoverIndex, 0, dragRow]],
-          }}},
-        }),
-      )
-    }
+      const { data: newData } = update(this.state, {
+        data: { [index]: { children: {
+          $splice: [[dragIndex, 1], [hoverIndex, 0, dragRow]],
+        }}},
+      })
 
+      this.setState({ data: newData },
+        () => this.setOrder(data[index].children, this.state.data[index].children))
+    }
   }
 
   render() {
@@ -251,12 +271,13 @@ class CategoryManage extends React.Component {
       visible,
       currentPage,
       pageSize,
-      selectedRowKeys,
       isEdit,
       data,
+      expandedRowKeys,
+      selectedRowKeys,
     } = this.state
 
-    const { categoryList, loading } = this.props
+    const { loading } = this.props
     const { getFieldDecorator } = this.props.form
 
     const columns = [
@@ -275,7 +296,7 @@ class CategoryManage extends React.Component {
         title: '名称',
         dataIndex: 'name',
       }, {
-        title: '父元素',
+        title: '父级',
         dataIndex: 'pName',
       }, {
         title: '操作',
@@ -296,7 +317,7 @@ class CategoryManage extends React.Component {
             <HeaderBar>
               <HeaderBar.Left>
                 <Button type="primary" onClick={this.addHandler}>添加</Button>
-                <Button className="button" onClick={this.batchDelete}>批量删除</Button>
+                <Button className="button" onClick={this.batchDelete}>批量删除</Button>                
               </HeaderBar.Left>
             </HeaderBar>
           </div>
@@ -307,15 +328,14 @@ class CategoryManage extends React.Component {
                 onChange: this.onSelectChange,
                 getCheckboxProps: this.getCheckboxProps,
               }}
-              onRow={(record, index) => {
-
-                return ({
-                  index,
-                  moveRow: (dragIndex, hoverIndex, isChildrenDragable) =>
-                    this.moveRow(dragIndex, hoverIndex, isChildrenDragable, record),
-                })
-              }}
+              onRow={(record, index) => ({
+                index,
+                moveRow: (dragIndex, hoverIndex, isChildrenDragable) =>
+                  this.moveRow(dragIndex, hoverIndex, isChildrenDragable, record),
+              })}
               components={this.components}
+              expandedRowKeys={expandedRowKeys}
+              onExpand={this.onExpandHandler}
               loading={loading}
               columns={columns}
               dataSource={data || []}
@@ -324,7 +344,7 @@ class CategoryManage extends React.Component {
             />
           </DndProvider>
           <Modal
-            title={isEdit ? '编辑分类' : '添加分类'}
+            title={isEdit ? '编辑导航' : '添加导航'}
             visible={visible}
             width={740}
             maskClosable={false}
@@ -333,7 +353,28 @@ class CategoryManage extends React.Component {
           >
             <div>
               <FormItem
-                label="分类名称"
+                label="父级"
+                {...formItemLayout}
+              >
+                {getFieldDecorator('labelSizeLevel', {
+                  rules: [{
+                    required: true,
+                    message: '请选择父级',
+                    whitespace: true,
+                    type: 'number',
+                  }],
+                })(
+                  <Select placeholder="请选择父级" style={{ width: 360 }}>
+                    <Option key={1} value={1}>顶级</Option>
+                    <Option key={2} value={2}>文章管理</Option>
+                    <Option key={3} value={3}>分类管理</Option>
+                    <Option key={4} value={4}>标签管理</Option>
+                    <Option key={5} value={5}>账号管理</Option>
+                  </Select>
+                )}
+              </FormItem>
+              <FormItem
+                label="名称"
                 {...formItemLayout}
               >
                 {getFieldDecorator('name', {

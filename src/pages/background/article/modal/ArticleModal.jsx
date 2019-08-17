@@ -300,7 +300,7 @@ class ArticleModal extends React.Component {
               {getFieldDecorator('content', {
                 rules: [{
                   required: true,
-                  message: ' '
+                  message: ' ',
                 }],
                 initialValue: ' ',
               })(
