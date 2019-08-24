@@ -4,7 +4,7 @@ import { Modal } from 'antd'
 import '../style/PreviewModal.less'
 import marked from '../../../../components/markdown/helpers/marked'
 import handleCode from '../../../../components/markdown/helpers/handelCode'
-import { getTransshipmentArticle } from '@/modules/TransshipmentArticle'
+import { getTransshipmentArticle } from '@/modules/transshipmentArticle'
 
 
 @connect(

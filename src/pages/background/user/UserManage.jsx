@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux';
 import './style/UserManage.less'
-import TabUser from './tabUser'
-import TabRole from './tabRole'
+import TabUser from './tabUser/Index'
+import TabRole from './tabRole/Index'
 import { Tabs } from 'antd'
 
 

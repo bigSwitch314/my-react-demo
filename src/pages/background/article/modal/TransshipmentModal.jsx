@@ -5,7 +5,7 @@ import Editor from '@/components/markdown';
 import '@/components/markdown/editor/index.less';
 import handleCode from '@/components/markdown/helpers/handelCode';
 import marked from '@/components/markdown/helpers/marked';
-import { addTransshipmentArticle, editTransshipmentArticle } from '@/modules/TransshipmentArticle';
+import { addTransshipmentArticle, editTransshipmentArticle } from '@/modules/transshipmentArticle';
 import { noSpecialChar, REGEXP_URL } from '@/utils/validator'
 import '../style/TransshipmentModal.less'
 
