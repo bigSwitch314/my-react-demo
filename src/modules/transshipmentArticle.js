@@ -29,10 +29,10 @@ export default {
 
 const n = (name) => `transshipmentArticle/${name}`
 
-export const getTransshipmentArticleList = (params) => request.get('/blog/transshipmentArticle/get', n('getTransshipmentArticleList'), params)
-export const getTransshipmentArticle = (params) => request.get('/blog/transshipmentArticle/getArticleDetail', n('getTransshipmentArticle'), params)
-export const addTransshipmentArticle = (params) => request.post('/blog/transshipmentArticle/add', n('addTransshipmentArticle'), params)
-export const editTransshipmentArticle = (params) => request.post('/blog/transshipmentArticle/edit', n('editArticle'), params)
-export const changeReleaseStatus = (params) => request.post('/blog/transshipmentArticle/changeReleaseStatus', n('changeReleaseStatus'), params)
-export const deleteTransshipmentArticle = (params) => request.post('/blog/transshipmentArticle/delete', n('deleteTransshipmentArticle'), params)
+export const getTransshipmentArticleList = (params) => request.get('/blog/transshipment_article/get', n('getTransshipmentArticleList'), params)
+export const getTransshipmentArticle = (params) => request.get('/blog/transshipment_article/getArticleDetail', n('getTransshipmentArticle'), params)
+export const addTransshipmentArticle = (params) => request.post('/blog/transshipment_article/add', n('addTransshipmentArticle'), params)
+export const editTransshipmentArticle = (params) => request.post('/blog/transshipment_article/edit', n('editArticle'), params)
+export const changeReleaseStatus = (params) => request.post('/blog/transshipment_article/changeReleaseStatus', n('changeReleaseStatus'), params)
+export const deleteTransshipmentArticle = (params) => request.post('/blog/transshipment_article/delete', n('deleteTransshipmentArticle'), params)
 

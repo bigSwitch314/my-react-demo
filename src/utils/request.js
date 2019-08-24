@@ -3,6 +3,7 @@ import { message } from 'antd'
 // import { removeLogin } from '../components/Authentication/util'
 
 const baseUrl = 'http://39.108.60.163:443'
+// const baseUrl = 'http://bigswitch314.cn:80'
 
 
 function fetchApi(url, options, timeout = 30000) {
