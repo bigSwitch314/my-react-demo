@@ -6,7 +6,7 @@ import OperatorIcons from '@/components/shared/OperatorIcon'
 import Pagination from '@/components/shared/Pagination'
 import HeaderBar from '@/components/shared/HeaderBar'
 import { addRole, getRoleList, changeStatus, deleteRole, editRole } from '@/modules/role'
-import RoleModal from './RoleModal/'
+import RoleModal from './RoleModal'
 
 import './Index.less'
 
