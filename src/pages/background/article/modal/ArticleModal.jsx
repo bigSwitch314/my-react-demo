@@ -99,7 +99,10 @@ class ArticleModal extends React.Component {
         title: '',
         release: 0,
       })
-      this.setState({ htmlValue: '' })
+      this.setState({
+        htmlValue: '',
+        editorValue: '',
+      })
     }
   }
 

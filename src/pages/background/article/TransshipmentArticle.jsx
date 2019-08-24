@@ -11,9 +11,7 @@ import TransshipmentPreviewModal from './modal/TransshipmentPreviewModal'
 import moment from 'moment'
 import './style/TransshipmentArticle.less'
 
-import { getCategoryList } from '../../../modules/category'
-import { getLabelList } from '../../../modules/label'
-import { getArticleList, changeReleaseStatus, getArticle, deleteArticle } from '../../../modules/article'
+import { getTransshipmentArticleList, changeReleaseStatus, getTransshipmentArticle, deleteTransshipmentArticle } from '../../../modules/transshipmentArticle'
 
 const FormItem = Form.Item
 const Option = Select.Option;
@@ -24,17 +22,13 @@ const { RangePicker } = DatePicker
 
 @connect(
   state => ({
-    categoryList: state.category.categoryList,
-    labelList: state.label.labelList,
-    articleList: state.article.articleList,
-    loading: state.loading['article/getArticleList'],
+    transshipmentArticleList: state.transshipmentArticle.transshipmentArticleList,
+    loading: state.loading['transshipmentArticle/getTransshipmentArticleList'],
   }), {
-    getCategoryList,
-    getLabelList,
-    getArticleList,
+    getTransshipmentArticleList,
     changeReleaseStatus,
-    getArticle,
-    deleteArticle,
+    getTransshipmentArticle,
+    deleteTransshipmentArticle,
   }
 )
 class OriginalArticle extends React.Component {
@@ -61,21 +55,19 @@ class OriginalArticle extends React.Component {
   }
 
   componentDidMount() {
-    this.getArticleList()
-    this.props.getCategoryList({})
-    this.props.getLabelList({})
+    this.getTransshipmentArticleList()
   }
 
   // 获取文章
   getArticle = (id) => {
-    return this.props.getArticle({ id })
+    return this.props.getTransshipmentArticle({ id })
   }
 
   // 获取文章列表
-  getArticleList = () => {
+  getTransshipmentArticleList = () => {
     const { currentPage, pageSize } = this.state
     const { getFieldsValue } = this.props.form
-    const { title='', category='', label=[], time, timeType=1 } = getFieldsValue()
+    const { title='', time, timeType=1 } = getFieldsValue()
 
     const beginTime = time ? time[0].format('YYYY-MM-DD HH:mm:ss') : ''
     const endTime = time ? time[1].format('YYYY-MM-DD HH:mm:ss') : ''
@@ -84,12 +76,9 @@ class OriginalArticle extends React.Component {
       message.error('结束时间必须大于开始时间')
       return
     }
-    this.props.getArticleList({
+    this.props.getTransshipmentArticleList({
       page_no: currentPage,
       page_size: pageSize,
-      back_ground: 1,
-      category_id: category,
-      label_ids: label.join(','),
       begin_time: beginTime,
       end_time: endTime,
       time_type: timeType,
@@ -99,7 +88,7 @@ class OriginalArticle extends React.Component {
 
   handleQuery = (e) => {
     e && e.preventDefault()
-    this.setState({ currentPage: 1 }, () => this.getArticleList())
+    this.setState({ currentPage: 1 }, () => this.getTransshipmentArticleList())
   }
 
   handleReset = () => {
@@ -136,12 +125,12 @@ class OriginalArticle extends React.Component {
   deleteData = (id) => {
     let idArr = []
     id instanceof Array ? idArr = id : idArr.push(id)
-    this.props.deleteArticle({
+    this.props.deleteTransshipmentArticle({
       id: idArr.join(','),
     }).then((res) => {
       if (res instanceof Error) { return }
       message.success('删除成功', 1, () => {
-        this.getArticleList()
+        this.getTransshipmentArticleList()
       })
       const selectedRowKeys = removeArr(this.state.selectedRowKeys, id)
       this.setState({ selectedRowKeys })
@@ -159,19 +148,9 @@ class OriginalArticle extends React.Component {
 
   /** 预览文章 */
   preview(record) {
-    // this.getArticle(record.id).then(res => {
-    //   if (res instanceof Error) { return }
-    //   this.setState({
-    //     previewVisible: true,
-    //   })
-    //   console.log(this.previewModelRef)
-    //   this.previewModelRef.getRecord(res.payload)
-    // })
-
     this.setState({
       previewVisible: true,
     })
-    console.log(this.previewModelRef)
     this.previewModelRef.getRecord(record)
   }
 
@@ -192,7 +171,7 @@ class OriginalArticle extends React.Component {
     this.setState({
       currentPage: 1,
       visible: false,
-    }, this.getArticleList)
+    }, this.getTransshipmentArticleList)
   }
 
   /** 关闭文章弹窗 */
@@ -216,19 +195,19 @@ class OriginalArticle extends React.Component {
       release: Number(checked),
     }).then(res => {
       if (res instanceof Error) { return }
-      this.getArticleList()
+      this.getTransshipmentArticleList()
     })
   }
 
   onShowSizeChange = (currentPage, pageSize) => {
     this.setState({ currentPage: 1, pageSize }, () => {
-      this.getArticleList()
+      this.getTransshipmentArticleList()
     })
   }
 
   changePage = (currentPage, pageSize) => {
     this.setState({ currentPage, pageSize }, () => {
-      this.getArticleList()
+      this.getTransshipmentArticleList()
     })
   }
 
@@ -242,41 +221,8 @@ class OriginalArticle extends React.Component {
       previewVisible,
     } = this.state
     const { getFieldDecorator } = this.props.form
-    const { loading } = this.props
-
-    const testData = [{
-      id: 1,
-      title: 'react进阶',
-      author: '秋雨',
-      link: 'https://www.cnblogs.com/gxp69/p/7251767.html',
-      release: 1,
-      edit_time: '2019-05-22 14:32',
-      create_time: '2019-05-14 09:19',
-    }, {
-      id: 2,
-      title: 'react进阶2',
-      author: '秋雨',
-      link: 'https://www.cnblogs.com/gxp69/p/7251767.html',
-      release: 1,
-      edit_time: '2019-05-22 14:32',
-      create_time: '2019-05-14 09:19'
-    }, {
-      id: 3,
-      title: 'react进阶3',
-      author: '秋雨',
-      link: 'https://www.cnblogs.com/gxp69/p/7251767.html',
-      release: 1,
-      edit_time: '2019-05-22 14:32',
-      create_time: '2019-05-14 09:19'
-    }, {
-      id: 4,
-      title: 'react进阶4',
-      author: '秋雨',
-      link: 'https://www.cnblogs.com/gxp69/p/7251767.html',
-      release: 1,
-      edit_time: '2019-05-22 14:32',
-      create_time: '2019-05-14 09:19'
-    }]
+    const { transshipmentArticleList = {}, loading } = this.props
+    const { list = [], count = 0 } = transshipmentArticleList
 
     const columns = [{
       title: '序号',
@@ -343,7 +289,7 @@ class OriginalArticle extends React.Component {
                 )}
               </FormItem>
             </Col>
-            <Col span={7} style={{ left: '-18px' }}>
+            <Col span={7} style={{ left: '-6px' }}>
               <InputGroup compact style={{ width: '310px' }}>
                 <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 12 }} className='query-time' >
                   {getFieldDecorator('time', {
@@ -353,21 +299,22 @@ class OriginalArticle extends React.Component {
                 </FormItem>
                 <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 12 }} className='query-time-type' >
                   {getFieldDecorator('timeType', {
-                    initialValue: '1'
+                    initialValue: '1',
                   })(
                     <Select style={{ width: '100px' }}>
                       <Option value="1">转载时间</Option>
+                      <Option value="2">更新时间</Option>
                     </Select>
                   )}
                 </FormItem>
               </InputGroup>
             </Col>
-            <Col span={1} style={{ left: '21px' }}>
+            <Col span={1} style={{ left: '33px' }}>
               <FormItem>
                 <Button type="primary" onClick={this.handleQuery}>查询</Button>
               </FormItem>
             </Col>
-            <Col span={1} style={{ left: '65px' }}>
+            <Col span={1} style={{ left: '77px' }}>
               <FormItem>
                 <Button onClick={this.handleReset}>重置</Button>
               </FormItem>
@@ -392,16 +339,14 @@ class OriginalArticle extends React.Component {
           rowKey={record => record.id}
           loading={loading}
           columns={columns}
-          // dataSource={articleList.list}
-          dataSource={testData}
+          dataSource={list}
           pagination={false}
         />
         <Pagination
           current={currentPage}
           pageSize={pageSize}
           pageSizeOptions={['5', '10', '15', '20']}
-          // total={articleList.count}
-          total={testData.length}
+          total={count}
           onChange={this.changePage}
           onShowSizeChange={this.onShowSizeChange}
         />

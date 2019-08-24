@@ -1,4 +1,4 @@
-import { isArray, uniq, indexOf, remove, cloneDeep } from "lodash";
+import { isArray, uniq, indexOf, remove, cloneDeep } from 'lodash';
 
 /** 将三级树型结构转为表格数据源 */
 export function transform(data) {
@@ -15,9 +15,9 @@ export function transform(data) {
         node: data[i].children[j].children.map(item => ({
           id: item.id,
           name: item.name,
-          status: 0
+          status: 0,
         })),
-        rowSpan: j === 0 ? data[i].children.length : 0
+        rowSpan: j === 0 ? data[i].children.length : 0,
       };
       result.push(item);
     }

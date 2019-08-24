@@ -5,8 +5,9 @@ import Editor from '@/components/markdown';
 import '@/components/markdown/editor/index.less';
 import handleCode from '@/components/markdown/helpers/handelCode';
 import marked from '@/components/markdown/helpers/marked';
-import { addArticle, editArticle } from '@/modules/article';
-import '../style/TransshipmentModal.less';
+import { addTransshipmentArticle, editTransshipmentArticle } from '@/modules/TransshipmentArticle';
+import { noSpecialChar, REGEXP_URL } from '@/utils/validator'
+import '../style/TransshipmentModal.less'
 
 const FormItem = Form.Item
 const RadioGroup = Radio.Group
@@ -28,11 +29,8 @@ const formItemLayoutContent = {
 
 @Form.create()
 @connect(
-  state => ({
-    categoryList: state.category.categoryList,
-    labelList: state.label.labelList,
-  }),
-  { addArticle, editArticle },
+  null,
+  { addTransshipmentArticle, editTransshipmentArticle },
   null,
   { forwardRef: true },
 )
@@ -69,9 +67,9 @@ class ArticleModal extends React.Component {
     const { setFieldsValue } = this.props.form
     if(isEdit) {
       setFieldsValue({
-        category: editData.category_id,
-        label: editData.label_ids,
         title: editData.title,
+        author: editData.author,
+        link: editData.link,
         release: editData.release,
       })
       this.setState({
@@ -81,12 +79,15 @@ class ArticleModal extends React.Component {
       })
     } else {
       setFieldsValue({
-        category: undefined,
-        label: [],
-        title: '',
+        title: null,
+        author: null,
+        link: null,
         release: 0,
       })
-      this.setState({ htmlValue: '' })
+      this.setState({
+        htmlValue: null,
+        editorValue: null,
+      })
     }
   }
 
@@ -125,7 +126,7 @@ class ArticleModal extends React.Component {
 
   onOk() {
     const { validateFieldsAndScroll, getFieldsValue } = this.props.form
-    const { addArticle, isEdit, editArticle } = this.props
+    const { addTransshipmentArticle, isEdit, editTransshipmentArticle } = this.props
     validateFieldsAndScroll((err) => {
       const { htmlValue, editorValue, editData } = this.state
       if (!err) {
@@ -135,26 +136,24 @@ class ArticleModal extends React.Component {
         }
 
         // 保存文章
-        const { title, category, label, release } = getFieldsValue()
+        const { title, author, link, release } = getFieldsValue()
         const param = {
           title,
-          category_id: category,
-          label_ids: label.join(','),
+          author: author,
+          link: link,
           content_md: editorValue,
-          content_html: 'not_has_html',
           release,
-          type: 1,
         }
 
         if(isEdit) {
           param.id = editData.id
-          editArticle(param).then((res) => {
+          editTransshipmentArticle(param).then((res) => {
             if (res instanceof Error) { return }
             this.props.onOk()
             this.setState({ htmlValue: null })
           })
         } else {
-          addArticle(param).then((res) => {
+          addTransshipmentArticle(param).then((res) => {
             if (res instanceof Error) { return }
             this.props.onOk()
             this.setState({ htmlValue: null })
@@ -197,11 +196,9 @@ class ArticleModal extends React.Component {
                   required: true,
                   message: '请输入标题',
                   whitespace: true,
-                }, {
-                  // validator: this.validateOldPassword,
-                }],
+                }, noSpecialChar],
               })(
-                <Input />,
+                <Input maxLength={200} />,
               )}
             </FormItem>
             <FormItem
@@ -214,9 +211,9 @@ class ArticleModal extends React.Component {
                   required: true,
                   message: '请输入作者',
                   whitespace: true,
-                }],
+                }, noSpecialChar],
               })(
-                <Input />,
+                <Input maxLength={200} />,
               )}
             </FormItem>
             <FormItem
@@ -228,9 +225,12 @@ class ArticleModal extends React.Component {
                   required: true,
                   message: '请输入原文链接',
                   whitespace: true,
+                }, {
+                  pattern: REGEXP_URL,
+                  message: '请输入正确url',
                 }],
               })(
-                <Input style={{ left: 8 }}/>,
+                <Input style={{ left: 8 }} maxLength={300} />,
               )}
             </FormItem>
             <FormItem
@@ -263,7 +263,7 @@ class ArticleModal extends React.Component {
               {getFieldDecorator('content', {
                 rules: [{
                   required: true,
-                  message: ' '
+                  message: ' ',
                 }],
                 initialValue: ' ',
               })(

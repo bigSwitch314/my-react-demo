@@ -4,11 +4,14 @@ import { Modal } from 'antd'
 import '../style/PreviewModal.less'
 import marked from '../../../../components/markdown/helpers/marked'
 import handleCode from '../../../../components/markdown/helpers/handelCode'
+import { getTransshipmentArticle } from '@/modules/TransshipmentArticle'
 
 
 @connect(
-  null,
-  null,
+  state => ({
+    transshipmentArticle: state.transshipmentArticle.transshipmentArticle,
+  }),
+  { getTransshipmentArticle },
   null,
   { forwardRef: true },
 )
@@ -30,8 +33,16 @@ class TransshipmentPreviewModal extends React.Component {
   componentDidMount() {
   }
 
+  // 获取文章
+  getArticle = (id) => {
+    return this.props.getTransshipmentArticle({ id })
+  }
+
   getRecord(record) {
-    this.setState({ article: record })
+    this.getArticle(record.id).then(res => {
+      console.log(res)
+      this.setState({ article: res.payload})
+    })
   }
 
   render() {
