@@ -30,27 +30,26 @@ module.exports = merge(baseWebpackConfig, {
     })
   ],
   module: {
-    rules:
-      [
-        {
-          test: /\.(css|less)$/,
-          use: [
-            MiniCssExtractPlugin.loader,
-            {
-              loader: 'css-loader',
-              options: {
-                localIdentName: '[local]__[hash:7]'
-              }
-            },
-            {
-              loader: 'less-loader',
-            },
-            {
-              loader: 'postcss-loader'
+    rules: [
+      {
+        test: /\.(css|less)$/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: {
+              localIdentName: '[local]__[hash:7]'
             }
-          ]
-        },
-      ]
+          },
+          {
+            loader: 'postcss-loader'
+          },
+          {
+            loader: 'less-loader',
+          },
+        ]
+      },
+    ]
   },
   optimization: {
     minimizer: [

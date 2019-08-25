@@ -20,7 +20,20 @@ module.exports = {
           { loader: 'eslint-loader' }
         ],
         include: SRC_PATH,
-      }
+      },
+      {
+        test: /(iconfont.svg)|\.(woff|woff2|eot|ttf|otf)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',  // [path] 上下文环境路径
+              publicPath: './assets/iconfont/',    // 公共路径
+              outputPath: 'assets/iconfont/',  // 输出路径							
+            }
+          }				
+        ]
+      },
     ]
   },
   resolve: {
