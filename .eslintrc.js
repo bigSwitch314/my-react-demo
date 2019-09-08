@@ -40,7 +40,10 @@ module.exports = {
     "no-spaced-func": 1, // 函数调用时 函数名与()之间不能有空格
     "no-trailing-spaces": 1, // 一行结束后面不要有空格
     "no-unneeded-ternary": 1, // 禁止不必要的嵌套 var isYes = answer === 1 ? true : false
-
+    "prefer-const": 1,  // 更喜欢用const
+    "comma-dangle": [1, "always-multiline"],  // 要求或禁止末尾逗号
+    "comma-spacing": [1, { "before": false, "after": true }],  // 强制在逗号前后使用一致的空格
+    // "array-bracket-spacing": [1, "always"], // 强制数组方括号中使用一致的空格
   },
   "env": {
     "es6": true,

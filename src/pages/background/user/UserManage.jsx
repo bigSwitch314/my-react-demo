@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux';
 import './style/UserManage.less'
-import TabUser from './tabUser'
-import TabRole from './tabRole'
+import TabUser from './tabUser/Index'
+import TabRole from './tabRole/Index'
 import { Tabs } from 'antd'
 
 
@@ -37,7 +37,7 @@ class UserManage extends React.Component {
     const { count = 0 } = this.props.userList
     return (
       <div className="container">
-        <Tabs defaultActiveKey="1">
+        <Tabs defaultActiveKey="2">
           <TabPane tab={`用户列表(${count})`} key="1">
             <TabUser />
           </TabPane>

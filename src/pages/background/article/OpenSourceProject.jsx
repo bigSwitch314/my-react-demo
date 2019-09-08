@@ -3,6 +3,10 @@ import { Table, Switch, Row, Col, Form, Select, Input, DatePicker, Button, List,
 import OperatorIcons from 'components/shared/OperatorIcon'
 import HeaderBar from 'components/shared/HeaderBar'
 import UpdateLogModal from './modal/UpdateLogModal'
+<<<<<<< HEAD
+=======
+import ProjectModal from './modal/ProjectModal'
+>>>>>>> fed644f73e4fa13c70b7d0cb8918fa2dd412bb0e
 import './style/OpenSourceProject.less'
 
 const FormItem = Form.Item
@@ -19,8 +23,15 @@ class OpenSourceProject extends React.Component {
     this.state = {
       currentPage: 1,
       pageSize: 5,
+<<<<<<< HEAD
       UpdateLogModalVisible: false,
+=======
+      isEdit: false,
+      UpdateLogModalVisible: false,
+      projectVisible: false,
+>>>>>>> fed644f73e4fa13c70b7d0cb8918fa2dd412bb0e
     }
+    this.projectModelRef = React.createRef()
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -48,6 +59,40 @@ class OpenSourceProject extends React.Component {
     this.setState({ UpdateLogModalVisible: false })
   }
 
+<<<<<<< HEAD
+=======
+  /** 开源项目弹窗显示（添加） */
+  addProject = () => {
+    this.setState({
+      projectVisible: true,
+      isEdit: false,
+    })
+    this.projectModelRef.setFieldsValue(false, null)
+  }
+
+  /** 开源项目弹窗显示（编辑） */
+  editProject = (record) => {
+    this.setState({
+      projectVisible: true,
+      isEdit: true,
+    })
+    this.projectModelRef.setFieldsValue(true, record)
+  }
+
+  /** 保存开源项目  */
+  handleOk = () => {
+    this.setState({
+      currentPage: 1,
+      projectVisible: false,
+    }, {})
+  }
+
+  /** 关闭开源项目弹窗 */
+  handleCancel = () => {
+    this.setState({ projectVisible: false })
+  }
+
+>>>>>>> fed644f73e4fa13c70b7d0cb8918fa2dd412bb0e
   expandedRowRender(record) {
     const data = [
       {
@@ -79,13 +124,30 @@ class OpenSourceProject extends React.Component {
           <div className="add-log">
             <Icon type="plus" title="添加" onClick={() => this.showUpdateLogModal()} />
           </div>
+<<<<<<< HEAD
           <div>
+=======
+          <div className="pagination">
+>>>>>>> fed644f73e4fa13c70b7d0cb8918fa2dd412bb0e
             <Pagination simple defaultCurrent={2} total={50} />
           </div>
         </React.Fragment>
       )
     }
 
+<<<<<<< HEAD
+=======
+    const getTitle = (title) => {
+      return (
+        <div className="title">
+          <span>{title}</span>
+          <Icon type="edit" title="添加" onClick={() => this.showUpdateLogModal()} style={{ margin: '0px 20px' }} className="title-icon"/>
+          <Icon type="delete" title="添加" onClick={null} className="title-icon"/>
+        </div>
+      )
+    }
+
+>>>>>>> fed644f73e4fa13c70b7d0cb8918fa2dd412bb0e
     return (
       <List
         header={getHeadr()}
@@ -94,7 +156,11 @@ class OpenSourceProject extends React.Component {
         renderItem={item => (
           <ListItem>
             <ListItemMeta
+<<<<<<< HEAD
               title={item.title}
+=======
+              title={getTitle(item.title)}
+>>>>>>> fed644f73e4fa13c70b7d0cb8918fa2dd412bb0e
               description={getDescription(item.updateLog)}
             />
           </ListItem>
@@ -108,6 +174,11 @@ class OpenSourceProject extends React.Component {
       currentPage,
       pageSize,
       UpdateLogModalVisible,
+<<<<<<< HEAD
+=======
+      projectVisible,
+      isEdit,
+>>>>>>> fed644f73e4fa13c70b7d0cb8918fa2dd412bb0e
     } = this.state
 
     const { getFieldDecorator } = this.props.form
@@ -131,14 +202,14 @@ class OpenSourceProject extends React.Component {
         dataIndex: 'level',
         key: 'level',
         render: (text, record) => {
-          const index = record.level + 1
-          return levelArr.slice(index, index + 1)
+          const index = record.level - 1
+          return levelArr[index]
         },
       },
       { title: '地址', dataIndex: 'url', key: 'url', width: '30px' },
       { title: '版本', dataIndex: 'version', key: 'version' },
       {
-        title: '是否开源',
+        title: '是否发布',
         dataIndex: 'release',
         render: (text, record) => (
           <Switch
@@ -159,7 +230,7 @@ class OpenSourceProject extends React.Component {
         render: (text, record) => {
           return (
             <OperatorIcons>
-              <OperatorIcons.Icon title="编辑" type="edit" onClick={() => this.editArticle(record)} />
+              <OperatorIcons.Icon title="编辑" type="edit" onClick={() => this.editProject(record)} />
               <OperatorIcons.Icon title="删除" type="delete" onClick={() => this.showConfirm(record.id)} />
             </OperatorIcons>
           )
@@ -249,7 +320,7 @@ class OpenSourceProject extends React.Component {
         <hr className="line-hr" />
         <HeaderBar>
           <HeaderBar.Left>
-            <Button type="primary" onClick={() => this.addArticle()}>添加</Button>
+            <Button type="primary" onClick={() => this.addProject()}>添加</Button>
           </HeaderBar.Left>
         </HeaderBar>
         <Table
@@ -258,6 +329,18 @@ class OpenSourceProject extends React.Component {
           dataSource={data}
         />
 
+<<<<<<< HEAD
+=======
+        {/* 开源项目弹窗 */}
+        <ProjectModal
+          isEdit={isEdit}
+          visible={projectVisible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+          wrappedComponentRef={(node) => this.projectModelRef = node}
+        />
+
+>>>>>>> fed644f73e4fa13c70b7d0cb8918fa2dd412bb0e
         {/* 更新日志弹窗 */}
         <UpdateLogModal
           onOk={() => this.onOkUpdateLogModal()}

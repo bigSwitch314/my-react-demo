@@ -30,56 +30,41 @@ module.exports = merge(baseWebpackConfig, {
     })
   ],
   module: {
-    rules:
-      [
-        {
-          test: /\.(css|less)$/,
-          use: [
-            MiniCssExtractPlugin.loader,
-            {
-              loader: 'css-loader',
-              options: {
-                modules: true,
-                localIdentName: '[local]__[hash:7]'
-              }
-            },
-            {
-              loader: 'less-loader',
-            },
-            {
-              loader: 'postcss-loader'
+    rules: [
+      {
+        test: /\.(css|less)$/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: {
+              localIdentName: '[local]__[hash:7]'
             }
-          ]
-        },
-      ]
+          },
+          {
+            loader: 'postcss-loader'
+          },
+          {
+            loader: 'less-loader',
+          },
+        ]
+      },
+    ]
   },
   optimization: {
     minimizer: [
       new UglifyJSPlugin(),
-      new OptimizeCSSAssetsPlugin({
-        cssProcessorOptions: true
-          ? {
-            map: { inline: false }
-          }
-          : {}
-      })
+      new OptimizeCSSAssetsPlugin()
     ],
     splitChunks: {
-      chunks: "all",
+      chunks: 'all',
       minChunks: 1,
       minSize: 0,
       cacheGroups: {
-        framework: {
-          priority: 200,
-          test: "framework",
-          name: "framework",
-          enforce: true,
-          reuseExistingChunk: true
-        },
         vendor: {
           priority: 10,
           test: /node_modules/,
-          name: "vendor",
+          name: 'vendor',
           enforce: true,
           reuseExistingChunk: true
         }

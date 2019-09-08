@@ -1,51 +1,36 @@
-import { Checkbox, Col, Form, Input, Modal, Radio, Row } from 'antd';
+import { Form, Input, Modal, Radio } from 'antd';
 import React from 'react';
 import { connect } from 'react-redux';
 import Editor from '@/components/markdown';
 import '@/components/markdown/editor/index.less';
 import handleCode from '@/components/markdown/helpers/handelCode';
 import marked from '@/components/markdown/helpers/marked';
-import { addArticle, editArticle } from '@/modules/article';
-import '../style/ArticleModal.less';
+import { addTransshipmentArticle, editTransshipmentArticle } from '@/modules/transshipmentArticle';
+import { noSpecialChar, REGEXP_URL } from '@/utils/validator'
+import '../style/TransshipmentModal.less'
 
 const FormItem = Form.Item
 const RadioGroup = Radio.Group
-const CheckboxGroup = Checkbox.Group
 
 const formItemLayout = {
-  labelCol: {
-    sm: { span: 2 },
-  },
-  wrapperCol: {
-    sm: { span: 12 },
-  },
+  labelCol: { span: 2 },
+  wrapperCol: { span: 12 },
 }
 
 const formItemLayoutRadio = {
-  labelCol: {
-    sm: { span: 2 },
-  },
-  wrapperCol: {
-    sm: { span: 20 },
-  },
+  labelCol: { span: 2 },
+  wrapperCol: { span: 20 },
 }
 
 const formItemLayoutContent = {
-  labelCol: {
-    sm: { span: 2 },
-  },
-  wrapperCol: {
-    sm: { span: 21 },
-  },
+  labelCol: {span: 2 },
+  wrapperCol: { span: 21 },
 }
 
 @Form.create()
 @connect(
-  state => ({
-    categoryList: state.category.categoryList,
-    labelList: state.label.labelList,
-  }),
-  { addArticle, editArticle },
+  null,
+  { addTransshipmentArticle, editTransshipmentArticle },
   null,
   { forwardRef: true },
 )
@@ -82,9 +67,9 @@ class ArticleModal extends React.Component {
     const { setFieldsValue } = this.props.form
     if(isEdit) {
       setFieldsValue({
-        category: editData.category_id,
-        label: editData.label_ids,
         title: editData.title,
+        author: editData.author,
+        link: editData.link,
         release: editData.release,
       })
       this.setState({
@@ -94,14 +79,14 @@ class ArticleModal extends React.Component {
       })
     } else {
       setFieldsValue({
-        category: undefined,
-        label: [],
-        title: '',
+        title: null,
+        author: null,
+        link: null,
         release: 0,
       })
       this.setState({
-        htmlValue: '',
-        editorValue: '',
+        htmlValue: null,
+        editorValue: null,
       })
     }
   }
@@ -141,7 +126,7 @@ class ArticleModal extends React.Component {
 
   onOk() {
     const { validateFieldsAndScroll, getFieldsValue } = this.props.form
-    const { addArticle, isEdit, editArticle } = this.props
+    const { addTransshipmentArticle, isEdit, editTransshipmentArticle } = this.props
     validateFieldsAndScroll((err) => {
       const { htmlValue, editorValue, editData } = this.state
       if (!err) {
@@ -151,26 +136,24 @@ class ArticleModal extends React.Component {
         }
 
         // 保存文章
-        const { title, category, label, release } = getFieldsValue()
+        const { title, author, link, release } = getFieldsValue()
         const param = {
           title,
-          category_id: category,
-          label_ids: label.join(','),
+          author: author,
+          link: link,
           content_md: editorValue,
-          content_html: 'not_has_html',
           release,
-          type: 1,
         }
 
         if(isEdit) {
           param.id = editData.id
-          editArticle(param).then((res) => {
+          editTransshipmentArticle(param).then((res) => {
             if (res instanceof Error) { return }
             this.props.onOk()
             this.setState({ htmlValue: null })
           })
         } else {
-          addArticle(param).then((res) => {
+          addTransshipmentArticle(param).then((res) => {
             if (res instanceof Error) { return }
             this.props.onOk()
             this.setState({ htmlValue: null })
@@ -187,18 +170,9 @@ class ArticleModal extends React.Component {
 
   render() {
     const { editorValue, editorVisible, htmlValue, hasContentMessage } = this.state
-    const { visible, onCancel, categoryList, labelList, isEdit } = this.props
+    const { visible, onCancel, isEdit } = this.props
     const { getFieldDecorator } = this.props.form
 
-    let CategoryOptions = []
-    if(categoryList && categoryList.list) {
-      CategoryOptions = categoryList.list
-    }
-
-    let labelOptions = []
-    if(labelList && labelList.list) {
-      labelOptions = labelList.list
-    }
 
     return (
       <React.Fragment>
@@ -211,73 +185,58 @@ class ArticleModal extends React.Component {
           onCancel={onCancel}
           okText='保存'
         >
-          <div className='article-modal'>
+          <div className='Transshipment-modal'>
             <FormItem
               label='标题'
               {...formItemLayout}
+              style={{ left: 8 }}
             >
               {getFieldDecorator('title', {
                 rules: [{
                   required: true,
                   message: '请输入标题',
                   whitespace: true,
-                }, {
-                  // validator: this.validateOldPassword,
-                }],
+                }, noSpecialChar],
               })(
-                <Input />,
+                <Input maxLength={200} />,
               )}
             </FormItem>
             <FormItem
-              label='分类'
-              {...formItemLayoutRadio}
+              label='作者'
+              {...formItemLayout}
+              style={{ left: 8 }}
             >
-              {getFieldDecorator('category', {
+              {getFieldDecorator('author', {
                 rules: [{
                   required: true,
-                  message: '请选择分类',
+                  message: '请输入作者',
                   whitespace: true,
-                  type: 'number',
-                }],
+                }, noSpecialChar],
               })(
-                <RadioGroup onChange={this.onRadioChange}>
-                  <Row>
-                    {CategoryOptions.map(item => (
-                      <Col key={item.id} span={4} style={{ height: 30 }}>
-                        <Radio value={item.id}>{item.name}</Radio>
-                      </Col>
-                    ))}
-                  </Row>
-                </RadioGroup>,
+                <Input maxLength={200} />,
               )}
             </FormItem>
             <FormItem
-              label='标签'
-              {...formItemLayoutRadio}
+              label='原文链接'
+              {...formItemLayout}
             >
-              {getFieldDecorator('label', {
+              {getFieldDecorator('link', {
                 rules: [{
-                  required: false,
+                  required: true,
+                  message: '请输入原文链接',
+                  whitespace: true,
+                }, {
+                  pattern: REGEXP_URL,
+                  message: '请输入正确url',
                 }],
               })(
-                <CheckboxGroup
-                  onChange={this.onLabelChange}
-                >
-                  <Row>
-                    {labelOptions.map(item => (
-                      <Col key={item.id} span={4} style={{ height: 30 }}>
-                        <Checkbox value={item.id}>
-                          {item.name}
-                        </Checkbox>
-                      </Col>
-                    ))}
-                  </Row>
-                </CheckboxGroup>,
+                <Input style={{ left: 8 }} maxLength={300} />,
               )}
             </FormItem>
             <FormItem
               label='发布'
               {...formItemLayoutRadio}
+              style={{ left: 8 }}
             >
               {getFieldDecorator('release', {
                 rules: [{
@@ -299,6 +258,7 @@ class ArticleModal extends React.Component {
             <FormItem
               label='内容'
               {...formItemLayoutContent}
+              style={{ left: 8 }}
             >
               {getFieldDecorator('content', {
                 rules: [{

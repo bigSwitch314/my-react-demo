@@ -5,6 +5,8 @@ import Routers from './routers'
 import { Provider } from 'react-redux'
 import { LocaleProvider } from 'antd'
 import zhCN from 'antd/lib/locale-provider/zh_CN'
+import './styles/index.less'
+import '@/assets/iconfont/iconfont.css'
 
 window.log = window.console.log
 

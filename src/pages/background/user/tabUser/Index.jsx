@@ -8,7 +8,7 @@ import Pagination from '@/components/shared/Pagination'
 import HeaderBar from '@/components/shared/HeaderBar'
 import { deleteConfirm, deleteBatchConfirm, removeArr } from 'components/shared/Confirm'
 import { noSpecialChar, passwordValidate, REGEXP_MAIL } from '@/utils/validator'
-import './index.less'
+import './Index.less'
 
 const CheckboxGroup = Checkbox.Group
 const RadioGroup = Radio.Group
