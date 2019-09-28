@@ -138,7 +138,7 @@ class OpenSourceProject extends React.Component {
   onCancelUpdateLogModal() {
     this.setState({ UpdateLogModalVisible: false })
   }
-
+  
   onDoSuccess(ospId) {
     this.onExpand(true, ospId, true)
   }
@@ -237,6 +237,7 @@ class OpenSourceProject extends React.Component {
               total={count}
               onChange={this.onChangePageLog}
             />
+            <Pagination simple defaultCurrent={2} total={50} />
           </div>
         </React.Fragment>
       )
@@ -518,6 +519,7 @@ class OpenSourceProject extends React.Component {
           onChange={this.changePage}
           onShowSizeChange={this.onShowSizeChange}
         />
+
         {/* 开源项目弹窗 */}
         <ProjectModal
           isEdit={isEdit}
@@ -526,6 +528,7 @@ class OpenSourceProject extends React.Component {
           onCancel={this.handleCancel}
           wrappedComponentRef={(node) => this.projectModelRef = node}
         />
+
         {/* 更新日志弹窗 */}
         <UpdateLogModal
           onOk={() => this.onOkUpdateLogModal()}
