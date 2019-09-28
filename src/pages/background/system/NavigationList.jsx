@@ -317,7 +317,7 @@ class CategoryManage extends React.Component {
             <HeaderBar>
               <HeaderBar.Left>
                 <Button type="primary" onClick={this.addHandler}>添加</Button>
-                <Button className="button" onClick={this.batchDelete}>批量删除</Button>                
+                <Button className="button" onClick={this.batchDelete}>批量删除</Button>
               </HeaderBar.Left>
             </HeaderBar>
           </div>

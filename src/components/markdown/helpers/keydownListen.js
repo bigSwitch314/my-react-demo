@@ -1,3 +1,4 @@
+/* eslint-disable */
 const KEY_CODE = {
   F8: 119,
   F9: 120,

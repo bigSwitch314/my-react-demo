@@ -109,7 +109,7 @@ class BasicLayout extends React.Component {
               onCollapse={this.onCollapse}
             >
               <div style={{ width: 256 }}>
-                <Menu
+                <Menu className="menu"
                   openKeys={[openkeys]}
                   onOpenChange={this.onOpenChange}
                   selectedKeys={selectkeys}

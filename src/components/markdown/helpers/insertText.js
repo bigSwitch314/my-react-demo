@@ -1,3 +1,4 @@
+/* eslint-disable */
 function insert($vm, prefix, hint = '', subfix = '') {
   const value = $vm.value
   if ($vm.selectionStart || $vm.selectionStart === 0) {

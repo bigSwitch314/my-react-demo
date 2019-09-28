@@ -1,9 +1,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Modal, Form, Input, Icon, Button } from 'antd'
+import { Modal, Form, Input, Icon, Button, DatePicker } from 'antd'
+import { addOspUpdateLog } from '@/modules/ospUpdateLog'
 import '../style/UpdateLogModal.less'
+import moment from 'moment'
 
-let id = 3;
+const FormItem = Form.Item
+let id = 1
 
 
 @Form.create()
@@ -11,7 +14,7 @@ let id = 3;
   state => ({
     categoryList: state.category.categoryList,
   }),
-  null,
+  { addOspUpdateLog },
   null,
   { forwardRef: true },
 )
@@ -22,6 +25,7 @@ class PreviewModal extends React.Component {
     this.state = {
       article: null,
       categoryName: null,
+      keyArr: [0],
     }
   }
 
@@ -34,6 +38,26 @@ class PreviewModal extends React.Component {
   }
 
   componentDidMount() {
+
+  }
+
+  setFieldsValue = (isEdit, editData) => {
+    const { setFieldsValue } = this.props.form
+    if(isEdit) {
+      setFieldsValue({
+        version: editData.version,
+        time: moment(editData.create_time, 'YYYY/MM/DD'),
+      })
+      const keyArr = Array(editData.content.length).fill().map((e, i) => i)
+      this.setState({ editData, keyArr }, () => {
+        setFieldsValue({names: editData.content})
+      })
+    } else {
+      setFieldsValue({
+        version: '',
+        time: null,
+      })
+    }
   }
 
   remove = k => {
@@ -63,20 +87,39 @@ class PreviewModal extends React.Component {
     });
   };
 
-  handleSubmit = e => {
+  onOkHandler(e) {
     e.preventDefault();
-    this.props.form.validateFields((err, values) => {
+    const { ospId, form, onOk, addOspUpdateLog, onDoSuccess } = this.props
+    const { validateFields, resetFields } = form
+
+    validateFields((err, values) => {
       if (!err) {
-        const { keys, names } = values;
-        console.log('Received values of form: ', values);
-        console.log('Merged values:', keys.map(key => names[key]));
+        const { names, time, version } = values;
+        const createTime = time ? time.format('YYYY-MM-DD HH:mm:ss') : ''
+        const params = {
+          osp_id: ospId,
+          version,
+          create_time: createTime,
+          content: names,
+        }
+        addOspUpdateLog(params).then(res => {
+          // debugger
+          // if (res.errcode === 0) onDoSuccess()
+          onDoSuccess()
+        })
       }
     });
-  };
+
+    onOk()
+    setTimeout(() => {
+      resetFields()
+    }, 1000)
+  }
 
 
   render() {
-    const { visible, onCancel, onOk } = this.props
+    const { visible, onCancel } = this.props
+    const { keyArr } = this.state
     const { getFieldDecorator, getFieldValue } = this.props.form;
 
     const formItemLayoutWithOutLabel = {
@@ -85,7 +128,8 @@ class PreviewModal extends React.Component {
         sm: { span: 20, offset: 4 },
       },
     };
-    getFieldDecorator('keys', { initialValue: [0, 1, 2] });
+
+    getFieldDecorator('keys', { initialValue: keyArr });
     const keys = getFieldValue('keys');
     const formItems = keys.map(k => (
       <Form.Item
@@ -102,7 +146,7 @@ class PreviewModal extends React.Component {
               message: "Please input passenger's name or delete this field.",
             },
           ],
-        })(<Input placeholder="Update Log" style={{ width: '60%', marginRight: 8 }} />)}
+        })(<Input placeholder="请输入更新日志" style={{ width: '60%', marginRight: 8 }} />)}
         {keys.length > 1 ? (
           <Icon
             className="dynamic-delete-button"
@@ -118,12 +162,24 @@ class PreviewModal extends React.Component {
         width={600}
         visible={visible}
         onCancel={onCancel}
-        onOk={onOk}
+        onOk={(e) => this.onOkHandler(e)}
         title={'添加更新日志'}
         maskClosable={false}
         className="container"
       >
-        <Form onSubmit={this.handleSubmit}>
+        <Form>
+          <FormItem {...formItemLayoutWithOutLabel} >
+            {getFieldDecorator('version', {
+            })(
+              <Input placeholder="请输入版本号" style={{ width: '60%', marginRight: 8 }} />
+            )}
+          </FormItem>
+          <FormItem {...formItemLayoutWithOutLabel} >
+            {getFieldDecorator('time', {
+            })(
+              <DatePicker placeholder="请选择日期" style={{ width: '60%', marginRight: 8 }} />
+            )}
+          </FormItem>
           {formItems}
           <Form.Item {...formItemLayoutWithOutLabel}>
             <Button type="dashed" onClick={this.add} style={{ width: '60%' }}>

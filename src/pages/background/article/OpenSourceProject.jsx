@@ -1,10 +1,39 @@
 import React from 'react'
-import { Table, Switch, Row, Col, Form, Select, Input, DatePicker, Button, List, Icon, Pagination } from 'antd'
+import { connect } from 'react-redux'
+import {
+  Table,
+  Switch,
+  Row,
+  Col,
+  Form,
+  Select,
+  Input,
+  DatePicker,
+  Button,
+  List,
+  Icon,
+  Pagination,
+  message,
+  Popover,
+} from 'antd'
+import moment from 'moment'
+
 import OperatorIcons from 'components/shared/OperatorIcon'
+import MyPagination from 'components/shared/Pagination'
 import HeaderBar from 'components/shared/HeaderBar'
 import UpdateLogModal from './modal/UpdateLogModal'
 import ProjectModal from './modal/ProjectModal'
 import './style/OpenSourceProject.less'
+
+import { deleteConfirm, removeArr } from 'components/shared/Confirm'
+import {
+  getOpenSourceProjectList,
+  changeReleaseStatus,
+  getOpenSourceProject,
+  deleteOpenSourceProject,
+} from '../../../modules/openSourceProject'
+
+import { getOspUpdateLogList } from '@/modules/ospUpdateLog'
 
 const FormItem = Form.Item
 const Option = Select.Option
@@ -13,7 +42,25 @@ const RangePicker = DatePicker.RangePicker
 const ListItem = List.Item
 const ListItemMeta = List.Item.Meta
 
+let updateLog = null
+
+
 @Form.create()
+@connect(
+  state => ({
+    openSourceProjectList: state.openSourceProject.openSourceProjectList,
+    ospUpdateLogList: state.ospUpdateLog.ospUpdateLogList,
+    loading: state.loading['openSourceProject/getOpenSourceProjectList'],
+    loadingLog: state.loading['ospUpdateLog/getOspUpdateLogList'],
+  }), {
+    getOpenSourceProjectList,
+    changeReleaseStatus,
+    getOpenSourceProject,
+    deleteOpenSourceProject,
+    getOspUpdateLogList,
+  }
+)
+
 class OpenSourceProject extends React.Component {
   constructor(props) {
     super(props)
@@ -23,8 +70,16 @@ class OpenSourceProject extends React.Component {
       isEdit: false,
       UpdateLogModalVisible: false,
       projectVisible: false,
+      expandedRowKeys: [],
+      ospId: null,
+      updateLogItem: null,
+      expandedRowRenderAgain: 1,
+      addLogSuccess: 1,
+      currentPageLog: 1,
+      pageSizeLog: 5,
     }
     this.projectModelRef = React.createRef()
+    this.updateLogModelRef = React.createRef()
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -36,12 +91,44 @@ class OpenSourceProject extends React.Component {
   }
 
   componentDidMount() {
-    log('4444444444444444444444444')
+    this.getOpenSourceProjectList()
 
   }
 
-  showUpdateLogModal() {
-    this.setState({ UpdateLogModalVisible: true })
+  // 获取开源项目列表
+  getOpenSourceProjectList = () => {
+    const { currentPage, pageSize } = this.state
+    const { getFieldsValue } = this.props.form
+    const { name='', time, timeType=1 } = getFieldsValue()
+
+    const beginTime = time ? time[0].format('YYYY-MM-DD HH:mm:ss') : ''
+    const endTime = time ? time[1].format('YYYY-MM-DD HH:mm:ss') : ''
+
+    if (beginTime && endTime && moment(beginTime).valueOf() >= moment(endTime).valueOf()) {
+      message.error('结束时间必须大于开始时间')
+      return
+    }
+    this.props.getOpenSourceProjectList({
+      page_no: currentPage,
+      page_size: pageSize,
+      begin_time: beginTime,
+      end_time: endTime,
+      time_type: timeType,
+      name,
+    })
+  }
+
+  // 获取更新日志列表
+  getOspUpdateLogList(osp_id) {
+    this.props.getOspUpdateLogList({ osp_id })
+  }
+
+  showUpdateLogModal(ospId, item=null) {
+    this.setState({
+      UpdateLogModalVisible: true,
+      ospId,
+    })
+    this.updateLogModelRef.setFieldsValue(item !== null, item)
   }
 
   onOkUpdateLogModal() {
@@ -50,6 +137,10 @@ class OpenSourceProject extends React.Component {
 
   onCancelUpdateLogModal() {
     this.setState({ UpdateLogModalVisible: false })
+  }
+
+  onDoSuccess(ospId) {
+    this.onExpand(true, ospId, true)
   }
 
   /** 开源项目弹窗显示（添加） */
@@ -75,7 +166,7 @@ class OpenSourceProject extends React.Component {
     this.setState({
       currentPage: 1,
       projectVisible: false,
-    }, {})
+    }, () => this.getOpenSourceProjectList())
   }
 
   /** 关闭开源项目弹窗 */
@@ -83,18 +174,35 @@ class OpenSourceProject extends React.Component {
     this.setState({ projectVisible: false })
   }
 
+  async onExpand(expanded, ospId, page_1=false) {
+    const { currentPageLog, pageSizeLog } = this.state
+    this.setState({
+      loadingLog: true,
+    })
+    const result = await this.props.getOspUpdateLogList({
+      osp_id: ospId,
+      page_no: page_1 ? 1 : currentPageLog,
+      page_size: pageSizeLog,
+    })
+    updateLog = result ? result.payload : []
+
+    this.setState({
+      expandedRowRenderAgain: ospId,
+      loadingLog: false,
+      currentPageLog: page_1 ? 1 : currentPageLog,
+      ospId,
+    })
+  }
+
   expandedRowRender(record) {
-    const data = [
-      {
-        title: 'v_2.0.12  2019-06-29',
-      },
-      {
-        title: 'v_2.0.11  2019-06-21',
-      },
-      {
-        title: 'v_2.0.10  2019-06-18',
-      },
-    ]
+    let data = []
+    let count = 0
+    if (updateLog) {
+      data = updateLog.list
+      count = updateLog.count
+    }
+
+    const { currentPageLog, pageSizeLog, loadingLog } = this.state
 
     const getDescription = (updateLog) => {
       const log = updateLog || ['文章列表样式修正', '添加文章失败修复', '新增开源项目']
@@ -109,43 +217,144 @@ class OpenSourceProject extends React.Component {
 
     const getHeadr = () => {
       return (
-        <React.Fragment className="header">
+        <React.Fragment>
           <div>更新日志 </div>
           <div className="add-log">
-            <Icon type="plus" title="添加" onClick={() => this.showUpdateLogModal()} />
+            <Icon
+              type="plus"
+              title="添加"
+              onClick={() => this.showUpdateLogModal(record.id)}
+            />
           </div>
           <div className="pagination">
-            <Pagination simple defaultCurrent={2} total={50} />
+            <span style={{ left: '-46px', position: 'absolute' }}>
+              共{count}条
+            </span>
+            <Pagination
+              simple
+              current={currentPageLog}
+              pageSize={pageSizeLog}
+              total={count}
+              onChange={this.onChangePageLog}
+            />
           </div>
         </React.Fragment>
       )
     }
 
-    const getTitle = (title) => {
+    const getTitle = (item) => {
       return (
         <div className="title">
-          <span>{title}</span>
-          <Icon type="edit" title="添加" onClick={() => this.showUpdateLogModal()} style={{ margin: '0px 20px' }} className="title-icon"/>
-          <Icon type="delete" title="添加" onClick={null} className="title-icon"/>
+          <span>{item.version}</span>
+          <span style={{ marginLeft: 20 }}>{item.create_time}</span>
+          <Icon
+            type="edit"
+            title="编辑"
+            onClick={() => this.showUpdateLogModal(record.id, item)}
+            style={{ margin: '0px 20px' }}
+            className="title-icon"
+          />
+          <Icon
+            type="delete"
+            title="删除"
+            onClick={null}
+            className="title-icon"
+          />
         </div>
       )
     }
 
     return (
       <List
+        loading={loadingLog}
         header={getHeadr()}
         itemLayout="horizontal"
         dataSource={data}
         renderItem={item => (
           <ListItem>
             <ListItemMeta
-              title={getTitle(item.title)}
-              description={getDescription(item.updateLog)}
+              title={getTitle(item)}
+              description={getDescription(item.content)}
             />
           </ListItem>
         )}
       />
     )
+  }
+
+  onExpandedRowsChange(expandedRows) {
+    this.setState({
+      expandedRowKeys: [expandedRows.pop()],
+    })
+  }
+
+  handleQuery = (e) => {
+    e && e.preventDefault()
+    this.setState({ currentPage: 1 }, () => this.getOpenSourceProjectList())
+  }
+
+  handleReset = () => {
+    const { resetFields } = this.props.form
+    resetFields()
+    this.handleQuery()
+  }
+
+  /** 删除弹框 */
+  showConfirm = (id) => {
+    deleteConfirm(() => this.deleteData(id))
+  }
+
+  /** 删除数据方法 */
+  deleteData = (id) => {
+    let idArr = []
+    id instanceof Array ? idArr = id : idArr.push(id)
+    this.props.deleteOpenSourceProject({
+      id: idArr.join(','),
+    }).then((res) => {
+      if (res instanceof Error) { return }
+      message.success('删除成功', 1, () => {
+        this.getOpenSourceProjectList()
+      })
+      const selectedRowKeys = removeArr(this.state.selectedRowKeys, id)
+      this.setState({ selectedRowKeys })
+    })
+  }
+
+  changeSwitchStatus = (checked, record) => {
+    this.props.changeReleaseStatus({
+      id: record.id,
+      release: Number(checked),
+    }).then(res => {
+      if (res instanceof Error) { return }
+      this.getOpenSourceProjectList()
+    })
+  }
+
+  onShowSizeChange = (currentPage, pageSize) => {
+    this.setState({ currentPage: 1, pageSize }, () => {
+      this.getOpenSourceProjectList()
+    })
+  }
+
+  changePage = (currentPage, pageSize) => {
+    this.setState({ currentPage, pageSize }, () => {
+      this.getOpenSourceProjectList()
+    })
+  }
+
+  onShowSizeChangeLog = (currentPage, pageSize) => {
+    const { ospId } = this.state
+    this.setState({ currentPageLog: 1, pageSizeLog: pageSize }, () => {
+      this.onExpand(true, ospId)
+    })
+  }
+
+  onChangePageLog = (currentPage, pageSize) => {
+    const { ospId } = this.state
+    debugger
+    this.setState({ currentPageLog: currentPage, pageSizeLog: pageSize }, () => {
+      this.onExpand(true, ospId)
+    })
   }
 
   render() {
@@ -155,10 +364,18 @@ class OpenSourceProject extends React.Component {
       UpdateLogModalVisible,
       projectVisible,
       isEdit,
+      expandedRowKeys,
+      ospId,
+      expandedRowRenderAgain,
+      addLogSuccess,
     } = this.state
 
-    const { getFieldDecorator } = this.props.form
-    const { loading } = this.props
+    log()
+
+    const { openSourceProjectList, ospUpdateLogList, form, loading } = this.props
+    const { getFieldDecorator } = form
+
+    log(ospUpdateLogList)
 
     const levelArr = ['系统', '插件', '组件', '其他']
 
@@ -172,7 +389,25 @@ class OpenSourceProject extends React.Component {
           )
         },
       },
-      { title: '项目名称', dataIndex: 'name', key: 'name' },
+      {
+        title: '项目名称',
+        dataIndex: 'name',
+        key: 'name',
+        render(text, record) {
+          const { introduction } = record
+          return (
+            <Popover
+              content={introduction ? `简介：${introduction}` : '简介：暂无'}
+              placement="right"
+              trigger="hover"
+              className="popover"
+              overlayClassName="osp-popover"
+            >
+              <span style={{color: '#0366d6' }}>{text}</span>
+            </Popover>
+          )
+        },
+      },
       {
         title: '级别',
         dataIndex: 'level',
@@ -199,7 +434,7 @@ class OpenSourceProject extends React.Component {
       }, {
         title: '创建时间',
         dataIndex: 'create_time',
-      },{
+      }, {
         title: '操作',
         key: 'operation',
         dataIndex: 'operation',
@@ -211,58 +446,23 @@ class OpenSourceProject extends React.Component {
             </OperatorIcons>
           )
         },
-      }
+      },
     ];
 
-    const data = [
-      {
-        key: 1,
-        name: '博客系统',
-        introduction: '博客系统分为前台和后台，前端采用react+antd+redux，后端使用php+mysql+redis+nginx，使用阿里云主机部署。',
-        level: 1,
-        url: 'https://github.com/bigSwitch314/blog-fe',
-        version: 'V_2.0',
-        release: 1,
-        edit_time: '2019-05-23 11:29',
-        create_time: '2019-03-14 16:02',
-      },
-      {
-        key: 2,
-        name: '博客系统2',
-        introduction: '博客系统分为前台和后台，前端采用react+antd+redux，后端使用php+mysql+redis+nginx，使用阿里云主机部署。',
-        level: 1,
-        url: 'https://github.com/bigSwitch314/blog-fe',
-        version: 'V_2.0',
-        release: 1,
-        edit_time: '2019-05-23 11:29',
-        create_time: '2019-03-14 16:02',
-      },
-      {
-        key: 3,
-        name: '博客系统3',
-        introduction: '博客系统分为前台和后台，前端采用react+antd+redux，后端使用php+mysql+redis+nginx，使用阿里云主机部署。',
-        level: 1,
-        url: 'https://github.com/bigSwitch314/blog-fe',
-        version: 'V_2.0',
-        release: 1,
-        edit_time: '2019-05-23 11:29',
-        create_time: '2019-03-14 16:02',
-      },
-    ];
     return (
       <div className="container">
         <div className="serch-area">
           <Row style={{ width: '1000px'}}>
             <Col span={5}>
               <FormItem labelCol={{ span: 4}} wrapperCol={{ span: 12}} >
-                {getFieldDecorator('title', {
+                {getFieldDecorator('name', {
                   rules: [{}],
                 })(
-                  <Input placeholder="请输入标题" style={{ width: '180px' }} />,
+                  <Input placeholder="请输入项目名称" style={{ width: '180px' }} />,
                 )}
               </FormItem>
             </Col>
-            <Col span={7} style={{ left: '-18px' }}>
+            <Col span={7} style={{ left: '-7px' }}>
               <InputGroup compact style={{ width: '310px' }}>
                 <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 12 }} className='query-time' >
                   {getFieldDecorator('time', {
@@ -272,21 +472,22 @@ class OpenSourceProject extends React.Component {
                 </FormItem>
                 <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 12 }} className='query-time-type' >
                   {getFieldDecorator('timeType', {
-                    initialValue: '1'
+                    initialValue: '1',
                   })(
                     <Select style={{ width: '100px' }}>
-                      <Option value="1">转载时间</Option>
+                      <Option value="1">创建时间</Option>
+                      <Option value="2">更新时间</Option>
                     </Select>
                   )}
                 </FormItem>
               </InputGroup>
             </Col>
-            <Col span={1} style={{ left: '21px' }}>
+            <Col span={1} style={{ left: '32px' }}>
               <FormItem>
                 <Button type="primary" onClick={this.handleQuery}>查询</Button>
               </FormItem>
             </Col>
-            <Col span={1} style={{ left: '65px' }}>
+            <Col span={1} style={{ left: '76px' }}>
               <FormItem>
                 <Button onClick={this.handleReset}>重置</Button>
               </FormItem>
@@ -300,11 +501,23 @@ class OpenSourceProject extends React.Component {
           </HeaderBar.Left>
         </HeaderBar>
         <Table
+          loading={loading}
           columns={columns}
-          expandedRowRender={record => this.expandedRowRender(record)}
-          dataSource={data}
+          expandedRowKeys={expandedRowKeys}
+          onExpand={(expanded, record) => this.onExpand(expanded, record.id, true)}
+          expandedRowRender={record => addLogSuccess && this.expandedRowRender(record)}
+          onExpandedRowsChange={expandedRows => expandedRowRenderAgain && this.onExpandedRowsChange(expandedRows)}
+          dataSource={openSourceProjectList.list}
+          pagination={false}
         />
-
+        <MyPagination
+          current={currentPage}
+          pageSize={pageSize}
+          pageSizeOptions={['5', '10', '15', '20']}
+          total={openSourceProjectList.count}
+          onChange={this.changePage}
+          onShowSizeChange={this.onShowSizeChange}
+        />
         {/* 开源项目弹窗 */}
         <ProjectModal
           isEdit={isEdit}
@@ -313,12 +526,14 @@ class OpenSourceProject extends React.Component {
           onCancel={this.handleCancel}
           wrappedComponentRef={(node) => this.projectModelRef = node}
         />
-
         {/* 更新日志弹窗 */}
         <UpdateLogModal
           onOk={() => this.onOkUpdateLogModal()}
           onCancel={() => this.onCancelUpdateLogModal()}
           visible={UpdateLogModalVisible}
+          ospId={ospId}
+          onDoSuccess={() => this.onDoSuccess(ospId)}
+          wrappedComponentRef={(node) => this.updateLogModelRef = node}
         />
       </div>
     )

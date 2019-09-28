@@ -431,7 +431,7 @@ class UserList extends React.Component {
                     whitespace: true,
                   }, {
                     pattern: new RegExp(REGEXP_MAIL),
-                    message: '请输入正确电子邮件'
+                    message: '请输入正确电子邮件',
                   },
                   ],
                   initialValue: '',

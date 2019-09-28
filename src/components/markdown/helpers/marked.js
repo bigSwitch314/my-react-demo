@@ -1,3 +1,4 @@
+/* eslint-disable */
 import marked from 'marked'
 import Hljs from './highlight'
 

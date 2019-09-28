@@ -17,7 +17,15 @@ module.exports = {
         test: /\.(js|jsx)$/,
         use: [
           { loader: 'babel-loader' },
-          { loader: 'eslint-loader' }
+          {
+            loader: 'eslint-loader',
+            // options: {
+            //   // formatter: require('eslint-friendly-formatter'),
+            //   // 不符合Eslint规则时只警告(默认运行出错)
+            //   // emitWarning: false,
+            //   // eslintPath: path.join(__dirname, ".eslintrc.js")
+            // },
+          }
         ],
         include: SRC_PATH,
       },

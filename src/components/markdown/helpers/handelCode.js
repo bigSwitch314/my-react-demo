@@ -1,3 +1,4 @@
+/* eslint-disable */
 function handleCode(str) {
   if (!str) return ''
 

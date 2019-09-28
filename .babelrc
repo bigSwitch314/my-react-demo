@@ -18,6 +18,9 @@
     ["import", { "libraryName": "antd", "style": "css" }],
     "dynamic-import-webpack",
     ["@babel/plugin-proposal-decorators", { "legacy": true }],
-    ["@babel/plugin-proposal-class-properties", { "loose": true }]
+    ["@babel/plugin-proposal-class-properties", { "loose": true }],
+    [
+    "@babel/plugin-transform-runtime",
+  ]
   ]
 }

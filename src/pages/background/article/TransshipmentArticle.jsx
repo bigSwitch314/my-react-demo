@@ -256,7 +256,7 @@ class OriginalArticle extends React.Component {
     }, {
       title: '转载时间',
       dataIndex: 'create_time',
-    },{
+    }, {
       title: '操作',
       key: 'operation',
       dataIndex: 'operation',

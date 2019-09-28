@@ -160,7 +160,7 @@ class RoleModal extends React.Component {
       }
     }
 
-    this.setState({ newData: cloneNewData });
+    this.setState({ newData: cloneNewData })
   }
 
   /** 功能权限勾选 */
@@ -168,20 +168,20 @@ class RoleModal extends React.Component {
     const { newData } = this.state;
     const cloneNewData = cloneDeep(newData);
     cloneNewData[index].node.map(item => {
-      const result = indexOf(checkedKeys, item.id);
+      const result = indexOf(checkedKeys, item.id)
       item.status = result === -1 ? 0 : 1;
       return item;
     });
 
-    this.setState({ newData: cloneNewData });
+    this.setState({ newData: cloneNewData })
   }
 
   onOk() {
     const { newData } = this.state;
-    const checkedId = getCheckedNodeId(newData);
+    const checkedId = getCheckedNodeId(newData)
 
     alert(checkedId);
-    console.log("checkedId----------------------", checkedId);
+    console.log('checkedId----------------------', checkedId)
   }
 
   render() {
@@ -207,9 +207,9 @@ class RoleModal extends React.Component {
                 />
               </div>
             ),
-            props: { rowSpan: row.rowSpan }
-          };
-        }
+            props: { rowSpan: row.rowSpan },
+          }
+        },
       },
       {
         title: '二级菜单',
@@ -225,7 +225,7 @@ class RoleModal extends React.Component {
               />
             </div>
           );
-        }
+        },
       },
       {
         title: '功能权限',

@@ -272,7 +272,7 @@ class OriginalArticle extends React.Component {
     }, {
       title: '创建时间',
       dataIndex: 'create_time',
-    },{
+    }, {
       title: '操作',
       key: 'operation',
       dataIndex: 'operation',
@@ -345,7 +345,7 @@ class OriginalArticle extends React.Component {
                 </FormItem>
                 <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 12 }} className='query-time-type' >
                   {getFieldDecorator('timeType', {
-                    initialValue: '1'
+                    initialValue: '1',
                   })(
                     <Select style={{ width: '100px' }}>
                       <Option value="1">创建时间</Option>

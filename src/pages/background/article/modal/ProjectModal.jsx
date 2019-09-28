@@ -1,9 +1,9 @@
-import { Form, Input, Modal, Radio, Select } from 'antd';
-import React from 'react';
-import { connect } from 'react-redux';
-import { addArticle, editArticle } from '@/modules/article';
+import { Form, Input, Modal, Radio, Select } from 'antd'
+import React from 'react'
+import { connect } from 'react-redux'
 import { noSpecialChar } from '@/utils/validator'
-import '../style/ArticleModal.less';
+
+import { addOpenSourceProject, editOpenSourceProject } from '@/modules/openSourceProject'
 
 const FormItem = Form.Item
 const RadioGroup = Radio.Group
@@ -13,20 +13,20 @@ const formItemLayout = {
   wrapperCol: { span: 21, offset: 0 },
 }
 
-const Option = Select.Option;
+const Option = Select.Option
+const { TextArea } = Input
 
 @Form.create()
 @connect(
   state => ({
     categoryList: state.category.categoryList,
-    labelList: state.label.labelList,
   }),
-  { addArticle, editArticle },
+  { addOpenSourceProject, editOpenSourceProject },
   null,
   { forwardRef: true },
 )
 
-class ArticleModal extends React.Component {
+class ProjectModal extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -62,8 +62,10 @@ class ArticleModal extends React.Component {
         level: editData.level,
         url: editData.url,
         version: editData.version,
+        introduction: editData.introduction,
         release: editData.release,
       })
+      this.setState({ editData })
     } else {
       setFieldsValue({
         name: '',
@@ -96,52 +98,37 @@ class ArticleModal extends React.Component {
 
   onOk() {
     const { validateFieldsAndScroll, getFieldsValue } = this.props.form
-    const { addArticle, isEdit, editArticle } = this.props
+    const { addOpenSourceProject, isEdit, editOpenSourceProject } = this.props
     validateFieldsAndScroll((err) => {
-      const { htmlValue, editorValue, editData } = this.state
+      const { editData } = this.state
       if (!err) {
-        if(!htmlValue) {
-          this.setState({ hasContentMessage: true })
-          return
-        }
-
-        // 保存文章
-        const { title, category, label, release } = getFieldsValue()
+        const { name, level, url, version, introduction, release } = getFieldsValue()
         const param = {
-          title,
-          category_id: category,
-          label_ids: label.join(','),
-          content_md: editorValue,
-          content_html: 'not_has_html',
+          name,
+          level,
+          url,
+          version,
+          introduction,
           release,
-          type: 1,
         }
 
         if(isEdit) {
           param.id = editData.id
-          editArticle(param).then((res) => {
-            if (res instanceof Error) { return }
+          editOpenSourceProject(param).then((res) => {
+            if (res instanceof Error) return
             this.props.onOk()
-            this.setState({ htmlValue: null })
           })
         } else {
-          addArticle(param).then((res) => {
-            if (res instanceof Error) { return }
+          addOpenSourceProject(param).then((res) => {
+            if (res instanceof Error) return
             this.props.onOk()
-            this.setState({ htmlValue: null })
           })
-        }
-      } else {
-        if (!htmlValue) {
-          this.setState({ hasContentMessage: true })
-          return
         }
       }
     })
   }
 
   render() {
-    const { editorValue, editorVisible } = this.state
     const { visible, onCancel, isEdit } = this.props
     const { getFieldDecorator } = this.props.form
 
@@ -236,6 +223,26 @@ class ArticleModal extends React.Component {
             )}
           </FormItem>
           <FormItem
+            label="简介"
+            {...formItemLayout}
+          >
+            {getFieldDecorator('introduction', {
+              rules: [{
+                message: '请输入项目简介',
+                whitespace: true,
+              }, {
+                message: '不能超过300个字符',
+                max: 300,
+              }],
+            })(
+              <TextArea
+                type="text"
+                style={{ width: 560 }}
+                rows={6}
+              />,
+            )}
+          </FormItem>
+          <FormItem
             label='发布'
             {...formItemLayout}
           >
@@ -261,5 +268,5 @@ class ArticleModal extends React.Component {
   }
 }
 
-export default ArticleModal
+export default ProjectModal
 
