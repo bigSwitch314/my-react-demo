@@ -33,7 +33,7 @@ import {
   deleteOpenSourceProject,
 } from '../../../modules/openSourceProject'
 
-import { getOspUpdateLogList } from '@/modules/ospUpdateLog'
+import { getOspUpdateLogList, deleteOspUpdateLog } from '@/modules/ospUpdateLog'
 
 const FormItem = Form.Item
 const Option = Select.Option
@@ -58,6 +58,7 @@ let updateLog = null
     getOpenSourceProject,
     deleteOpenSourceProject,
     getOspUpdateLogList,
+    deleteOspUpdateLog,
   }
 )
 
@@ -138,9 +139,13 @@ class OpenSourceProject extends React.Component {
   onCancelUpdateLogModal() {
     this.setState({ UpdateLogModalVisible: false })
   }
-  
-  onDoSuccess(ospId) {
-    this.onExpand(true, ospId, true)
+
+  deleteOspUpdateLog(id, ospId) {
+    this.showConfirm(id, ospId)
+  }
+
+  onDoSuccess(ospId, isEdit) {
+    this.onExpand(true, ospId, !isEdit)
   }
 
   /** 开源项目弹窗显示（添加） */
@@ -237,7 +242,6 @@ class OpenSourceProject extends React.Component {
               total={count}
               onChange={this.onChangePageLog}
             />
-            <Pagination simple defaultCurrent={2} total={50} />
           </div>
         </React.Fragment>
       )
@@ -258,7 +262,7 @@ class OpenSourceProject extends React.Component {
           <Icon
             type="delete"
             title="删除"
-            onClick={null}
+            onClick={() => this.deleteOspUpdateLog(item.id, record.id)}
             className="title-icon"
           />
         </div>
@@ -301,24 +305,37 @@ class OpenSourceProject extends React.Component {
   }
 
   /** 删除弹框 */
-  showConfirm = (id) => {
-    deleteConfirm(() => this.deleteData(id))
+  showConfirm = (id, ospId=false) => {
+    deleteConfirm(() => this.deleteData(id, ospId))
   }
 
   /** 删除数据方法 */
-  deleteData = (id) => {
+  deleteData = (id, ospId) => {
     let idArr = []
     id instanceof Array ? idArr = id : idArr.push(id)
-    this.props.deleteOpenSourceProject({
-      id: idArr.join(','),
-    }).then((res) => {
-      if (res instanceof Error) { return }
-      message.success('删除成功', 1, () => {
-        this.getOpenSourceProjectList()
+
+    // 删除更新日志
+    if (ospId) {
+      this.props.deleteOspUpdateLog({
+        id: idArr.join(','),
+      }).then((res) => {
+        if (res instanceof Error) { return }
+        message.success('删除成功', 1, () => {
+          this.onExpand(true, ospId, true)
+        })
       })
-      const selectedRowKeys = removeArr(this.state.selectedRowKeys, id)
-      this.setState({ selectedRowKeys })
-    })
+    } else { // 删除项目
+      this.props.deleteOpenSourceProject({
+        id: idArr.join(','),
+      }).then((res) => {
+        if (res instanceof Error) { return }
+        message.success('删除成功', 1, () => {
+          this.getOpenSourceProjectList()
+        })
+        const selectedRowKeys = removeArr(this.state.selectedRowKeys, id)
+        this.setState({ selectedRowKeys })
+      })
+    }
   }
 
   changeSwitchStatus = (checked, record) => {
@@ -352,7 +369,6 @@ class OpenSourceProject extends React.Component {
 
   onChangePageLog = (currentPage, pageSize) => {
     const { ospId } = this.state
-    debugger
     this.setState({ currentPageLog: currentPage, pageSizeLog: pageSize }, () => {
       this.onExpand(true, ospId)
     })
@@ -535,7 +551,7 @@ class OpenSourceProject extends React.Component {
           onCancel={() => this.onCancelUpdateLogModal()}
           visible={UpdateLogModalVisible}
           ospId={ospId}
-          onDoSuccess={() => this.onDoSuccess(ospId)}
+          onDoSuccess={(isEdit) => this.onDoSuccess(ospId, isEdit)}
           wrappedComponentRef={(node) => this.updateLogModelRef = node}
         />
       </div>
