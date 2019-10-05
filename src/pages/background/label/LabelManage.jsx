@@ -212,9 +212,6 @@ class LabelManage extends React.Component {
         title: '文章数量',
         dataIndex: 'article_number',
       }, {
-        title: '更新时间',
-        dataIndex: 'edit_time',
-      }, {
         title: '创建时间',
         dataIndex: 'create_time',
       }, {

@@ -86,7 +86,7 @@ class BasicLayout extends React.Component {
           <div className="basic-layout-header-left">
             <Link to={'/admin/home/'}>
               <span className="logo" />
-              <span>管理平台</span>
+              <span>博客管理平台</span>
             </Link>
           </div>
           <div className="basic-layout-header-right">

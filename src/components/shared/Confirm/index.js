@@ -39,9 +39,9 @@ export const deleteBatchConfirm = (arr, cb) => {
   })
 }
 
-export const deleteConfirm = (cb) => {
+export const deleteConfirm = (cb, title='确认删除这条记录吗？') => {
   confirm({
-    title: '确认删除这条记录吗？',
+    title,
     onOk: (...args) => cb(...args),
   })
 }

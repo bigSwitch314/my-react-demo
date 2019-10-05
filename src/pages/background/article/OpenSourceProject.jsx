@@ -276,7 +276,7 @@ class OpenSourceProject extends React.Component {
         itemLayout="horizontal"
         dataSource={data}
         renderItem={item => (
-          <ListItem>
+          <ListItem className="list-item">
             <ListItemMeta
               title={getTitle(item)}
               description={getDescription(item.content)}
