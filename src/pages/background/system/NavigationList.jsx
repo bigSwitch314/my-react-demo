@@ -1,6 +1,6 @@
 import React from 'react'
-import { Table, Button, Modal, Input, message, Form, Select } from 'antd'
-import { getCategoryList, addCategory, editCategory, deleteCategory } from '@/modules/category'
+import { Table, Button, Modal, Input, message, Form, Select, Alert } from 'antd'
+import { getMenuList, addMenu, editMenu, deleteMenu, batchUpdateSort } from '@/modules/menu'
 import { connect } from 'react-redux'
 import { DndProvider } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
@@ -25,27 +25,27 @@ const Option = Select.Option;
 @Form.create()
 @connect(
   state => ({
-    categoryList: state.category.categoryList,
-    loading: state.loading['category/getCategoryList'],
+    menuList: state.menu.menuList,
+    loading: state.loading['menu/getMenuList'],
   }),
   {
-    getCategoryList,
-    addCategory,
-    editCategory,
-    deleteCategory,
+    getMenuList,
+    addMenu,
+    editMenu,
+    deleteMenu,
+    batchUpdateSort,
   },
 )
 
 
-class CategoryManage extends React.Component {
+class MenuManage extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       isEdit: false,
       visible: false,
-      categoryList: {},
-      currentPage: 1,
-      pageSize: 5,
+      menuTree: [],
+      menuList: [],
       selectedRowKeys: [],
       confirmDirty: false,
       divisionValue: [],
@@ -56,79 +56,62 @@ class CategoryManage extends React.Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (props.categoryList !== state.categoryList) {
-      return { categoryList: props.categoryList }
+    if (props.menuList.list !== state.menuList) {
+      return {
+        menuList: props.menuList.list,
+      }
     }
 
     return null
   }
 
   componentDidMount() {
-    const testData = [
-      { id: 1, name: '文章管理', pId: 0, pName: '顶级', sort: 1, children:
-        [
-          { id: 11, name: '原创文章', pId: 1, pName: '文章管理', sort: 1 },
-          { id: 12, name: '转载文章', pId: 1, pName: '文章管理', sort: 2 },
-          { id: 13, name: '开源项目', pId: 1, pName: '文章管理', sort: 3 },
-          { id: 14, name: '个人简介', pId: 1, pName: '文章管理', sort: 4 },
-        ],
-      },
-      { id: 2, name: '分类管理', pId: 0, pName: '顶级', sort: 2, children:
-        [],
-      },
-      { id: 3, name: '系统管理', pId: 0, pName: '顶级', sort: 3, children:
-        [
-          { id: 31, name: '导航列表', pId: 3, pName: '系统管理', sort: 1 },
-          { id: 32, name: '节点管理', pId: 3, pName: '系统管理', sort: 2 },
-        ],
-      },
-    ]
-
-    this.setState({ data: testData })
+    this.getMenuList()
   }
 
   // 获取分类列表
-  getCategoryList = () => {
-    const { currentPage, pageSize } = this.state
-    this.props.getCategoryList({
-      page_no: currentPage,
-      page_size: pageSize,
+  getMenuList = () => {
+    return this.props.getMenuList({}).then(res => {
+      if (res instanceof Error) return
+      this.setState({ menuTree: res.payload.tree })
     })
   }
 
   // 添加或编辑分类
-  addCategory = (isEdit) => {
+  addMenu = (isEdit) => {
     const { getFieldsValue } = this.props.form
-    const { name } = getFieldsValue()
-
-    const param = { name }
+    const { name, pid } = getFieldsValue()
+    const param = { name, pid, sort: 1 }
 
     if(isEdit) {
       param.id = this.editData.id
-      this.props.editCategory(param).then((res) => {
+      this.props.editMenu(param).then((res) => {
         if (res instanceof Error) return
         message.success('修改成功', 1, () => {
-          this.setState({ currentPage: 1 }, this.getCategoryList)
+          this.setState({ currentPage: 1 }, this.getMenuList)
           this.setState({ visible: false })
           this.editData = {}
         })
       })
     } else {
-      this.props.addCategory(param).then((res) => {
+      this.props.addMenu(param).then((res) => {
         if (res instanceof Error) return
         message.success('添加成功', 1, () => {
-          this.setState({ currentPage: 1 }, this.getCategoryList)
-          this.setState({ visible: false })
+          this.setState({ visible: false }, () => this.getMenuList())
         })
       })
     }
   }
 
+  batchUpdateSort = (paramList) => {
+    return this.props.batchUpdateSort(paramList)
+  }
+
   editHandler = (record) => {
     this.editData = record
     console.log(record)
-    const { name } = record
-    this.props.form.setFieldsValue({ name })
+    const { name, pid } = record
+    this.props.form.setFieldsValue({ name, pid })
 
     this.setState({
       isEdit: true,
@@ -155,18 +138,18 @@ class CategoryManage extends React.Component {
   onOk = (isEdit) => {
     this.props.form.validateFieldsAndScroll((err) => {
       if (!err) {
-        this.addCategory(isEdit)
+        this.addMenu(isEdit)
       }
     })
   }
 
   /** 表格分頁 */
   changePage = (currentPage, pageSize) => {
-    this.setState({ currentPage, pageSize }, this.getCategoryList)
+    this.setState({ currentPage, pageSize }, this.getMenuList)
   }
 
   onShowSizeChange = (currentPage, pageSize) => {
-    this.setState({ currentPage: 1, pageSize }, this.getCategoryList)
+    this.setState({ currentPage: 1, pageSize }, this.getMenuList)
   }
 
   /** 表格复选框选中 */
@@ -191,7 +174,7 @@ class CategoryManage extends React.Component {
   deleteData = (id) => {
     let idArr = []
     id instanceof Array ? idArr = id : idArr.push(id)
-    this.props.deleteCategory({
+    this.props.deleteMenu({
       id: idArr.join(','),
     }).then((res) => {
       if (res instanceof Error) return
@@ -200,10 +183,10 @@ class CategoryManage extends React.Component {
         const totalPage = Math.ceil((userList.count - idArr.length) / pageSize)
         if (currentPage > totalPage) {
           this.setState({ currentPage: 1 }, () => {
-            this.getCategoryList()
+            this.getMenuList()
           })
         } else {
-          this.getCategoryList()
+          this.getMenuList()
         }
       })
       const selectedRowKeys = removeArr(this.state.selectedRowKeys, id)
@@ -211,15 +194,23 @@ class CategoryManage extends React.Component {
     })
   }
 
-  setOrder(preData, data) {
-    const newOrder = []
+  setSort(preData, data) {
+    const newSort = []
     data.forEach((item, index) => {
-      if (item.id !== preData[index].id) {
-        newOrder.push({
+      if (item.id !== preData[index].id || item.pid === preData[index].pid) {
+        newSort.push({
           id: item.id,
-          order: index + 1,
+          sort: index + 1,
         })
       }
+    })
+    this.batchUpdateSort({
+      list: newSort,
+    }).then(res => {
+      if (res instanceof Error) return
+      this.getMenuList()
+    }).catch(err => {
+      console.log(err)
     })
   }
 
@@ -238,41 +229,38 @@ class CategoryManage extends React.Component {
 
   /** 拖动行 */
   moveRow = (dragIndex, hoverIndex, isChildrenDragable, record) => {
-    const { data } = this.state;
+    const { menuTree } = this.state;
 
     if (isChildrenDragable === false) {
-      const dragRow = data[dragIndex];
-      const { data: newData } = update(this.state, {
-        data: {
+      const dragRow = menuTree[dragIndex];
+      const { menuTree: newData } = update(this.state, {
+        menuTree: {
           $splice: [[dragIndex, 1], [hoverIndex, 0, dragRow]],
         },
       })
-      this.setState({ data: newData },
-        () => this.setOrder(data, this.state.data))
+      this.setSort(menuTree, newData)
 
     } else {
-      const pId = record.pId
-      const index = data.findIndex(item => item.id === pId)
-      const dragRow = data[index].children[dragIndex]
+      const pid = record.pid
+      const index = menuTree.findIndex(item => item.id === pid)
+      const dragRow = menuTree[index].children[dragIndex]
 
-      const { data: newData } = update(this.state, {
-        data: { [index]: { children: {
+      const { menuTree: newData } = update(this.state, {
+        menuTree: { [index]: { children: {
           $splice: [[dragIndex, 1], [hoverIndex, 0, dragRow]],
         }}},
       })
 
-      this.setState({ data: newData },
-        () => this.setOrder(data[index].children, this.state.data[index].children))
+      this.setSort(menuTree[index].children, newData[index].children)
     }
   }
 
   render() {
     const {
       visible,
-      currentPage,
-      pageSize,
       isEdit,
-      data,
+      menuTree,
+      menuList,
       expandedRowKeys,
       selectedRowKeys,
     } = this.state
@@ -283,15 +271,7 @@ class CategoryManage extends React.Component {
     const columns = [
       {
         title: '序号',
-        key: 'xuhao',
-        render(text, record, index) {
-          const number = (currentPage - 1) * pageSize + index + 1
-          if (record.pId === 0) {
-            return number
-          } else {
-            return `${record.pId}-${number}`
-          }
-        },
+        dataIndex: 'serial_number',
       }, {
         title: '名称',
         dataIndex: 'name',
@@ -308,7 +288,8 @@ class CategoryManage extends React.Component {
             <OperatorIcons.Icon title="删除" type="delete" onClick={() => this.showConfirm(record.id)} />
           </OperatorIcons>
         ),
-      }]
+      },
+    ]
 
     return (
       <React.Fragment>
@@ -321,6 +302,12 @@ class CategoryManage extends React.Component {
               </HeaderBar.Left>
             </HeaderBar>
           </div>
+          <Alert
+            description="菜单列表支持拖动排序。拖动排序后，需手动刷新页面，以同步左侧导航菜单顺序。"
+            type="info"
+            showIcon
+            closable
+          />
           <DndProvider backend={HTML5Backend}>
             <Table
               rowSelection={{
@@ -338,7 +325,7 @@ class CategoryManage extends React.Component {
               onExpand={this.onExpandHandler}
               loading={loading}
               columns={columns}
-              dataSource={data || []}
+              dataSource={menuTree}
               rowKey={record => record.id}
               pagination={false}
             />
@@ -356,7 +343,7 @@ class CategoryManage extends React.Component {
                 label="父级"
                 {...formItemLayout}
               >
-                {getFieldDecorator('labelSizeLevel', {
+                {getFieldDecorator('pid', {
                   rules: [{
                     required: true,
                     message: '请选择父级',
@@ -364,12 +351,11 @@ class CategoryManage extends React.Component {
                     type: 'number',
                   }],
                 })(
-                  <Select placeholder="请选择父级" style={{ width: 360 }}>
-                    <Option key={1} value={1}>顶级</Option>
-                    <Option key={2} value={2}>文章管理</Option>
-                    <Option key={3} value={3}>分类管理</Option>
-                    <Option key={4} value={4}>标签管理</Option>
-                    <Option key={5} value={5}>账号管理</Option>
+                  <Select placeholder="请选择父级" style={{ width: 360 }} disabled={isEdit}>
+                    <Option key={0} value={0}>顶级</Option>
+                    {menuList && menuList.filter(item => item.pid === 0).map(item => (
+                      <Option key={item.id} value={item.id}>{item.name}</Option>
+                    ))}
                   </Select>
                 )}
               </FormItem>
@@ -401,4 +387,4 @@ class CategoryManage extends React.Component {
   }
 }
 
-export default CategoryManage
+export default MenuManage

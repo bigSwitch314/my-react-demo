@@ -66,7 +66,7 @@ export const routerConfig = [
     path: 'systemSetting',
     icon: <i className="iconfont icon-setting" />,
     children: [
-      { path: 'navigationList', name: '导航列表', component: NavigationList },
+      { path: 'navigationList', name: '导航菜单', component: NavigationList },
       { path: 'nodeManage', name: '节点管理', component: NodeManage },
     ],
   },
