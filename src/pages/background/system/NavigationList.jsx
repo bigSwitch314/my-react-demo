@@ -1,5 +1,5 @@
 import React from 'react'
-import { Table, Button, Modal, Input, message, Form, Select, Alert } from 'antd'
+import { Table, Button, Modal, Input, Message, Form, Select, Alert } from 'antd'
 import { getMenuList, addMenu, editMenu, deleteMenu, batchUpdateSort } from '@/modules/menu'
 import { connect } from 'react-redux'
 import { DndProvider } from 'react-dnd';
@@ -56,7 +56,7 @@ class MenuManage extends React.Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (props.menuList.list !== state.menuList) {
+    if (props.menuList && props.menuList.list !== state.menuList) {
       return {
         menuList: props.menuList.list,
       }
@@ -69,11 +69,12 @@ class MenuManage extends React.Component {
     this.getMenuList()
   }
 
-  // 获取分类列表
+  // 获取菜单列表
   getMenuList = () => {
     return this.props.getMenuList({}).then(res => {
       if (res instanceof Error) return
-      this.setState({ menuTree: res.payload.tree })
+      const tree = res.payload ? res.payload.tree : []
+      this.setState({ menuTree: tree })
     })
   }
 
@@ -87,7 +88,7 @@ class MenuManage extends React.Component {
       param.id = this.editData.id
       this.props.editMenu(param).then((res) => {
         if (res instanceof Error) return
-        message.success('修改成功', 1, () => {
+        Message.success('修改成功', 1, () => {
           this.setState({ currentPage: 1 }, this.getMenuList)
           this.setState({ visible: false })
           this.editData = {}
@@ -96,7 +97,7 @@ class MenuManage extends React.Component {
     } else {
       this.props.addMenu(param).then((res) => {
         if (res instanceof Error) return
-        message.success('添加成功', 1, () => {
+        Message.success('添加成功', 1, () => {
           this.setState({ visible: false }, () => this.getMenuList())
         })
       })
@@ -178,7 +179,7 @@ class MenuManage extends React.Component {
       id: idArr.join(','),
     }).then((res) => {
       if (res instanceof Error) return
-      message.success('删除成功', 1, () => {
+      Message.success('删除成功', 1, () => {
         const { currentPage, pageSize, userList = {} } = this.state
         const totalPage = Math.ceil((userList.count - idArr.length) / pageSize)
         if (currentPage > totalPage) {
@@ -325,7 +326,7 @@ class MenuManage extends React.Component {
               onExpand={this.onExpandHandler}
               loading={loading}
               columns={columns}
-              dataSource={menuTree}
+              dataSource={menuTree || []}
               rowKey={record => record.id}
               pagination={false}
             />

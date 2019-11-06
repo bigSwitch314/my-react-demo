@@ -1,7 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Modal, Form, Select, Input, Radio } from 'antd'
+import { Modal, Form, Select, Input, Radio, Message } from 'antd'
 import { noSpecialChar } from '@/utils/validator'
+import { getMenuList } from '@/modules/menu'
+import { addNode, editNode } from '@/modules/node'
 import '../style/NodeModal.less'
 
 const FormItem = Form.Item
@@ -16,9 +18,14 @@ const formItemLayout = {
 @Form.create()
 @connect(
   state => ({
-    categoryList: state.category.categoryList,
+    menuList: state.menu.menuList,
+    levelOneNode: state.node.levelOneNode,
   }),
-  null,
+  {
+    getMenuList,
+    addNode,
+    editNode,
+  },
   null,
   { forwardRef: true },
 )
@@ -27,92 +34,185 @@ class NodeModal extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      article: null,
-      categoryName: null,
+      menuList: [],
+      menuTree: [],
+      nameArr: [],
+      isEdit: false,
+      editData: [],
     }
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (props.userList !== state.userList) {
-      return { userList: props.userList }
+    if (props.menuList.list !== state.menuList) {
+      return {
+        menuList: props.menuList.list,
+        menuTree: props.menuList.tree,
+      }
     }
 
     return null
   }
 
   componentDidMount() {
+    this.getMenuList()
+  }
+
+  // 获取菜单列表
+  getMenuList = () => {
+    this.props.getMenuList({})
   }
 
   setFieldsValue = (isEdit, editData) => {
+    const { menuTree } = this.state
     const { setFieldsValue } = this.props.form
     if(isEdit) {
       setFieldsValue({
-        category: editData.category_id,
-        label: editData.label_ids,
-        title: editData.title,
-        release: editData.release,
+        name: editData.menu ? editData.menu_id : editData.name,
+        parent: editData.pid,
+        node: editData.node,
+        status: editData.status,
+        menu: editData.menu,
+        group: editData.group_id,
+      })
+
+      const node = menuTree.find(item => {
+        return item.id === editData.group_id
       })
       this.setState({
-        editorValue: editData.content_md,
         editData,
+        isEdit,
+        nameArr: node && node.children || [],
       })
     } else {
-      setFieldsValue({
-        category: undefined,
-        label: [],
-        title: '',
-        release: 0,
-      })
-      this.setState({ htmlValue: '' })
+      const { selectedRowKeys, levelOneNode } = this.props
+      let parent = null
+      if (selectedRowKeys.length === 1) {
+        const key = selectedRowKeys[0]
+        const node = levelOneNode.find(item => item.id === key)
+        if (node) parent = key
+      }
+      this.setState({ isEdit }, () => setFieldsValue({
+        name: null,
+        parent: parent,
+        node: null,
+        status: 1,
+        menu: parent ? 0 : 1,
+        group: parent ? -1 : null,
+      }))
     }
   }
 
-  getRecord(record) {
-    const { categoryList } = this.props
-    const category = categoryList.list.find(item => item.id === record.category_id)
-    this.setState({
-      article: record,
-      categoryName: category.name,
+  onOk = (isEdit) => {
+    this.props.form.validateFieldsAndScroll((err) => {
+      if (!err) {
+        this.addNode(isEdit)
+      }
     })
   }
 
+  onCancel = () => {
+    const { onCancel } = this.props
+    onCancel()
+    this.setState({
+      nameArr: [],
+    })
+  }
+
+  // 添加或编辑分类
+  addNode = (isEdit) => {
+    const { menuList } = this.state
+    const { getFieldsValue } = this.props.form
+    const { group, parent, node, name, menu, status } = getFieldsValue()
+    let newName = name
+    if (menu) {
+      newName = menuList.find(item => item.id === name).name
+    }
+
+    const param = {
+      name: newName,
+      pid: parent,
+      node,
+      status,
+      menu,
+      menu_id: menu ? name : 0,
+      group_id: group,
+    }
+
+    if(isEdit) {
+      const { editData } = this.state
+      param.id = editData.id
+      this.props.editNode(param).then((res) => {
+        if (res instanceof Error) return
+        Message.success('修改成功', 1, () => {
+          this.props.onOk()
+          this.setState({
+            isEdit: false,
+            editData: {},
+            nameArr: [],
+          })
+        })
+      })
+    } else {
+      this.props.addNode(param).then((res) => {
+        if (res instanceof Error) return
+        Message.success('添加成功', 1, () => {
+          this.props.onOk()
+          this.setState({
+            nameArr: [],
+          })
+        })
+      })
+    }
+  }
+
+  // 分组下拉值改变处理函数
+  onParentChange = (value) => {
+    const { setFieldsValue } = this.props.form
+    if (value !== 0) {
+      setFieldsValue({
+        group: -1,
+        menu: 0,
+      })
+    }
+  }
+
+  // 分组下拉值改变处理函数
+  onGroupChange = (value) => {
+    const { setFieldsValue } = this.props.form
+    if (value === -1) {
+      setFieldsValue({ menu: 0 })
+      return
+    }
+
+    const { menuTree } = this.state
+    const node = menuTree.find(item => {
+      return item.id === value
+    })
+    this.setState({ nameArr: node.children})
+  }
+
+  // 名称下拉值改变处理函数
+  onNameChange = (value) => {
+    const { setFieldsValue } = this.props.form
+    setFieldsValue({ name: value })
+  }
+
   render() {
-    const { visible, onCancel } = this.props
-    // const {} = this.state
-    const { getFieldDecorator } = this.props.form
+    const { visible, levelOneNode=[] } = this.props
+    const { isEdit, menuList, nameArr } = this.state
+    const { getFieldDecorator, getFieldsValue } = this.props.form
+    const { group, menu, parent } = getFieldsValue()
 
     return (
       <Modal
         width={760}
         visible={visible}
-        onCancel={onCancel}
+        onCancel={() => this.onCancel()}
+        onOk={() => this.onOk(isEdit)}
         title={'添加节点'}
         maskClosable={false}
       >
         <div>
-          <FormItem
-            label="分组"
-            {...formItemLayout}
-          >
-            {getFieldDecorator('group', {
-              rules: [{
-                required: true,
-                message: '请选择分组',
-                whitespace: true,
-                type: 'number',
-              }],
-            })(
-              <Select placeholder="请选择分组" style={{ width: 360 }}>
-                <Option key={1} value={1}>顶级</Option>
-                <Option key={2} value={2}>--文章管理</Option>
-                <Option key={21} value={2}>----原创文章</Option>
-                <Option key={22} value={2}>----转载文章</Option>
-                <Option key={3} value={3}>--分类管理</Option>
-                <Option key={4} value={4}>--标签管理</Option>
-                <Option key={5} value={5}>--账号管理</Option>
-              </Select>
-            )}
-          </FormItem>
           <FormItem
             label="父级"
             {...formItemLayout}
@@ -125,34 +225,96 @@ class NodeModal extends React.Component {
                 type: 'number',
               }],
             })(
-              <Select placeholder="请选择父级" style={{ width: 360 }}>
-                <Option key={1} value={1}>顶级</Option>
-                <Option key={2} value={2}>--原创文章</Option>
-                <Option key={3} value={3}>--转载文章</Option>
-                <Option key={4} value={4}>--标签</Option>
-                <Option key={5} value={5}>--账号</Option>
+              <Select
+                onChange={(value) => this.onParentChange(value)}
+                style={{ width: 360 }}
+                disabled={isEdit}
+              >
+                <Option key={0} value={0}>顶级</Option>
+                {levelOneNode && levelOneNode.map(item => (
+                  <Option key={item.id} value={item.id}>{item.name}</Option>
+                ))}
               </Select>
+            )}
+          </FormItem>
+          <FormItem
+            label="分组"
+            {...formItemLayout}
+          >
+            {getFieldDecorator('group', {
+              rules: [{
+                required: true,
+                message: '请选择分组',
+                whitespace: true,
+                type: 'number',
+              }],
+            })(
+              <Select
+                placeholder="请选择分组"
+                style={{ width: 360 }}
+                onChange={(value) => this.onGroupChange(value)}
+              >
+                <Option key={-1} value={-1} disabled={parent === 0}>无</Option>
+                {menuList && menuList.filter(item => item.pid === 0).map(item => (
+                  <Option key={item.id} value={item.id} disabled={parent !== 0}>{item.name}</Option>
+                ))}
+              </Select>
+            )}
+          </FormItem>
+          <FormItem
+            label='菜单'
+            {...formItemLayout}
+          >
+            {getFieldDecorator('menu', {
+              rules: [{
+                required: true,
+                message: '请选择是否为菜单',
+                whitespace: true,
+                type: 'number',
+              }],
+            })(
+              <RadioGroup
+                onChange={this.onTypeChange}
+                disabled={group === -1}
+              >
+                <Radio value={1}>是</Radio>
+                <Radio value={0}>否</Radio>
+              </RadioGroup>,
             )}
           </FormItem>
           <FormItem
             label="名称"
             {...formItemLayout}
           >
-            {getFieldDecorator('name', {
-              rules: [{
-                required: true,
-                message: '请输入分类名称',
-                whitespace: true,
-              }, {
-                message: '不能超过50个字符',
-                max: 50,
-              }, noSpecialChar],
-            })(
-              <Input
-                type="text"
-                style={{ width: 360 }}
-              />,
-            )}
+            {menu ?
+              getFieldDecorator('name', {
+                rules: [{
+                  required: true,
+                  message: '请选择名称',
+                  whitespace: true,
+                  type: 'number',
+                }],
+              })(
+                <Select style={{ width: 360 }}>
+                  {nameArr && nameArr.map(item => (
+                    <Option key={item.id} value={item.id}>{item.name}</Option>
+                  ))}
+                </Select>) :
+              getFieldDecorator('name', {
+                rules: [{
+                  required: true,
+                  message: '请输入名称',
+                  whitespace: true,
+                }, {
+                  message: '不能超过50个字符',
+                  max: 50,
+                }, noSpecialChar],
+              })(
+                <Input
+                  type="text"
+                  style={{ width: 360 }}
+                />
+              )}
           </FormItem>
           <FormItem
             label="节点"
@@ -175,33 +337,13 @@ class NodeModal extends React.Component {
             )}
           </FormItem>
           <FormItem
-            label='菜单'
-            {...formItemLayout}
-          >
-            {getFieldDecorator('menu', {
-              rules: [{
-                required: true,
-                message: '请选择是否为菜单',
-                whitespace: true,
-                type: 'number',
-              }],
-            })(
-              <RadioGroup
-                onChange={this.onTypeChange}
-              >
-                <Radio value={1}>是</Radio>
-                <Radio value={0}>否</Radio>
-              </RadioGroup>,
-            )}
-          </FormItem>
-          <FormItem
             label='状态'
             {...formItemLayout}
           >
-            {getFieldDecorator('menu', {
+            {getFieldDecorator('status', {
               rules: [{
                 required: true,
-                message: '请选择是否为菜单',
+                message: '请选择菜单状态',
                 whitespace: true,
                 type: 'number',
               }],

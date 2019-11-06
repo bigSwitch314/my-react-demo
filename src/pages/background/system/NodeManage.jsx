@@ -1,6 +1,6 @@
 import React from 'react'
 import { Table, Button, message, Form } from 'antd'
-import { getCategoryList, addCategory, editCategory, deleteCategory } from '@/modules/category'
+import { getNodeList, addNode, editNode, deleteNode, getLevelOneNode } from '@/modules/node'
 import { connect } from 'react-redux'
 import { Tag } from 'antd';
 
@@ -16,14 +16,15 @@ import './style/NodeManage.less'
 @Form.create()
 @connect(
   state => ({
-    categoryList: state.category.categoryList,
-    loading: state.loading['category/getCategoryList'],
+    nodeList: state.node.nodeList,
+    loading: state.loading['node/getNodeList'],
   }),
   {
-    getCategoryList,
-    addCategory,
-    editCategory,
-    deleteCategory,
+    getNodeList,
+    addNode,
+    editNode,
+    deleteNode,
+    getLevelOneNode,
   },
 )
 
@@ -33,101 +34,76 @@ class NodeManage extends React.Component {
     this.state = {
       isEdit: false,
       visible: false,
-      categoryList: {},
+      nodeList: {},
       currentPage: 1,
       pageSize: 5,
       selectedRowKeys: [],
       confirmDirty: false,
       divisionValue: [],
-      data: [],
       expandedRowKeys: [],
     }
-    this.editData = {}
     this.NodeModelRef = React.createRef()
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (props.categoryList !== state.categoryList) {
-      return { categoryList: props.categoryList }
+    if (props.nodeList !== state.nodeList) {
+      return { nodeList: props.nodeList }
     }
 
     return null
   }
 
   componentDidMount() {
-    const testData = [
-      { id: 1, name: '原创文章', pId: 0, pName: '顶级', node: 'OriginalArticle', status: 1, menu: 1, group: '文章管理', sort: 1, children:
-        [
-          { id: 11, name: '添加', pId: 1, pName: '原创文章', node: 'addArticle', status: 1, menu: 0, group: '原创文章', sort: 1 },
-          { id: 12, name: '编辑', pId: 1, pName: '原创文章', node: 'editArticle', status: 1, menu: 0, group: '原创文章', sort: 2 },
-          { id: 13, name: '删除', pId: 1, pName: '原创文章', node: 'delArticle', status: 1, menu: 0, group: '原创文章', sort: 3 },
-          { id: 14, name: '预览', pId: 1, pName: '原创文章', node: 'previewArticle', status: 1, menu: 0, group: '原创文章', sort: 4 },
-          { id: 15, name: '发布', pId: 1, pName: '原创文章', node: 'release', status: 1, menu: 0, group: '原创文章', sort: 5 },
-        ],
-      },
-      { id: 2, name: '开源项目', pId: 0, pName: '顶级', node: 'OpenProject', status: 1, menu: 1, group: '文章管理', sort: 2, children:
-        [
-          { id: 11, name: '添加', pId: 1, pName: '开源项目', node: 'addProject', status: 1, menu: 0, group: '开源项目', sort: 1 },
-          { id: 12, name: '编辑', pId: 1, pName: '开源项目', node: 'editroject', status: 1, menu: 0, group: '开源项目', sort: 2 },
-          { id: 13, name: '删除', pId: 1, pName: '开源项目', node: 'delProject', status: 1, menu: 0, group: '开源项目', sort: 3 },
-          { id: 14, name: '发布', pId: 1, pName: '开源项目', node: 'release', status: 1, menu: 0, group: '开源项目', sort: 4 },
-        ],
-      },
-      { id: 3, name: '导航列表', pId: 0, pName: '顶级', node: 'NavigationList', status: 0, menu: 1, group: '系统管理', sort: 3, children:
-        [
-          { id: 31, name: '添加', pId: 3, pName: '导航列表', node: 'add', status: 1, menu: 0, group: '导航列表', sort: 1 },
-          { id: 32, name: '删除', pId: 3, pName: '导航列表', node: 'del', status: 1, menu: 0, group: '导航列表', sort: 2 },
-        ],
-      },
-    ]
-
-    this.setState({ data: testData })
+    this.getNodeList()
+    this.props.getLevelOneNode()
   }
 
-  // 获取分类列表
-  getCategoryList = () => {
+  // 获取节点列表
+  getNodeList = () => {
     const { currentPage, pageSize } = this.state
-    this.props.getCategoryList({
+    this.props.getNodeList({
       page_no: currentPage,
       page_size: pageSize,
     })
   }
 
   addHandler = () => {
-    const { resetFields } = this.props.form
-    resetFields()
-
     this.setState({
       isEdit: false,
       visible: true,
-      divisionValue: [],
     })
+    this.NodeModelRef.setFieldsValue(false, null)
   }
 
   editHandler = (record) => {
-    this.editData = record
     this.setState({
       isEdit: true,
       visible: true,
-    });
+    })
+    this.NodeModelRef.setFieldsValue(true, record)
   }
 
   onCancel = () => {
     this.setState({ visible: false })
-    this.editData = {}
   }
 
   onOk = () => {
-
+    this.setState({
+      currentPage: 1,
+      visible: false,
+    }, () => {
+      this.getNodeList()
+      this.props.getLevelOneNode()
+    })
   }
 
   /** 表格分頁 */
   changePage = (currentPage, pageSize) => {
-    this.setState({ currentPage, pageSize }, this.getCategoryList)
+    this.setState({ currentPage, pageSize }, this.getNodeList)
   }
 
   onShowSizeChange = (currentPage, pageSize) => {
-    this.setState({ currentPage: 1, pageSize }, this.getCategoryList)
+    this.setState({ currentPage: 1, pageSize }, this.getNodeList)
   }
 
   /** 表格复选框选中 */
@@ -152,7 +128,7 @@ class NodeManage extends React.Component {
   deleteData = (id) => {
     let idArr = []
     id instanceof Array ? idArr = id : idArr.push(id)
-    this.props.deleteCategory({
+    this.props.deleteNode({
       id: idArr.join(','),
     }).then((res) => {
       if (res instanceof Error) return
@@ -161,26 +137,14 @@ class NodeManage extends React.Component {
         const totalPage = Math.ceil((userList.count - idArr.length) / pageSize)
         if (currentPage > totalPage) {
           this.setState({ currentPage: 1 }, () => {
-            this.getCategoryList()
+            this.getNodeList()
           })
         } else {
-          this.getCategoryList()
+          this.getNodeList()
         }
       })
       const selectedRowKeys = removeArr(this.state.selectedRowKeys, id)
       this.setState({ selectedRowKeys })
-    })
-  }
-
-  setOrder(preData, data) {
-    const newOrder = []
-    data.forEach((item, index) => {
-      if (item.id !== preData[index].id) {
-        newOrder.push({
-          id: item.id,
-          order: index + 1,
-        })
-      }
     })
   }
 
@@ -196,25 +160,19 @@ class NodeManage extends React.Component {
       currentPage,
       pageSize,
       isEdit,
-      data,
       expandedRowKeys,
       selectedRowKeys,
+      nodeList,
     } = this.state
+
+    const { list=[], count=0 } = nodeList || {}
 
     const { loading } = this.props
 
     const columns = [
       {
         title: '序号',
-        key: 'xuhao',
-        render(text, record, index) {
-          const number = (currentPage - 1) * pageSize + index + 1
-          if (record.pId === 0) {
-            return number
-          } else {
-            return `${record.pId}-${number}`
-          }
-        },
+        dataIndex: 'serial_number',
       }, {
         title: '名称',
         dataIndex: 'name',
@@ -229,9 +187,9 @@ class NodeManage extends React.Component {
           const status = text === 1 ? '正常' : '禁用'
           return <Tag color={color}> {status} </Tag>
         },
-      }, {
-        title: '父级',
-        dataIndex: 'pName',
+      // }, {
+      //   title: '父级',
+      //   dataIndex: 'pname',
       }, {
         title: '菜单',
         dataIndex: 'menu',
@@ -241,7 +199,7 @@ class NodeManage extends React.Component {
         },
       }, {
         title: '组',
-        dataIndex: 'group',
+        dataIndex: 'group_name',
       }, {
         title: '操作',
         dataIndex: 'operation',
@@ -252,7 +210,8 @@ class NodeManage extends React.Component {
             <OperatorIcons.Icon title="删除" type="delete" onClick={() => this.showConfirm(record.id)} />
           </OperatorIcons>
         ),
-      }]
+      },
+    ]
 
     return (
       <React.Fragment>
@@ -269,13 +228,12 @@ class NodeManage extends React.Component {
             rowSelection={{
               selectedRowKeys,
               onChange: this.onSelectChange,
-              getCheckboxProps: this.getCheckboxProps,
             }}
             expandedRowKeys={expandedRowKeys}
             onExpand={this.onExpandHandler}
             loading={loading}
             columns={columns}
-            dataSource={data || []}
+            dataSource={list}
             rowKey={record => record.id}
             pagination={false}
           />
@@ -283,7 +241,7 @@ class NodeManage extends React.Component {
             current={currentPage}
             pageSize={pageSize}
             pageSizeOptions={['5', '10', '15', '20']}
-            total={data.length || 0}
+            total={count}
             onChange={this.changePage}
             onShowSizeChange={this.onShowSizeChange}
           />
@@ -295,6 +253,7 @@ class NodeManage extends React.Component {
             onOk={this.onOk}
             onCancel={this.onCancel}
             wrappedComponentRef={(node) => this.NodeModelRef = node}
+            selectedRowKeys={selectedRowKeys}
           />
         </div>
       </React.Fragment>
