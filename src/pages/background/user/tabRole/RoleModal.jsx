@@ -1,99 +1,28 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Modal, Form, Table, Switch, Checkbox, Input } from 'antd'
+import { bindActionCreators } from 'redux'
+import { Modal, Form, Table, Switch, Checkbox, Input, message } from 'antd'
 import { transform, getCheckedNodeId, setNodeStatus } from './util'
 import { cloneDeep, indexOf, filter, isEmpty } from 'lodash'
 import { noSpecialChar } from '@/utils/validator'
+import { getMenuNodeTree, addRole, editRole } from '@/modules/role'
+
+import './Index.less'
 
 const CheckboxGroup = Checkbox.Group;
-
-const data = [
-  {
-    id: 1,
-    name: '文章管理',
-    pId: 0,
-    children: [
-      {
-        id: 11,
-        name: '原创文章',
-        pId: 1,
-        children: [
-          { id: 1101, name: '添加', pId: 11, children: [] },
-          { id: 1102, name: '删除', pId: 11, children: [] },
-          { id: 1103, name: '导入', pId: 11, children: [] },
-        ],
-      },
-      {
-        id: 12,
-        name: '转载文章',
-        pId: 1,
-        children: [
-          { id: 1201, name: '编辑', pId: 12, children: [] },
-          { id: 1202, name: '导出', pId: 12, children: [] },
-        ],
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: '系统设置',
-    pId: 0,
-    children: [
-      {
-        id: 21,
-        name: '权限节点',
-        pId: 2,
-        children: [
-          { id: 2101, name: '添加', pId: 21, children: [] },
-          { id: 2102, name: '编辑', pId: 21, children: [] },
-          { id: 2103, name: '删除', pId: 21, children: [] },
-          { id: 2104, name: '批量导出', pId: 21, children: [] },
-        ],
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: '日志管理',
-    pId: 0,
-    children: [
-      {
-        id: 31,
-        name: '登陆日志',
-        pId: 3,
-        children: [
-          { id: 3101, name: '查看', pId: 31, children: [] },
-          { id: 3102, name: '删除', pId: 31, children: [] },
-          { id: 3103, name: '导出', pId: 31, children: [] },
-        ],
-      },
-      {
-        id: 32,
-        name: '操作日志',
-        pId: 3,
-        children: [
-          { id: 3201, name: '查看', pId: 32, children: [] },
-          { id: 3202, name: '导出', pId: 32, children: [] },
-        ],
-      },
-      {
-        id: 33,
-        name: '系统日志',
-        pId: 3,
-        children: [
-          { id: 3301, name: '查看', pId: 33, children: [] },
-          { id: 3302, name: '导出', pId: 33, children: [] },
-        ],
-      },
-    ],
-  },
-];
 
 @Form.create()
 @connect(
   state => ({
-    categoryList: state.category.categoryList,
+    menuNodeTree: state.role.menuNodeTree,
   }),
+  dispatch => bindActionCreators({
+    getMenuNodeTree,
+    addRole,
+    editRole,
+  }, dispatch),
+  null,
+  { forwardRef: true },
 )
 
 class RoleModal extends React.Component {
@@ -101,6 +30,7 @@ class RoleModal extends React.Component {
     super(props)
     this.state = {
       newData: [],
+      editData: null,
     };
   }
 
@@ -113,12 +43,70 @@ class RoleModal extends React.Component {
   }
 
   componentDidMount() {
-    let newData = transform(data);
-    // 默认勾选
-    const defaultChecked = [1, 11, 1103, 2, 21, 2101, 2103];
-    newData = setNodeStatus(newData, defaultChecked);
+    this.props.getMenuNodeTree().then(res => {
+      if (res instanceof Error) return
 
-    this.setState({ newData });
+      const data = res.payload && res.payload.tree || []
+      let newData = transform(data);
+      // 默认勾选
+      const defaultChecked = [1, 11, 1103, 2, 21, 2101, 2103];
+      newData = setNodeStatus(newData, defaultChecked);
+
+      this.setState({ newData });
+    })
+  }
+
+  /** 初始值设置 */
+  setFieldsValue = (record) => {
+    const { setFieldsValue } = this.props.form
+    const { newData } = this.state
+    if(record) {
+      setFieldsValue({ name: record.name })
+      const data = setNodeStatus(newData, record.nodes);
+      this.setState({
+        editData: record,
+        newData: data,
+      })
+    } else {
+      setFieldsValue({ name: null })
+    }
+  }
+
+  /** 添加/编辑 角色 */
+  addRole(isEdit) {
+    const { onOk, onChange } = this.props
+    const { newData, editData } = this.state
+    const checkedId = getCheckedNodeId(newData)
+
+    const { getFieldsValue } = this.props.form
+    const { name } = getFieldsValue()
+
+    const param = {
+      name,
+      status: 1,
+      nodes: checkedId,
+    }
+
+    if(isEdit) {
+      param.id = editData.id
+      param.status = editData.status
+      this.props.editRole(param).then((res) => {
+        if (res instanceof Error) return
+        message.success('修改成功', 1, () => {
+          this.setState({ editData: null })
+          onOk()
+          onChange()
+        })
+      })
+    } else {
+      this.props.addRole(param).then((res) => {
+        if (res instanceof Error) return
+        message.success('添加成功', 1, () => {
+          onOk()
+          onChange()
+        })
+      })
+    }
   }
 
   /** 一二级菜单 开启/关闭 */
@@ -176,18 +164,20 @@ class RoleModal extends React.Component {
     this.setState({ newData: cloneNewData })
   }
 
-  onOk() {
-    const { newData } = this.state;
-    const checkedId = getCheckedNodeId(newData)
-
-    alert(checkedId);
-    console.log('checkedId----------------------', checkedId)
+  onOk(isEdit) {
+    this.props.form.validateFieldsAndScroll((err) => {
+      if (!err) {
+        this.addRole(isEdit)
+      }
+    })
   }
 
   render() {
-    const { visible, onCancel, onOk, editData } = this.props
+    const { visible, onCancel, menuNodeTree=[] } = this.props
     const { getFieldDecorator } = this.props.form;
-    const { newData } = this.state;
+    const { newData, editData } = this.state;
+
+    log('menuNodeTree----', menuNodeTree)
 
     const columns = [
       {
@@ -267,14 +257,14 @@ class RoleModal extends React.Component {
         width={900}
         visible={visible}
         onCancel={onCancel}
-        onOk={onOk}
+        onOk={() => this.onOk(editData)}
         title={isEmpty(editData) ? '添加角色' : '编辑角色'}
         maskClosable={false}
         className='container'
       >
         <Form >
           <Form.Item label="角色名" {...formItemLayout} >
-            {getFieldDecorator('roleName', {
+            {getFieldDecorator('name', {
               rules: [{
                 required: true,
                 message: '请输入角色名',

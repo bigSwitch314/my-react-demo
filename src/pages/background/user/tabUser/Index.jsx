@@ -1,6 +1,7 @@
 import React from 'react'
 import { Table, Switch, Button, Modal, Input, message, Form, Checkbox, Col, Row, Radio } from 'antd'
 import { addUser, getUserList, changeStatus, deleteUser, editUser } from '@/modules/user'
+import { getAllRole } from '@/modules/role'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import OperatorIcons from '@/components/shared/OperatorIcon'
@@ -18,26 +19,13 @@ const formItemLayout = {
   wrapperCol: { span: 20, offset: 0 },
 }
 
-const roleOptions = [
-  {id: 1, name: '超级管理员'},
-  {id: 2, name: '普通管理员'},
-  {id: 3, name: '运营'},
-  {id: 4, name: '游客'},
-  {id: 5, name: '游客5'},
-  {id: 6, name: '游客6'},
-  {id: 7, name: '游客7'},
-  {id: 9, name: '游客9'},
-  {id: 10, name: '游客10'},
-  {id: 11, name: '游客11'},
-  {id: 12, name: '游客12'},
-]
-
 const FormItem = Form.Item
 
 @Form.create()
 @connect(
   state => ({
     userList: state.user.userList,
+    allRole: state.role.allRole,
     loading: state.loading['user/getUserList'],
     currentUser: [state],
   }),
@@ -47,7 +35,10 @@ const FormItem = Form.Item
     editUser,
     changeStatus,
     deleteUser,
+    getAllRole,
   }, dispatch),
+  null,
+  { forwardRef: true },
 )
 
 
@@ -76,7 +67,15 @@ class UserList extends React.Component {
   }
 
   componentDidMount() {
-    this.getUserList()
+    this.getAllRole()
+  }
+
+  // 获取全部角色
+  getAllRole = () => {
+    this.props.getAllRole({
+      page_no: 1,
+      page_size: 100,
+    })
   }
 
   // 获取用户列表
@@ -101,7 +100,7 @@ class UserList extends React.Component {
       username: userName,
       password,
       email: mail,
-      role,
+      roles: role,
       status,
     }
 
@@ -113,6 +112,7 @@ class UserList extends React.Component {
           this.setState({ currentPage: 1 }, this.getUserList)
           this.setState({ visible: false })
           this.editData = {}
+          this.props.onChange()
         })
       })
     } else {
@@ -121,6 +121,7 @@ class UserList extends React.Component {
         message.success('添加成功', 1, () => {
           this.setState({ currentPage: 1 }, this.getUserList)
           this.setState({ visible: false })
+          this.props.onChange()
         })
       })
     }
@@ -128,13 +129,15 @@ class UserList extends React.Component {
 
   editHandler = (record) => {
     this.editData = record
-    const { username: userName, email: mail, role=[1, 2], status } = record
+    const { username: userName, email: mail, roles, status } = record
+    const role_ids = roles.map(item => item.id)
+
     this.props.form.setFieldsValue({
       userName,
       password: null,
       confirm: null,
       mail,
-      role,
+      role: role_ids,
       status,
     })
 
@@ -272,7 +275,7 @@ class UserList extends React.Component {
       isEdit,
     } = this.state
 
-    const { userList, loading } = this.props
+    const { userList, loading, allRole } = this.props
     const { getFieldDecorator } = this.props.form
 
     const columns = [
@@ -290,10 +293,12 @@ class UserList extends React.Component {
         key: 'name',
       }, {
         title: '角色',
-        dataIndex: 'role',
+        dataIndex: 'roles',
         key: 'role',
-        render() {
-          return ('管理员')
+        render: (text, record) => {
+          if (!record.roles) return
+          const role = record.roles.map(item => item.name)
+          return role.length ? role.join(',') : '暂无'
         },
       }, {
         title: '邮箱',
@@ -367,6 +372,7 @@ class UserList extends React.Component {
             maskClosable={false}
             onCancel={this.onCancel}
             onOk={() => this.onOk(isEdit)}
+            className="user-modal"
           >
             <div>
               <FormItem
@@ -442,17 +448,16 @@ class UserList extends React.Component {
               <FormItem
                 label="角色"
                 {...formItemLayout}
+                className="role"
               >
                 {getFieldDecorator('role', {
                   rules: [{
                     required: false,
                   }],
                 })(
-                  <CheckboxGroup
-                    onChange={this.onLabelChange}
-                  >
+                  <CheckboxGroup>
                     <Row>
-                      {roleOptions.map(item => (
+                      {allRole && allRole.list && allRole.list.map(item => (
                         <Col key={item.id} span={5} style={{ height: 30 }}>
                           <Checkbox value={item.id}>
                             {item.name}

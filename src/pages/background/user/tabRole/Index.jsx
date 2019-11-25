@@ -1,11 +1,12 @@
 import React from 'react'
 import { getAllUser } from '@/modules/user'
 import { connect } from 'react-redux'
-import { Table, Switch, Button, Modal, Checkbox, Row, Col } from 'antd'
+import { Table, Switch, Button, Modal, Checkbox, Row, Col, message } from 'antd'
 import OperatorIcons from '@/components/shared/OperatorIcon'
 import Pagination from '@/components/shared/Pagination'
 import HeaderBar from '@/components/shared/HeaderBar'
-import { addRole, getRoleList, changeStatus, deleteRole, editRole } from '@/modules/role'
+import { deleteConfirm, deleteBatchConfirm, removeArr } from '@/components/shared/Confirm'
+import { addRole, getRoleList, changeStatus, deleteRole, editRole, bindAccount } from '@/modules/role'
 import RoleModal from './RoleModal'
 
 import './Index.less'
@@ -16,7 +17,6 @@ const CheckboxGroup = Checkbox.Group;
   state => ({
     allUser: state.user.allUser,
     roleList: state.role.roleList,
-    // loading: state.loading['role/getRoleList'],
   }),
   {
     getAllUser,
@@ -25,7 +25,10 @@ const CheckboxGroup = Checkbox.Group;
     editRole,
     changeStatus,
     deleteRole,
+    bindAccount,
   },
+  null,
+  { forwardRef: true },
 )
 
 class TabRole extends React.Component {
@@ -36,11 +39,15 @@ class TabRole extends React.Component {
       pageSize: 5,
       bindVisible: false,
       checkedList: [],
-      indeterminate: true,
+      indeterminate: false,
       checkAll: false,
       roleVisible: false,
       editData: {},
+      selectedRowKeys: [],
+      bindRoleId: null,
     }
+    this.roleModelRef = React.createRef()
+    this.modelRef = React.createRef()
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -53,7 +60,6 @@ class TabRole extends React.Component {
 
   componentDidMount() {
     this.getAllUser()
-    this.getRoleList()
   }
 
   // 获取用户列表
@@ -73,6 +79,14 @@ class TabRole extends React.Component {
     })
   }
 
+  bindAccount = () => {
+    const { checkedList, bindRoleId } = this.state
+    return this.props.bindAccount({
+      role_id: bindRoleId,
+      account_ids: checkedList,
+    })
+  }
+
   /** 表格分頁 */
   changePage = (currentPage, pageSize) => {
     this.setState({ currentPage, pageSize }, this.getRoleList)
@@ -84,34 +98,94 @@ class TabRole extends React.Component {
 
   // 角色绑定
   showBindModal(record){
-    const checkedList=record.grant_account.map(item=>item.user_id)||[]
-    this.setState({ bindVisible: true, checkedList: checkedList })
+    const checkedList=record.accounts.map(item=>item.id)||[]
+    this.onChange(checkedList)
+    this.setState({
+      bindVisible: true,
+      checkedList: checkedList,
+      bindRoleId: record.id,
+    })
   }
 
-  onOkBind(){
-    // lj
-
-    this.setState({ bindVisible: false })
+  // 绑定角色
+  onOkBind() {
+    this.bindAccount().then(res => {
+      if (res instanceof Error) return
+      message.success('绑定成功', 1, () => {
+        this.setState({
+          bindVisible: false,
+          bindRoleId: null,
+        })
+        this.getRoleList()
+      })
+    })
   }
 
   onCancelBind(){
     this.setState({ bindVisible: false })
   }
 
+  changeStatus = (checked, record) => {
+    this.props.changeStatus({
+      id: record.id,
+      status: Number(checked),
+    }).then(res => {
+      if (res instanceof Error) return
+      this.getRoleList()
+    })
+  }
+
+  /** 批量删除 */
+  batchDelete = () => {
+    const { selectedRowKeys } = this.state;
+    deleteBatchConfirm(selectedRowKeys, () => this.deleteData(selectedRowKeys))
+  }
+
+  /** 删除弹框 */
+  showConfirm = (id) => {
+    deleteConfirm(() => this.deleteData(id))
+  }
+
+  /** 删除数据方法 */
+  deleteData = (id) => {
+    let idArr = []
+    id instanceof Array ? idArr = id : idArr.push(id)
+    this.props.deleteRole({
+      id: idArr.join(','),
+    }).then((res) => {
+      if (res instanceof Error) return
+      message.success('删除成功', 1, () => {
+        const { currentPage, pageSize } = this.state
+        const { roleList } = this.props
+        const totalPage = Math.ceil((roleList.count - idArr.length) / pageSize)
+        if (currentPage > totalPage) {
+          this.setState({ currentPage: 1 }, () => {
+            this.getRoleList()
+          })
+        } else {
+          this.getRoleList()
+        }
+      })
+      const selectedRowKeys = removeArr(this.state.selectedRowKeys, id)
+      this.setState({ selectedRowKeys })
+    })
+  }
+
 
   // 添加/编辑角色
-
-  showRoleModal(record={}){
+  showRoleModal(record=null){
     this.setState({
       roleVisible: true,
       isEdit: record,
     })
+    this.roleModelRef.setFieldsValue(record)
   }
 
   onOkRole(){
-    // lj
-
-    this.setState({ roleVisible: false })
+    this.setState({
+      currentPage: 1,
+      roleVisible: false,
+    }, this.getRoleList)
   }
 
   onCancelRole(){
@@ -119,8 +193,6 @@ class TabRole extends React.Component {
   }
 
   onChange = checkedList => {
-    log(checkedList)
-    log(checkedList.length, this.props.allUser.list.length)
     this.setState({
       checkedList,
       indeterminate: !!checkedList.length && checkedList.length < this.props.allUser.list.length,
@@ -137,9 +209,16 @@ class TabRole extends React.Component {
     });
   };
 
+  /** 表格复选框选中 */
+  onSelectChange = (selectedRowKeys) => {
+    this.setState({
+      selectedRowKeys,
+    })
+  }
+
   render() {
-    const { allUser } = this.props
-    const { currentPage, pageSize, roleVisible, editData } = this.state
+    const { allUser, roleList={}, onChange: onChangeRole } = this.props
+    const { currentPage, pageSize, roleVisible, selectedRowKeys} = this.state
 
     const columns = [
       {
@@ -156,11 +235,11 @@ class TabRole extends React.Component {
       },
       {
         title: '授权账号',
-        dataIndex: 'grant_account',
+        dataIndex: 'accounts',
         render(text, record) {
-          if (!record.grant_account) return
-          const account = record.grant_account.map(item => item.user_name)
-          return account.join(',')
+          if (!record.accounts) return
+          const account = record.accounts.map(item => item.name)
+          return account.length ? account.join(',') : '暂无'
         },
       },
       {
@@ -169,7 +248,7 @@ class TabRole extends React.Component {
         render: (text, record) => (
           <Switch
             checked={!!record.status}
-            onChange={(checked) => this.changeSwitchStatus(checked, record)}
+            onChange={(checked) => this.changeStatus(checked, record)}
           />
         ),
       }, {
@@ -186,48 +265,7 @@ class TabRole extends React.Component {
         ),
       },
     ];
-    const data = [
-      {
-        id: 1,
-        name: '超级管理员',
-        grant_account: [{
-          user_id: 18,
-          user_name: '刘海',
-        }, {
-          user_id: 19,
-          user_name: '李军',
-        }],
-        status: 1,
-      },
-      {
-        id: 2,
-        name: '管理员',
-        grant_account: [{
-          user_id: 2,
-          user_name: 'luoqiang',
-        }],
-        status: 0,
-      },
-      {
-        id: 3,
-        name: '运维',
-        grant_account: [{
-          user_id: 17,
-          user_name: '李晨',
-        }],
-        status: 1,
-      },
-    ];
-    // rowSelection object indicates the need for row selection
-    const rowSelection = {
-      onChange: (selectedRowKeys, selectedRows) => {
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-      },
-      getCheckboxProps: record => ({
-        disabled: record.name === 'Disabled User', // Column configuration not to be checked
-        name: record.name,
-      }),
-    };
+
     return (
       <div className="container">
         <HeaderBar>
@@ -237,16 +275,20 @@ class TabRole extends React.Component {
           </HeaderBar.Left>
         </HeaderBar>
         <Table
-          rowSelection={rowSelection}
+          rowSelection={{
+            selectedRowKeys,
+            onChange: this.onSelectChange,
+          }}
+          rowKey={record => record.id}
           columns={columns}
-          dataSource={data}
+          dataSource={roleList.list || []}
           pagination={false}
         />
         <Pagination
           current={currentPage}
           pageSize={pageSize}
           pageSizeOptions={['5', '10', '15', '20']}
-          total={3 || 0}
+          total={roleList.count || 0}
           onChange={this.changePage}
           onShowSizeChange={this.onShowSizeChange}
         />
@@ -291,9 +333,10 @@ class TabRole extends React.Component {
         <RoleModal
           visible={roleVisible}
           onOk={() => this.onOkRole()}
-          onCancel={() => this.onCancelRole()}>
-          value={editData}
-        </RoleModal>
+          onCancel={() => this.onCancelRole()}
+          wrappedComponentRef={(node) => this.roleModelRef = node}
+          onChange={onChangeRole}
+        />
       </div>
     )
   }
