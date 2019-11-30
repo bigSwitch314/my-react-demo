@@ -10,9 +10,9 @@ import PreviewModal from './modal/PreviewModal'
 import moment from 'moment'
 import './style/OriginalArticle.less'
 
-import { getCategoryList } from '../../../modules/category'
-import { getLabelList } from '../../../modules/label'
-import { getArticleList, changeReleaseStatus, getArticle, deleteArticle } from '../../../modules/article'
+import { getCategoryList } from '@/modules/category'
+import { getLabelList } from '@/modules/label'
+import { getArticleList, changeReleaseStatus, getArticle, deleteArticle } from '@/modules/article'
 
 const FormItem = Form.Item
 const Option = Select.Option;

@@ -117,6 +117,7 @@ class TabRole extends React.Component {
           bindRoleId: null,
         })
         this.getRoleList()
+        this.props.onChange()
       })
     })
   }
@@ -156,7 +157,7 @@ class TabRole extends React.Component {
       if (res instanceof Error) return
       message.success('删除成功', 1, () => {
         const { currentPage, pageSize } = this.state
-        const { roleList } = this.props
+        const { roleList, onChange } = this.props
         const totalPage = Math.ceil((roleList.count - idArr.length) / pageSize)
         if (currentPage > totalPage) {
           this.setState({ currentPage: 1 }, () => {
@@ -165,6 +166,7 @@ class TabRole extends React.Component {
         } else {
           this.getRoleList()
         }
+        onChange()
       })
       const selectedRowKeys = removeArr(this.state.selectedRowKeys, id)
       this.setState({ selectedRowKeys })

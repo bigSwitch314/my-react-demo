@@ -1,49 +1,137 @@
-import React, { Component } from 'react'
-import {HashRouter as Router, Route, Link, Switch} from 'react-router-dom'
+import React from 'react'
+import { connect } from 'react-redux'
+import { Form, Icon, Input, Button, Row, Col } from 'antd'
+// import { setLogin } from '../components/Authentication/util'
 
-const Home = () => (
-  <div>
-    <h2>首页</h2>
-  </div>
-)
-const About = () => (
-  <div>
-    <h2>关于</h2>
-  </div>
-)
+// import { loginSubmit } from '../modules/login'
+import './style/UserLayout.less'
 
-const List = () => (
-  <div>
-    <h2>列表</h2>
-  </div>
-)
+const FormItem = Form.Item
 
-class App extends Component {
+@connect(
+  state => ({
+    loading: state.loading['login/loginSubmit'],
+  }),
+  // dispatch => bindActionCreators({ loginSubmit }, dispatch),
+)
+@Form.create()
+class UserLayout extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      codeSrc: `/api/login/getCode?date=${Math.random()}`,
+    }
+    this.code = null
+  }
+
+  componentDidMount() {
+    // this.loadAccountInfo()
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.code)
+  }
+
+  handleSubmit = (e) => {
+    e.preventDefault()
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        log(values)
+        // const { userName, password, validCode } = values
+        // this.props.loginSubmit({
+        //   name: userName,
+        //   password,
+        //   validCode,
+        // }).then(
+        //   res => {
+        //     if (res instanceof Error) {
+        //       return
+        //     }
+
+        //     setLogin()
+        //     if (window.currentUrl) {
+        //       this.props.history.push(window.currentUrl)
+        //       delete window.currentUrl
+        //       return
+        //     }
+        //     this.props.history.push('/')
+        //   },
+        // )
+      }
+    })
+  }
+
+  getCodeSrc = () => {
+    clearTimeout(this.code)
+    this.code = setTimeout(() => {
+      this.setState({
+        codeSrc: `/api/login/getCode?date=${Math.random()}`,
+      })
+    }, 200)
+  }
+
   render() {
+    const { getFieldDecorator } = this.props.form
+    const { codeSrc } = this.state
     return (
-      <Router>
-        <div>
-          <ul>
-            <li>
-              <Link to="/">首页</Link>
-            </li>
-            <li>
-              <Link to="/about">关于</Link>
-            </li>
-            <li>
-              <Link to="/list">列表</Link>
-            </li>
-          </ul>
-
-          <Switch>
-            <Route exact path="/" component={Home} />
-            <Route path="/about" component={About} />
-            <Route path="/list" component={List} />
-          </Switch>
+      <div className="user-layout">
+        <div className="login-container">
+          <div className="login-info">
+            <div className="login-content">
+              <Form onSubmit={this.handleSubmit} className="login-form">
+                <FormItem><p className="login-name">博客管理平台</p></FormItem>
+                <FormItem>
+                  {getFieldDecorator('userName', {
+                    rules: [{ required: true, message: '请输入用户名' }],
+                  })(
+                    <Input
+                      prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                      placeholder="用户名"
+                      autoComplete="off"
+                    />,
+                  )}
+                </FormItem>
+                <FormItem>
+                  {getFieldDecorator('password', {
+                    rules: [{ required: true, message: '请输入密码' }],
+                  })(
+                    <Input
+                      prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                      type="password"
+                      placeholder="密码"
+                    />,
+                  )}
+                </FormItem>
+                <Row>
+                  <Col>
+                    <div className="img-wrap">
+                      <div className="img-input">
+                        <FormItem>
+                          {getFieldDecorator('validCode', {
+                            rules: [{ required: true, message: '请输入验证码' }],
+                          })(
+                            <Input placeholder="验证码" autoComplete="off" />,
+                          )}
+                        </FormItem>
+                      </div>
+                      <div className="img-box">
+                        <img alt="验证码" src={codeSrc} onClick={this.getCodeSrc} />
+                      </div>
+                    </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Button type="primary" htmlType="submit" className="login-form-button" style={{ height: 45 }}>
+                    登录
+                  </Button>
+                </Row>
+              </Form>
+            </div>
+          </div>
         </div>
-      </Router>
+      </div>
     )
   }
 }
 
-export default App;
+export default UserLayout

@@ -31,7 +31,7 @@ import {
   changeReleaseStatus,
   getOpenSourceProject,
   deleteOpenSourceProject,
-} from '../../../modules/openSourceProject'
+} from '@/modules/openSourceProject'
 
 import { getOspUpdateLogList, deleteOspUpdateLog } from '@/modules/ospUpdateLog'
 

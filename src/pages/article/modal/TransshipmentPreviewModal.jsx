@@ -2,26 +2,24 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Modal } from 'antd'
 import '../style/PreviewModal.less'
-import marked from '../../../../components/markdown/helpers/marked'
-import handleCode from '../../../../components/markdown/helpers/handelCode'
+import marked from '@/components/markdown/helpers/marked'
+import handleCode from '@/components/markdown/helpers/handelCode'
+import { getTransshipmentArticle } from '@/modules/transshipmentArticle'
 
 
 @connect(
   state => ({
-    categoryList: state.category.categoryList,
+    transshipmentArticle: state.transshipmentArticle.transshipmentArticle,
   }),
-  null,
+  { getTransshipmentArticle },
   null,
   { forwardRef: true },
 )
 
-class PreviewModal extends React.Component {
+class TransshipmentPreviewModal extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {
-      article: null,
-      categoryName: null,
-    }
+    this.state = { article: null }
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -35,18 +33,21 @@ class PreviewModal extends React.Component {
   componentDidMount() {
   }
 
+  // 获取文章
+  getArticle = (id) => {
+    return this.props.getTransshipmentArticle({ id })
+  }
+
   getRecord(record) {
-    const { categoryList } = this.props
-    const category = categoryList.list.find(item => item.id === record.category_id)
-    this.setState({
-      article: record,
-      categoryName: category.name,
+    this.getArticle(record.id).then(res => {
+      console.log(res)
+      this.setState({ article: res.payload})
     })
   }
 
   render() {
     const { visible, onCancel} = this.props
-    const { article, categoryName } = this.state
+    const { article } = this.state
 
     return (
       <Modal
@@ -61,17 +62,6 @@ class PreviewModal extends React.Component {
           {article ?
             <React.Fragment>
               <div className="title">{article.title}</div>
-              <div className="meta-info">
-                <ul>
-                  <li>发表于{article.create_time}</li>
-                  <li>|</li>
-                  <li>分类于{categoryName}</li>
-                  <li>|</li>
-                  <li>阅读次数：{article.read_number}</li>
-                  <li>|</li>
-                  <li>复制次数：{article.read_number}</li>
-                </ul>
-              </div>
               <div
                 className="content for-preview for-markdown-preview"
                 dangerouslySetInnerHTML={{ __html: handleCode(marked(article.content_md)) }}
@@ -84,5 +74,5 @@ class PreviewModal extends React.Component {
   }
 }
 
-export default PreviewModal
+export default TransshipmentPreviewModal
 

@@ -1,6 +1,6 @@
 import React from 'react'
 // import { Icon, Avatar } from 'antd'
-import img from '@/assets/image/luo.jpg'
+import img from '@/assets/images/luo.jpg'
 import RcViewer from '@/components/viewer/RcViewer'
 
 

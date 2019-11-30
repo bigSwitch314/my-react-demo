@@ -70,7 +70,7 @@ class UserList extends React.Component {
     this.getAllRole()
   }
 
-  // 获取全部角色
+  // 获取全部角色22
   getAllRole = () => {
     this.props.getAllRole({
       page_no: 1,
@@ -232,6 +232,7 @@ class UserList extends React.Component {
         } else {
           this.getUserList()
         }
+        this.props.onChange()
       })
       const selectedRowKeys = removeArr(this.state.selectedRowKeys, id)
       this.setState({ selectedRowKeys })

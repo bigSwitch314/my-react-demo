@@ -6,17 +6,17 @@ import React from 'react'
 import { Route, Switch } from 'react-router-dom'
 import loadComponent from '../loadComponent'
 
-const OriginalArticle = loadComponent(() => import('../pages/background/article/OriginalArticle'))
-const TransshipmentArticle = loadComponent(() => import('../pages/background/article/TransshipmentArticle'))
-const AuthorIntroduction = loadComponent(() => import('../pages/background/article/AuthorIntroduction'))
-const OpenSourceProject = loadComponent(() => import('../pages/background/article/OpenSourceProject'))
-const CategoryManage = loadComponent(() => import('../pages/background/category/CategoryManage'))
-const LabelManage = loadComponent(() => import('../pages/background/label/LabelManage'))
-const UserManage = loadComponent(() => import('../pages/background/user/UserManage'))
-const OperatorLog = loadComponent(() => import('../pages/background/log/OperatorLog'))
-const LoginLog = loadComponent(() => import('../pages/background/log/LoginLog'))
-const NavigationList = loadComponent(() => import('../pages/background/system/NavigationList'))
-const NodeManage = loadComponent(() => import('../pages/background/system/NodeManage'))
+const OriginalArticle = loadComponent(() => import('../pages/article/OriginalArticle'))
+const TransshipmentArticle = loadComponent(() => import('../pages/article/TransshipmentArticle'))
+const AuthorIntroduction = loadComponent(() => import('../pages/article/AuthorIntroduction'))
+const OpenSourceProject = loadComponent(() => import('../pages/article/OpenSourceProject'))
+const CategoryManage = loadComponent(() => import('../pages/category/CategoryManage'))
+const LabelManage = loadComponent(() => import('../pages/label/LabelManage'))
+const UserManage = loadComponent(() => import('../pages/user/UserManage'))
+const OperatorLog = loadComponent(() => import('../pages/log/OperatorLog'))
+const LoginLog = loadComponent(() => import('../pages/log/LoginLog'))
+const NavigationList = loadComponent(() => import('../pages/system/NavigationList'))
+const NodeManage = loadComponent(() => import('../pages/system/NodeManage'))
 
 
 export const routerConfig = [

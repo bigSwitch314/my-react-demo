@@ -1,0 +1,65 @@
+@import '~styles/mixins/index.less';
+
+.user-layout {
+  display: flex;
+  align-items: center;
+  .size(100%, 100%);
+  background: url(~images/bj.png) no-repeat center;
+  background-color: #1a2b5d;
+  min-height: 600px;
+  min-width: 1000px;
+  .login {
+    &-container {
+      margin: 0 auto;
+      .size(950px, 590px);
+      background: url(~images/dl.png) no-repeat center;
+    }
+    &-info {
+      display: flex;
+      align-items: center;
+      float: right;
+      .size(450px, 100%);
+    }
+    &-content {
+      margin: 0 auto;
+      .size(310px, 370px);
+    }
+  }
+  .ant-input {
+    border: none;
+    border-radius: 0px;
+    border-bottom: 1px solid #e7e7e7;
+    &:focus {
+      box-shadow: none;
+    }
+  }
+  .login-name {
+    color: #389df7;
+    font-size: 20px;
+  }
+  .login-form-button {
+    width: 100%;
+  }
+  .img-input{
+    display: inline-block;
+    width: 232px;
+  }
+  .img-box{
+    width: 68px;
+    height: 28px;
+    background: #efefef;
+    float: right;
+    margin-top: 8px;
+    & > img {
+      width: 100%;
+      height:100%;
+    }
+  }
+  .remember-passWord {
+    color: #bfbfbf;
+  }
+  .img-wrap{
+    width: 100%;
+    overflow: hidden;
+  }
+}

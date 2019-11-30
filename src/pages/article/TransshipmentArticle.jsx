@@ -11,7 +11,7 @@ import TransshipmentPreviewModal from './modal/TransshipmentPreviewModal'
 import moment from 'moment'
 import './style/TransshipmentArticle.less'
 
-import { getTransshipmentArticleList, changeReleaseStatus, getTransshipmentArticle, deleteTransshipmentArticle } from '../../../modules/transshipmentArticle'
+import { getTransshipmentArticleList, changeReleaseStatus, getTransshipmentArticle, deleteTransshipmentArticle } from '@/modules/transshipmentArticle'
 
 const FormItem = Form.Item
 const Option = Select.Option;
