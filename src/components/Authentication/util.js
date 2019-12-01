@@ -13,5 +13,5 @@ export function getLogin() {
     sessionStorage.setItem('authorized', true)
     return true
   }
-  return true
+  return false
 }

@@ -1,12 +1,16 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import {Route, Link, Switch, Redirect} from 'react-router-dom'
-import { Layout, Menu, Avatar } from 'antd'
+import { Layout, Menu, Avatar, Modal } from 'antd'
 import { getRoutesData } from '../router/menu'
 import { getMenus, getRoutes, getParentKey, getCurrentRoute } from '../router/utils'
+import { removeLogin } from '../components/Authentication/util'
+import { logout } from '@/modules/login'
 
 import './style/BasicLayout.less'
 
 const { Header, Content, Sider } = Layout
+const confirm = Modal.confirm
 
 const menuCodes = {
   文章管理: '001',
@@ -25,6 +29,13 @@ const menuCodes = {
   节点管理: '006002',
 }
 
+
+@connect(
+  state => ({
+    loading: state.loading['login/logout'],
+  }),
+  { logout },
+)
 
 class BasicLayout extends React.Component {
   constructor(props) {
@@ -52,7 +63,21 @@ class BasicLayout extends React.Component {
   }
 
   componentDidMount() {
-    // uu();
+  }
+
+  logout = () => {
+    const _this = this
+    confirm({
+      title: '确认退出吗？',
+      width: 300,
+      onOk() {
+        _this.props.logout()
+        removeLogin()
+        window.location.reload()
+      },
+      onCancel() {
+      },
+    })
   }
 
   onCollapse = (collapsed) => {
@@ -96,7 +121,9 @@ class BasicLayout extends React.Component {
               </span>
               <span className="name">admin</span>
             </span>
-            <span title="退出"><i className="iconfont icon-logout" /></span>
+            <span title="退出">
+              <i className="iconfont icon-logout" onClick={this.logout} />
+            </span>
           </div>
         </Header>
         <Content className="basic-layout-content">

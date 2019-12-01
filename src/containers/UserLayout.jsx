@@ -1,18 +1,18 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Form, Icon, Input, Button, Row, Col } from 'antd'
-// import { setLogin } from '../components/Authentication/util'
+import { setLogin } from '../components/Authentication/util'
 
-// import { loginSubmit } from '../modules/login'
+import { login } from '@/modules/login'
 import './style/UserLayout.less'
 
 const FormItem = Form.Item
 
 @connect(
   state => ({
-    loading: state.loading['login/loginSubmit'],
+    loading: state.loading['login/login'],
   }),
-  // dispatch => bindActionCreators({ loginSubmit }, dispatch),
+  { login },
 )
 @Form.create()
 class UserLayout extends React.Component {
@@ -36,27 +36,23 @@ class UserLayout extends React.Component {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        log(values)
-        // const { userName, password, validCode } = values
-        // this.props.loginSubmit({
-        //   name: userName,
-        //   password,
-        //   validCode,
-        // }).then(
-        //   res => {
-        //     if (res instanceof Error) {
-        //       return
-        //     }
-
-        //     setLogin()
-        //     if (window.currentUrl) {
-        //       this.props.history.push(window.currentUrl)
-        //       delete window.currentUrl
-        //       return
-        //     }
-        //     this.props.history.push('/')
-        //   },
-        // )
+        const { userName, password, validCode } = values
+        this.props.login({
+          username: userName,
+          password,
+          valid_code: validCode,
+        }).then(
+          res => {
+            if (res instanceof Error) return
+            setLogin()
+            if (window.currentUrl) {
+              this.props.history.push(window.currentUrl)
+              delete window.currentUrl
+              return
+            }
+            this.props.history.push('/')
+          },
+        )
       }
     })
   }
