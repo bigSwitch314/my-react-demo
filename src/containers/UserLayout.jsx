@@ -7,6 +7,7 @@ import { login } from '@/modules/login'
 import './style/UserLayout.less'
 
 const FormItem = Form.Item
+const baseUrl = 'http://bigswitch314.cn'
 
 @connect(
   state => ({
@@ -19,7 +20,7 @@ class UserLayout extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      codeSrc: `/api/login/getCode?date=${Math.random()}`,
+      codeSrc: `${baseUrl}/blog/public_controller/getCaptcha?date=${Math.random()}`,
     }
     this.code = null
   }
@@ -44,7 +45,8 @@ class UserLayout extends React.Component {
         }).then(
           res => {
             if (res instanceof Error) return
-            setLogin()
+            const { token=''} = res.payload
+            setLogin(token)
             if (window.currentUrl) {
               this.props.history.push(window.currentUrl)
               delete window.currentUrl
@@ -61,7 +63,7 @@ class UserLayout extends React.Component {
     clearTimeout(this.code)
     this.code = setTimeout(() => {
       this.setState({
-        codeSrc: `/api/login/getCode?date=${Math.random()}`,
+        codeSrc: `${baseUrl}/blog/public_controller/getCaptcha?date=${Math.random()}`,
       })
     }, 200)
   }
@@ -110,7 +112,7 @@ class UserLayout extends React.Component {
                           )}
                         </FormItem>
                       </div>
-                      <div className="img-box">
+                      <div className="img-box" title="换一张">
                         <img alt="验证码" src={codeSrc} onClick={this.getCodeSrc} />
                       </div>
                     </div>

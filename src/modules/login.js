@@ -17,5 +17,5 @@ export default {
 
 const n = (name) => `login/${name}`
 
-export const login = (params) => request.get('/blog/login/login', n('login'), params)
-export const logout = (params) => request.get('/blog/login/logout', n('logout'), params)
+export const login = (params) => request.post('/blog/public_controller/login', n('login'), params)
+export const logout = (params) => request.get('/blog/public_controller/logout', n('logout'), params)

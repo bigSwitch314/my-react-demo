@@ -43,10 +43,11 @@ class NodeModal extends React.Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (props.menuList.list !== state.menuList) {
+    const { menuList={}} = props
+    if (menuList.list!== state.menuList) {
       return {
-        menuList: props.menuList.list,
-        menuTree: props.menuList.tree,
+        menuList: menuList.list,
+        menuTree: menuList.tree,
       }
     }
 

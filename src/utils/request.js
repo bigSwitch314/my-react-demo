@@ -46,7 +46,6 @@ function getParams(data) {
 
 function generaterParams(url, options) {
   const { params, method } = options
-  options.credentials = 'same-origin'
   delete options.params
   if (method !== 'GET') {
     options.headers = {
@@ -66,6 +65,12 @@ function generaterParams(url, options) {
     }
     url = `${url}${getParams(params)}`
   }
+  // 携带cookie
+  options.credentials = 'include'
+  // 携带token
+  const token = sessionStorage.getItem('token')
+  options.headers = { ...options.headers, token }
+
   return { url, options }
 }
 

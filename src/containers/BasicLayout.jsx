@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import {Route, Link, Switch, Redirect} from 'react-router-dom'
-import { Layout, Menu, Avatar, Modal } from 'antd'
+import { Layout, Menu, Avatar } from 'antd'
 import { getRoutesData } from '../router/menu'
 import { getMenus, getRoutes, getParentKey, getCurrentRoute } from '../router/utils'
 import { removeLogin } from '../components/Authentication/util'
@@ -10,7 +10,6 @@ import { logout } from '@/modules/login'
 import './style/BasicLayout.less'
 
 const { Header, Content, Sider } = Layout
-const confirm = Modal.confirm
 
 const menuCodes = {
   文章管理: '001',
@@ -66,18 +65,8 @@ class BasicLayout extends React.Component {
   }
 
   logout = () => {
-    const _this = this
-    confirm({
-      title: '确认退出吗？',
-      width: 300,
-      onOk() {
-        _this.props.logout()
-        removeLogin()
-        window.location.reload()
-      },
-      onCancel() {
-      },
-    })
+    removeLogin()
+    window.location.reload()
   }
 
   onCollapse = (collapsed) => {
