@@ -69,7 +69,7 @@ function generaterParams(url, options) {
   options.credentials = 'include'
   // 携带token
   const token = sessionStorage.getItem('token')
-  options.headers = { ...options.headers, token }
+  options.headers = { ...options.headers, Token: token }
 
   return { url, options }
 }
