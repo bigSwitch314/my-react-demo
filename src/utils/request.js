@@ -1,6 +1,6 @@
 import 'whatwg-fetch'
 import { message } from 'antd'
-// import { removeLogin } from '../components/Authentication/util'
+import { removeLogin } from '../components/Authentication/util'
 
 // const baseUrl = 'http://39.108.60.163:443'
 const baseUrl = 'http://bigswitch314.cn:80'
@@ -69,7 +69,7 @@ function generaterParams(url, options) {
   options.credentials = 'include'
   // 携带token
   const token = sessionStorage.getItem('token')
-  options.headers = { ...options.headers, Token: token }
+  options.headers = { ...options.headers, Token: token || '' }
 
   return { url, options }
 }
@@ -78,6 +78,11 @@ const methods = ['POST', 'PUT', 'DELETE', 'GET']
 
 function handleCode(code, desc) {
   let msg = ''
+  if (code === 40000) { // 用户登出
+    removeLogin()
+    window.currentUrl = window.location.href
+    window.location.reload()
+  }
   if (code !==0) {
     msg = desc || '网络错误'
     const error = new Error(msg)
