@@ -76,8 +76,8 @@ class OriginalArticle extends React.Component {
     const { getFieldsValue } = this.props.form
     const { title='', category='', label=[], time, timeType=1 } = getFieldsValue()
 
-    const beginTime = time ? time[0].format('YYYY-MM-DD HH:mm:ss') : ''
-    const endTime = time ? time[1].format('YYYY-MM-DD HH:mm:ss') : ''
+    const beginTime = time ? time[0].format('YYYY-MM-DD') : ''
+    const endTime = time ? time[1].format('YYYY-MM-DD') : ''
 
     if (beginTime && endTime && moment(beginTime).valueOf() >= moment(endTime).valueOf()) {
       message.error('结束时间必须大于开始时间')
@@ -345,11 +345,11 @@ class OriginalArticle extends React.Component {
                 </FormItem>
                 <FormItem labelCol={{ span: 4 }} wrapperCol={{ span: 12 }} className='query-time-type' >
                   {getFieldDecorator('timeType', {
-                    initialValue: '1',
+                    initialValue: 1,
                   })(
                     <Select style={{ width: '100px' }}>
-                      <Option value="1">创建时间</Option>
-                      <Option value="2">更新时间</Option>
+                      <Option value={1}>创建时间</Option>
+                      <Option value={2}>更新时间</Option>
                     </Select>
                   )}
                 </FormItem>

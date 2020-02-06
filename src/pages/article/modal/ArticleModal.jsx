@@ -6,6 +6,7 @@ import '@/components/markdown/editor/index.less';
 import handleCode from '@/components/markdown/helpers/handelCode';
 import marked from '@/components/markdown/helpers/marked';
 import { addArticle, editArticle } from '@/modules/article';
+import { fadeIn, fadeOut } from '@/utils/common'
 import '../style/ArticleModal.less';
 
 const FormItem = Form.Item
@@ -124,6 +125,7 @@ class ArticleModal extends React.Component {
     // this.props.form.setFieldsValue({ content: encode })
     if(htmlValue) {
       this.setState({ hasContentMessage: false })
+      fadeOut('content-message')
     }
     this.setState({
       editorVisible: false,
@@ -147,6 +149,7 @@ class ArticleModal extends React.Component {
       if (!err) {
         if(!htmlValue) {
           this.setState({ hasContentMessage: true })
+          fadeIn('content-message')
           return
         }
 
@@ -179,15 +182,23 @@ class ArticleModal extends React.Component {
       } else {
         if (!htmlValue) {
           this.setState({ hasContentMessage: true })
+          fadeIn('content-message')
           return
         }
       }
     })
   }
 
+  onCancel() {
+    this.setState({ hasContentMessage: false })
+    fadeOut('content-message')
+    this.props.onCancel()
+
+  }
+
   render() {
     const { editorValue, editorVisible, htmlValue, hasContentMessage } = this.state
-    const { visible, onCancel, categoryList, labelList, isEdit } = this.props
+    const { visible, categoryList, labelList, isEdit } = this.props
     const { getFieldDecorator } = this.props.form
 
     let CategoryOptions = []
@@ -208,7 +219,7 @@ class ArticleModal extends React.Component {
           title={isEdit ? '编辑文章' : '添加文章'}
           visible={visible}
           onOk={() => this.onOk()}
-          onCancel={onCancel}
+          onCancel={() => this.onCancel()}
           okText='保存'
         >
           <div className='article-modal'>
@@ -314,7 +325,7 @@ class ArticleModal extends React.Component {
                 />
               )}
             </FormItem>
-            {hasContentMessage && <span className='content-message'>请输入内容</span>}
+            <span id='content-message' className='content-message'>请输入内容</span>
           </div>
         </Modal>
 
@@ -342,4 +353,3 @@ class ArticleModal extends React.Component {
 
 // export default Form.create()(ArticleModal)
 export default ArticleModal
-
