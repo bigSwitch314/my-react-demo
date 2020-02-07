@@ -1,4 +1,4 @@
-import { Checkbox, Col, Form, Input, Modal, Radio, Row } from 'antd';
+import { Checkbox, Col, Form, Input, Modal, Radio, Row, message } from 'antd';
 import React from 'react';
 import { connect } from 'react-redux';
 import Editor from '@/components/markdown';
@@ -112,6 +112,17 @@ class ArticleModal extends React.Component {
     this.setState({
       value: e.target.value,
     });
+  }
+
+  onLabelChange = (checkedValue) => {
+    if (checkedValue.length>4) {
+      message.warning('标签不能多于4个')
+      checkedValue.pop()
+    }
+
+    this.props.form.setFieldsValue({
+      label: checkedValue,
+    })
   }
 
   onEditorChange(value) {
@@ -236,7 +247,7 @@ class ArticleModal extends React.Component {
                   // validator: this.validateOldPassword,
                 }],
               })(
-                <Input />,
+                <Input maxLength={26}/>,
               )}
             </FormItem>
             <FormItem

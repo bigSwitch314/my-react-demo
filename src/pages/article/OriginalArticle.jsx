@@ -248,12 +248,19 @@ class OriginalArticle extends React.Component {
     }, {
       title: '标题',
       dataIndex: 'title',
+      width: 240,
     }, {
       title: '分类',
       dataIndex: 'category_name',
     }, {
       title: '标签',
       dataIndex: 'label_name',
+      width: 130,
+      render: (text, record) => (
+        <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
+          {text}
+        </div>
+      ),
     }, {
       title: '阅读次数',
       dataIndex: 'read_number',
@@ -327,6 +334,7 @@ class OriginalArticle extends React.Component {
                     style={{ width: '180px' }}
                     placeholder='请选择标签'
                     onChange={this.handleChange}
+                    maxTagCount={3}
                   >
                     {Object.keys(labelList).length && labelList.list.map(item => (
                       <Option key={item.id} value={item.id}>{item.name}</Option>

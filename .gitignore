@@ -7,3 +7,5 @@
 .alpharc.js
 .DS_Store
 .nohup
+/server/dist/
+/server/node_modules/
