@@ -7,6 +7,7 @@ import handleCode from '@/components/markdown/helpers/handelCode';
 import marked from '@/components/markdown/helpers/marked';
 import { addTransshipmentArticle, editTransshipmentArticle } from '@/modules/transshipmentArticle';
 import { noSpecialChar, REGEXP_URL } from '@/utils/validator'
+import { fadeIn, fadeOut } from '@/utils/common'
 import '../style/TransshipmentModal.less'
 
 const FormItem = Form.Item
@@ -109,6 +110,7 @@ class ArticleModal extends React.Component {
     // this.props.form.setFieldsValue({ content: encode })
     if(htmlValue) {
       this.setState({ hasContentMessage: false })
+      fadeOut('content-message')
     }
     this.setState({
       editorVisible: false,
@@ -132,6 +134,7 @@ class ArticleModal extends React.Component {
       if (!err) {
         if(!htmlValue) {
           this.setState({ hasContentMessage: true })
+          fadeIn('content-message')
           return
         }
 
@@ -162,15 +165,22 @@ class ArticleModal extends React.Component {
       } else {
         if (!htmlValue) {
           this.setState({ hasContentMessage: true })
+          fadeIn('content-message')
           return
         }
       }
     })
   }
 
+  onCancel() {
+    this.setState({ hasContentMessage: false })
+    fadeOut('content-message')
+    this.props.onCancel()
+  }
+
   render() {
     const { editorValue, editorVisible, htmlValue, hasContentMessage } = this.state
-    const { visible, onCancel, isEdit } = this.props
+    const { visible, isEdit } = this.props
     const { getFieldDecorator } = this.props.form
 
 
@@ -182,7 +192,7 @@ class ArticleModal extends React.Component {
           title={isEdit ? '编辑文章' : '添加文章'}
           visible={visible}
           onOk={() => this.onOk()}
-          onCancel={onCancel}
+          onCancel={() => this.onCancel()}
           okText='保存'
         >
           <div className='Transshipment-modal'>
@@ -198,7 +208,7 @@ class ArticleModal extends React.Component {
                   whitespace: true,
                 }, noSpecialChar],
               })(
-                <Input maxLength={200} />,
+                <Input maxLength={26} />,
               )}
             </FormItem>
             <FormItem
@@ -213,7 +223,7 @@ class ArticleModal extends React.Component {
                   whitespace: true,
                 }, noSpecialChar],
               })(
-                <Input maxLength={200} />,
+                <Input maxLength={6} />,
               )}
             </FormItem>
             <FormItem
@@ -230,7 +240,7 @@ class ArticleModal extends React.Component {
                   message: '请输入正确url',
                 }],
               })(
-                <Input style={{ left: 8 }} maxLength={300} />,
+                <Input style={{ left: 8 }} maxLength={64} />,
               )}
             </FormItem>
             <FormItem
@@ -274,7 +284,7 @@ class ArticleModal extends React.Component {
                 />
               )}
             </FormItem>
-            {hasContentMessage && <span className='content-message'>请输入内容</span>}
+            <span id='content-message' className='content-message'>请输入内容</span>
           </div>
         </Modal>
 

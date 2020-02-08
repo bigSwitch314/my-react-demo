@@ -256,7 +256,7 @@ class OriginalArticle extends React.Component {
       title: '标签',
       dataIndex: 'label_name',
       width: 130,
-      render: (text, record) => (
+      render: (text) => (
         <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
           {text}
         </div>
@@ -308,7 +308,11 @@ class OriginalArticle extends React.Component {
                 {getFieldDecorator('title', {
                   rules: [{}],
                 })(
-                  <Input placeholder="请输入标题" style={{ width: '180px' }} />,
+                  <Input
+                    placeholder="请输入标题"
+                    style={{ width: '180px' }}
+                    maxLength={26}
+                  />,
                 )}
               </FormItem>
             </Col>

@@ -62,6 +62,11 @@ class TransshipmentPreviewModal extends React.Component {
           {article ?
             <React.Fragment>
               <div className="title">{article.title}</div>
+              <div className="meta-info">
+                <span className="block">3天前</span>
+                <span className="block">{article.author}</span>
+                <span className="block">阅读约4分钟</span>
+              </div>
               <div
                 className="content for-preview for-markdown-preview"
                 dangerouslySetInnerHTML={{ __html: handleCode(marked(article.content_md)) }}

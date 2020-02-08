@@ -1,7 +1,7 @@
 import { Form, Input, Modal, Radio, Select } from 'antd'
 import React from 'react'
 import { connect } from 'react-redux'
-import { noSpecialChar } from '@/utils/validator'
+import { noSpecialChar, REGEXP_URL } from '@/utils/validator'
 
 import { addOpenSourceProject, editOpenSourceProject } from '@/modules/openSourceProject'
 
@@ -160,6 +160,7 @@ class ProjectModal extends React.Component {
               <Input
                 type="text"
                 style={{ width: 360 }}
+                maxLength={32}
               />,
             )}
           </FormItem>
@@ -194,11 +195,15 @@ class ProjectModal extends React.Component {
               }, {
                 message: '不能超过50个字符',
                 max: 50,
-              }, noSpecialChar],
+              }, {
+                pattern: REGEXP_URL,
+                message: '请输入正确url',
+              }],
             })(
               <Input
                 type="text"
                 style={{ width: 360 }}
+                maxLength={32}
               />,
             )}
           </FormItem>
@@ -219,6 +224,7 @@ class ProjectModal extends React.Component {
               <Input
                 type="text"
                 style={{ width: 360 }}
+                maxLength={8}
               />,
             )}
           </FormItem>

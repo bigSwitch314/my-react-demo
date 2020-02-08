@@ -204,7 +204,6 @@ class ArticleModal extends React.Component {
     this.setState({ hasContentMessage: false })
     fadeOut('content-message')
     this.props.onCancel()
-
   }
 
   render() {

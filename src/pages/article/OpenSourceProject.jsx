@@ -102,8 +102,8 @@ class OpenSourceProject extends React.Component {
     const { getFieldsValue } = this.props.form
     const { name='', time, timeType=1 } = getFieldsValue()
 
-    const beginTime = time ? time[0].format('YYYY-MM-DD HH:mm:ss') : ''
-    const endTime = time ? time[1].format('YYYY-MM-DD HH:mm:ss') : ''
+    const beginTime = time ? time[0].format('YYYY-MM-DD') : ''
+    const endTime = time ? time[1].format('YYYY-MM-DD') : ''
 
     if (beginTime && endTime && moment(beginTime).valueOf() >= moment(endTime).valueOf()) {
       message.error('结束时间必须大于开始时间')
@@ -276,7 +276,7 @@ class OpenSourceProject extends React.Component {
         itemLayout="horizontal"
         dataSource={data}
         renderItem={item => (
-          <ListItem className="list-item">
+          <ListItem key={item.id} className="list-item">
             <ListItemMeta
               title={getTitle(item)}
               description={getDescription(item.content)}
@@ -387,12 +387,8 @@ class OpenSourceProject extends React.Component {
       addLogSuccess,
     } = this.state
 
-    log()
-
-    const { openSourceProjectList, ospUpdateLogList, form, loading } = this.props
+    const { openSourceProjectList, form, loading } = this.props
     const { getFieldDecorator } = form
-
-    log(ospUpdateLogList)
 
     const levelArr = ['系统', '插件', '组件', '其他']
 
@@ -410,6 +406,7 @@ class OpenSourceProject extends React.Component {
         title: '项目名称',
         dataIndex: 'name',
         key: 'name',
+        width: 180,
         render(text, record) {
           const { introduction } = record
           return (
@@ -434,7 +431,17 @@ class OpenSourceProject extends React.Component {
           return levelArr[index]
         },
       },
-      { title: '地址', dataIndex: 'url', key: 'url', width: '30px' },
+      {
+        title: '地址',
+        dataIndex: 'url',
+        key: 'url',
+        width: 240,
+        render: (text) => (
+          <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
+            {text}
+          </div>
+        ),
+      },
       { title: '版本', dataIndex: 'version', key: 'version' },
       {
         title: '是否发布',
@@ -475,7 +482,7 @@ class OpenSourceProject extends React.Component {
                 {getFieldDecorator('name', {
                   rules: [{}],
                 })(
-                  <Input placeholder="请输入项目名称" style={{ width: '180px' }} />,
+                  <Input maxLength={16} placeholder="请输入项目名称" style={{ width: '180px' }} />,
                 )}
               </FormItem>
             </Col>
@@ -525,6 +532,7 @@ class OpenSourceProject extends React.Component {
           expandedRowRender={record => addLogSuccess && this.expandedRowRender(record)}
           onExpandedRowsChange={expandedRows => expandedRowRenderAgain && this.onExpandedRowsChange(expandedRows)}
           dataSource={openSourceProjectList.list}
+          rowKey={record => record.id}
           pagination={false}
         />
         <MyPagination

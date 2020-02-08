@@ -62,15 +62,9 @@ class PreviewModal extends React.Component {
             <React.Fragment>
               <div className="title">{article.title}</div>
               <div className="meta-info">
-                <ul>
-                  <li>发表于{article.create_time}</li>
-                  <li>|</li>
-                  <li>分类于{categoryName}</li>
-                  <li>|</li>
-                  <li>阅读次数：{article.read_number}</li>
-                  <li>|</li>
-                  <li>复制次数：{article.read_number}</li>
-                </ul>
+                <span className="block">3天前</span>
+                <span className="block">{categoryName}</span>
+                <span className="block">阅读约4分钟</span>
               </div>
               <div
                 className="content for-preview for-markdown-preview"

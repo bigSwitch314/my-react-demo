@@ -8,6 +8,7 @@ import { noSpecialChar } from '@/utils/validator'
 
 const FormItem = Form.Item
 
+
 @Form.create()
 @connect(
   state => ({
@@ -74,7 +75,6 @@ class PreviewModal extends React.Component {
     if (keys.length === 1) {
       return
     }
-
     form.setFieldsValue({
       keys: keys.filter(key => key !== k),
     });
@@ -83,7 +83,8 @@ class PreviewModal extends React.Component {
   add = () => {
     const { form } = this.props;
     const keys = form.getFieldValue('keys')
-    const nextKeys = keys.concat(keys.length++)
+    const max = Math.max(...keys)
+    const nextKeys = keys.concat(max + 1)
     form.setFieldsValue({
       keys: nextKeys,
     })
@@ -103,23 +104,28 @@ class PreviewModal extends React.Component {
           osp_id: ospId,
           version,
           create_time: createTime,
-          content: names,
+          content: names.filter(Boolean),
         }
-
         if (editData) {
           params.id = editData.id
-          editOspUpdateLog(params).then(() => {
+          editOspUpdateLog(params).then(res => {
+            if (res instanceof Error) return
             onDoSuccess(true)
+            onOk()
+            setTimeout(() => {
+              resetFields()
+            }, 1000)
           })
         } else {
-          addOspUpdateLog(params).then(() => {
+          addOspUpdateLog(params).then(res => {
+            if (res instanceof Error) return
             onDoSuccess(false)
+            onOk()
+            setTimeout(() => {
+              resetFields()
+            }, 1000)
           })
         }
-        onOk()
-        setTimeout(() => {
-          resetFields()
-        }, 1000)
       }
     })
   }
@@ -152,7 +158,12 @@ class PreviewModal extends React.Component {
             message: '请输入更新日志',
             whitespace: true,
           }, noSpecialChar],
-        })(<Input placeholder="请输入更新日志" style={{ width: '60%', marginRight: 8 }} />)}
+        })(
+          <Input
+            placeholder="请输入更新日志"
+            style={{ width: '60%', marginRight: 8 }}
+            maxLength={32}
+          />)}
         {keys.length > 1 ? (
           <Icon
             className="dynamic-delete-button"

@@ -69,8 +69,8 @@ class OriginalArticle extends React.Component {
     const { getFieldsValue } = this.props.form
     const { title='', time, timeType=1 } = getFieldsValue()
 
-    const beginTime = time ? time[0].format('YYYY-MM-DD HH:mm:ss') : ''
-    const endTime = time ? time[1].format('YYYY-MM-DD HH:mm:ss') : ''
+    const beginTime = time ? time[0].format('YYYY-MM-DD') : ''
+    const endTime = time ? time[1].format('YYYY-MM-DD') : ''
 
     if (beginTime && endTime && moment(beginTime).valueOf() >= moment(endTime).valueOf()) {
       message.error('结束时间必须大于开始时间')
@@ -235,12 +235,25 @@ class OriginalArticle extends React.Component {
     }, {
       title: '标题',
       dataIndex: 'title',
+      width: 240,
     }, {
       title: '作者',
       dataIndex: 'author',
+      width: 80,
+      render: (text) => (
+        <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
+          {text}
+        </div>
+      ),
     }, {
       title: '原文链接',
       dataIndex: 'link',
+      width: 200,
+      render: (text) => (
+        <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
+          {text}
+        </div>
+      ),
     }, {
       title: '是否发布',
       dataIndex: 'release',
@@ -285,7 +298,11 @@ class OriginalArticle extends React.Component {
                 {getFieldDecorator('title', {
                   rules: [{}],
                 })(
-                  <Input placeholder="请输入标题" style={{ width: '180px' }} />,
+                  <Input
+                    placeholder="请输入标题"
+                    style={{ width: '180px' }}
+                    maxLength={26}
+                  />,
                 )}
               </FormItem>
             </Col>
