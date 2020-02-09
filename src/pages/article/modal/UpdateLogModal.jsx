@@ -133,7 +133,7 @@ class PreviewModal extends React.Component {
 
   render() {
     const { visible, onCancel } = this.props
-    const { keyArr } = this.state
+    const { keyArr, editData } = this.state
     const { getFieldDecorator, getFieldValue } = this.props.form;
 
     const formItemLayoutWithOutLabel = {
@@ -180,7 +180,7 @@ class PreviewModal extends React.Component {
         visible={visible}
         onCancel={onCancel}
         onOk={(e) => this.onOkHandler(e)}
-        title={'添加更新日志'}
+        title={editData ? '编辑更新日志' : '添加更新日志'}
         maskClosable={false}
         className="container"
         destroyOnClose={true}

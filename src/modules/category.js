@@ -4,6 +4,7 @@ export default {
   namespace: 'category',
   initState: {
     categoryList: {},
+    levelOneCategory: {},
   },
   reducer: {
     getCategoryList(state, { payload }) {
@@ -18,6 +19,9 @@ export default {
     deleteCategory(state) {
       return ({ ...state })
     },
+    getLevelOneCategory(state, { payload }) {
+      return ({ ...state, levelOneCategory: payload })
+    },
   },
 }
 
@@ -27,3 +31,4 @@ export const getCategoryList = (params) => request.get('/blog/category/get', n('
 export const addCategory = (params) => request.post('/blog/category/add', n('addCategory'), params)
 export const editCategory = (params) => request.post('/blog/category/edit', n('editCategory'), params)
 export const deleteCategory = (params) => request.post('/blog/category/delete', n('deleteCategory'), params)
+export const getLevelOneCategory = (params) => request.post('/blog/category/getLevelOneCategory', n('getLevelOneCategory'), params)

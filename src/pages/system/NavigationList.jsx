@@ -20,7 +20,7 @@ const formItemLayout = {
 }
 
 const FormItem = Form.Item
-const Option = Select.Option;
+const Option = Select.Option
 
 @Form.create()
 @connect(

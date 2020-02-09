@@ -1,6 +1,6 @@
 import React from 'react'
-import { Table, Button, Modal, Input, message, Form } from 'antd'
-import { getCategoryList, addCategory, editCategory, deleteCategory } from '@/modules/category'
+import { Table, Button, Modal, Input, message, Form, Select } from 'antd'
+import { getCategoryList, addCategory, editCategory, deleteCategory, getLevelOneCategory } from '@/modules/category'
 import { connect } from 'react-redux'
 import OperatorIcons from '@/components/shared/OperatorIcon'
 import Pagination from '@/components/shared/Pagination'
@@ -15,11 +15,25 @@ const formItemLayout = {
 }
 
 const FormItem = Form.Item
+const Option = Select.Option
+
+const levelOneList = [{
+  id: 1,
+  name: 'php',
+}, {
+  id: 2,
+  name: 'mysql',
+}, {
+  id: 3,
+  name: 'js',
+}]
+
 
 @Form.create()
 @connect(
   state => ({
     categoryList: state.category.categoryList,
+    levelOneCategory: state.category.levelOneCategory,
     loading: state.loading['category/getCategoryList'],
   }),
   {
@@ -27,6 +41,7 @@ const FormItem = Form.Item
     addCategory,
     editCategory,
     deleteCategory,
+    getLevelOneCategory,
   },
 )
 
@@ -71,9 +86,9 @@ class CategoryManage extends React.Component {
   // 添加或编辑分类
   addCategory = (isEdit) => {
     const { getFieldsValue } = this.props.form
-    const { name } = getFieldsValue()
+    const { name, pid } = getFieldsValue()
 
-    const param = { name }
+    const param = { name, pid }
 
     if(isEdit) {
       param.id = this.editData.id
@@ -99,8 +114,8 @@ class CategoryManage extends React.Component {
   editHandler = (record) => {
     this.editData = record
     console.log(record)
-    const { name } = record
-    this.props.form.setFieldsValue({ name })
+    const { name, pid } = record
+    this.props.form.setFieldsValue({ name, pid })
 
     this.setState({
       isEdit: true,
@@ -117,6 +132,7 @@ class CategoryManage extends React.Component {
       visible: true,
       divisionValue: [],
     })
+    this.props.getLevelOneCategory()
   }
 
   onCancel = () => {
@@ -167,7 +183,14 @@ class CategoryManage extends React.Component {
       id: idArr.join(','),
     }).then((res) => {
       if (res instanceof Error) return
-      message.success('删除成功', 1, () => {
+      const { not_delete_category=[] } = res.payload
+      let msg = '删除成功'
+      let key= 'success'
+      if (not_delete_category.length) {
+        msg = not_delete_category.join() + '有子分类，删除失败'
+        key = 'error'
+      }
+      message[key](msg, 1, () => {
         const { currentPage, pageSize, userList = {} } = this.state
         const totalPage = Math.ceil((userList.count - idArr.length) / pageSize)
         if (currentPage > totalPage) {
@@ -192,8 +215,9 @@ class CategoryManage extends React.Component {
       isEdit,
     } = this.state
 
-    const { categoryList, loading } = this.props
+    const { categoryList, loading, levelOneCategory } = this.props
     const { getFieldDecorator } = this.props.form
+    const { list=[] } = levelOneCategory
 
     const columns = [
       {
@@ -207,6 +231,11 @@ class CategoryManage extends React.Component {
       }, {
         title: '分类名称',
         dataIndex: 'name',
+        render: (text, record) => (
+          record.pname
+            ? `${record.pname}/${record.name}`
+            : record.name
+        ),
       }, {
         title: '文章数量',
         dataIndex: 'article_number',
@@ -265,6 +294,26 @@ class CategoryManage extends React.Component {
             onOk={() => this.onOk(isEdit)}
           >
             <div>
+              <FormItem
+                label="父级"
+                {...formItemLayout}
+              >
+                {getFieldDecorator('pid', {
+                  rules: [{
+                    required: true,
+                    message: '请选择父级',
+                    whitespace: true,
+                    type: 'number',
+                  }],
+                })(
+                  <Select placeholder="请选择父级" style={{ width: 360 }}>
+                    <Option key={0} value={0}>顶级</Option>
+                    {list && list.map(item => (
+                      <Option key={item.id} value={item.id}>{item.name}</Option>
+                    ))}
+                  </Select>
+                )}
+              </FormItem>
               <FormItem
                 label="分类名称"
                 {...formItemLayout}

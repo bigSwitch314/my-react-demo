@@ -67,7 +67,6 @@ class AuthorIntroduction extends React.Component {
   }
 
   onEditorSave(value) {
-    console.log(marked(value))
     this.setState({
       htmlValue: marked(value),
       visible: false,
@@ -79,6 +78,10 @@ class AuthorIntroduction extends React.Component {
       text_data: value,
     }
     if (introduction.id) {
+      if (!value) {
+        this.deleteData(introduction.id)
+        return
+      }
       param.id = introduction.id
       editIntroduction(param).then(res => {
         if (res instanceof Error) return
@@ -87,6 +90,9 @@ class AuthorIntroduction extends React.Component {
         })
       })
     } else {
+      if (!value) {
+        return message.error('添加失败')
+      }
       addIntroduction(param).then(res => {
         if (res instanceof Error) return
         message.success('添加成功', 1, () => {
