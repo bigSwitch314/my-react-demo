@@ -265,7 +265,9 @@ class ArticleModal extends React.Component {
                   <Row>
                     {CategoryOptions.map(item => (
                       <Col key={item.id} span={4} style={{ height: 30 }}>
-                        <Radio value={item.id}>{item.name}</Radio>
+                        <Radio value={item.id}>
+                          {item.pname ? `${item.pname}/${item.name}` : item.name}
+                        </Radio>
                       </Col>
                     ))}
                   </Row>
