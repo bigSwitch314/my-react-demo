@@ -7,7 +7,7 @@ import { login } from '@/modules/login'
 import './style/UserLayout.less'
 
 const FormItem = Form.Item
-const baseUrl = 'http://bigswitch314.cn:8094'
+const baseUrl = 'http://bigswitch314.cn:80'
 
 @connect(
   state => ({
@@ -45,8 +45,7 @@ class UserLayout extends React.Component {
         }).then(
           res => {
             if (res instanceof Error) return
-            const { token=''} = res.payload
-            setLogin(token)
+            setLogin(res.payload)
             if (window.currentUrl) {
               this.props.history.push(window.currentUrl)
               delete window.currentUrl

@@ -238,10 +238,16 @@ class TabRole extends React.Component {
       {
         title: '授权账号',
         dataIndex: 'accounts',
-        render(text, record) {
+        width: '30%',
+        render: (text, record) => {
           if (!record.accounts) return
           const account = record.accounts.map(item => item.name)
-          return account.length ? account.join(',') : '暂无'
+          const content = account.length ? account.join(', ') : '暂无'
+          return (
+            <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
+              {content}
+            </div>
+          )
         },
       },
       {

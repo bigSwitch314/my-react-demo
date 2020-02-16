@@ -49,10 +49,11 @@ export function getCheckedNodeId(data) {
   return uniq(checkedNodeId);
 }
 
-/** 回显节点勾选 */
+/** 设置回显节点勾选 */
 export function setNodeStatus(data, checkedNodeId) {
   const checkedId = cloneDeep(checkedNodeId);
-  const cloneData = cloneDeep(data);
+  let cloneData = cloneDeep(data);
+  cloneData = resetNodeStatus(cloneData)
 
   for (let i = 0; i < cloneData.length; i++) {
     if (indexOf(checkedId, cloneData[i].menu_1_id) !== -1) {
@@ -72,6 +73,26 @@ export function setNodeStatus(data, checkedNodeId) {
         cloneData[i].node[j].status = 1;
         remove(checkedId, item => item === cloneData[i].node[j].id);
       }
+    }
+  }
+
+  return cloneData;
+}
+
+/** 重置回显节点勾选 */
+export function resetNodeStatus(data) {
+  const cloneData = cloneDeep(data)
+
+  for (let i = 0; i < cloneData.length; i++) {
+    cloneData[i].menu_1_status = 0
+    // 占多行
+    for (let k = 1; k < cloneData[i].rowSpan; k++) {
+      cloneData[i + k].menu_1_status = 0;
+    }
+    cloneData[i].menu_2_status = 0
+
+    for (let j = 0; j < cloneData[i].node.length; j++) {
+      cloneData[i].node[j].status = 0
     }
   }
 

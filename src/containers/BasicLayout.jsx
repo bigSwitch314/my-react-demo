@@ -62,6 +62,9 @@ class BasicLayout extends React.Component {
   }
 
   componentDidMount() {
+    const userInfo = sessionStorage.getItem('userInfo')
+    const { userName } = JSON.parse(userInfo)
+    this.setState({ userName })
   }
 
   logout = () => {
@@ -87,7 +90,7 @@ class BasicLayout extends React.Component {
   }
 
   render() {
-    const { menuData, normalRoutes, routeMap, collapsed, openkeys } = this.state
+    const { menuData, normalRoutes, routeMap, collapsed, openkeys, userName='' } = this.state
     const { location } = this.props
     const currentRoute = getCurrentRoute(location.pathname, routeMap)
     const { key, parentPath } = currentRoute
@@ -108,7 +111,7 @@ class BasicLayout extends React.Component {
               <span className="avatar">
                 <Avatar size="small"><i className="iconfont icon-user" /></Avatar>
               </span>
-              <span className="name">admin</span>
+              <span className="name">{userName}</span>
             </span>
             <span title="退出">
               <i className="iconfont icon-logout" onClick={this.logout} />
@@ -116,7 +119,7 @@ class BasicLayout extends React.Component {
           </div>
         </Header>
         <Content className="basic-layout-content">
-          <Layout>
+          <Layout style={{ width: '100%'}}>
             <Sider
               width={256}
               className="basic-layout-sider"

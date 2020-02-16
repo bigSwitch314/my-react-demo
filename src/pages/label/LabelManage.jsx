@@ -276,13 +276,14 @@ class LabelManage extends React.Component {
                     message: '请输入标签名称',
                     whitespace: true,
                   }, {
-                    message: '不能超过50个字符',
-                    max: 50,
+                    message: '不能超过12个字符',
+                    max: 12,
                   }, noSpecialChar],
                 })(
                   <Input
                     type="text"
                     style={{ width: 360 }}
+                    maxLength={12}
                   />,
                 )}
               </FormItem>

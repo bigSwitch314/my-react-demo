@@ -9,6 +9,7 @@ import Pagination from '@/components/shared/Pagination'
 import HeaderBar from '@/components/shared/HeaderBar'
 import { deleteConfirm, deleteBatchConfirm, removeArr } from 'components/shared/Confirm'
 import { noSpecialChar, passwordValidate, REGEXP_MAIL } from '@/utils/validator'
+import { removeLogin } from '@/components/Authentication/util'
 import './Index.less'
 
 const CheckboxGroup = Checkbox.Group
@@ -108,11 +109,19 @@ class UserList extends React.Component {
       param.id = this.editData.id
       this.props.editUser(param).then((res) => {
         if (res instanceof Error) return
-        message.success('修改成功', 1, () => {
+        const userInfo = sessionStorage.getItem('userInfo')
+        const { userId } = JSON.parse(userInfo)
+        const msg = userId === param.id ? '，请重新登录' : ''
+
+        message.success('修改成功' + msg, 1, () => {
           this.setState({ currentPage: 1 }, this.getUserList)
           this.setState({ visible: false })
           this.editData = {}
           this.props.onChange()
+          if (userId === param.id) {
+            removeLogin()
+            window.location.reload()
+          }
         })
       })
     } else {
@@ -299,16 +308,27 @@ class UserList extends React.Component {
         render: (text, record) => {
           if (!record.roles) return
           const role = record.roles.map(item => item.name)
-          return role.length ? role.join(',') : '暂无'
+          const content = role.length ? role.join(', ') : '暂无'
+          return (
+            <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
+              {content}
+            </div>
+          )
         },
       }, {
         title: '邮箱',
         dataIndex: 'email',
         key: 'mail',
+        render: (text) => (
+          <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
+            {text}
+          </div>
+        ),
       }, {
         title: '最近登录时间',
         dataIndex: 'last_login_time',
         key: 'last_login_time',
+        width: 160,
       }, {
         title: '启用/禁用',
         dataIndex: 'status',
@@ -386,14 +406,15 @@ class UserList extends React.Component {
                     message: '请输入账号',
                     whitespace: true,
                   }, {
-                    message: '不能超过50个字符',
-                    max: 50,
+                    message: '不能超过12个字符',
+                    max: 12,
                   }, noSpecialChar],
                 })(
                   <Input
                     type="text"
                     style={{ width: 360 }}
-                    disabled={isEdit && this.editData.name === 'system'}
+                    disabled={isEdit && this.editData.username === 'system'}
+                    maxLength={12}
                   />,
                 )}
               </FormItem>
@@ -439,11 +460,14 @@ class UserList extends React.Component {
                   }, {
                     pattern: new RegExp(REGEXP_MAIL),
                     message: '请输入正确电子邮件',
+                  }, {
+                    message: '不能超过32个字符',
+                    max: 32,
                   },
                   ],
                   initialValue: '',
                 })(
-                  <Input type="text" style={{ width: 360 }} maxLength={200} />,
+                  <Input type="text" style={{ width: 360 }} maxLength={32} />,
                 )}
               </FormItem>
               <FormItem

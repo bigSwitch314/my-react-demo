@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { Modal, Form, Table, Switch, Checkbox, Input, message } from 'antd'
-import { transform, getCheckedNodeId, setNodeStatus } from './util'
+import { transform, getCheckedNodeId, setNodeStatus, resetNodeStatus } from './util'
 import { cloneDeep, indexOf, filter, isEmpty } from 'lodash'
 import { noSpecialChar } from '@/utils/validator'
 import { getMenuNodeTree, addRole, editRole } from '@/modules/role'
@@ -69,6 +69,11 @@ class RoleModal extends React.Component {
       })
     } else {
       setFieldsValue({ name: null })
+      const data = resetNodeStatus(newData);
+      this.setState({
+        editData: null,
+        newData: data,
+      })
     }
   }
 
@@ -173,24 +178,21 @@ class RoleModal extends React.Component {
   }
 
   render() {
-    const { visible, onCancel, menuNodeTree=[] } = this.props
+    const { visible, onCancel } = this.props
     const { getFieldDecorator } = this.props.form;
     const { newData, editData } = this.state;
-
-    log('menuNodeTree----', menuNodeTree)
 
     const columns = [
       {
         title: '一级菜单',
         dataIndex: 'menu_1_name',
         render: (text, row, index) => {
-          console.log(row.rowSpan);
           return {
             children: (
               <div>
                 <span style={{ marginRight: 8 }}>{row.menu_1_name}</span>
                 <Switch
-                  checked={row.menu_1_status}
+                  checked={row.menu_1_status ===1 }
                   onChange={checked =>
                     this.changeSwitchStatus(checked, index, 1)
                   }
@@ -210,7 +212,7 @@ class RoleModal extends React.Component {
               <span style={{ marginRight: 8 }}>{row.menu_2_name}</span>
               <Switch
                 disabled={row.menu_1_status === 0}
-                checked={row.menu_2_status}
+                checked={row.menu_2_status ===1 }
                 onChange={checked => this.changeSwitchStatus(checked, index, 2)}
               />
             </div>
@@ -270,16 +272,17 @@ class RoleModal extends React.Component {
                 message: '请输入角色名',
                 whitespace: true,
               }, {
-                message: '不能超过50个字符',
-                max: 50,
+                message: '不能超过12个字符',
+                max: 12,
               }, noSpecialChar],
-            })(<Input style={{ width: 300 }}/>)}
+            })(<Input style={{ width: 300 }} maxLength={12} />)}
           </Form.Item>
         </Form>
         <Table
           columns={columns}
           dataSource={newData}
           bordered
+          rowKey={record => record.menu_2_id}
           pagination={false}
         />
       </Modal>
