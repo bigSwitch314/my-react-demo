@@ -78,10 +78,21 @@ const methods = ['POST', 'PUT', 'DELETE', 'GET']
 
 function handleCode(code, desc) {
   let msg = ''
-  if (code === 40000) { // 用户登出
-    removeLogin()
-    window.currentUrl = window.location.href
-    window.location.reload()
+  if (code === 44444) { // token过期
+    message.error('登录超时，请重新登录！', 1, () => {
+      removeLogin()
+      window.currentUrl = window.location.href
+      window.location.reload()
+    })
+    return
+  }
+  if (code === 40000) { // token错误
+    message.error('token错误！', 1, () => {
+      removeLogin()
+      window.currentUrl = window.location.href
+      window.location.reload()
+    })
+    return
   }
   if (code !==0) {
     msg = desc || '网络错误'

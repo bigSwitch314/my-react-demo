@@ -145,7 +145,7 @@ class NodeModal extends React.Component {
       this.props.editNode(param).then((res) => {
         if (res instanceof Error) return
         Message.success('修改成功', 1, () => {
-          this.props.onOk()
+          this.props.onOk(isEdit)
           this.setState({
             isEdit: false,
             editData: {},
@@ -157,7 +157,7 @@ class NodeModal extends React.Component {
       this.props.addNode(param).then((res) => {
         if (res instanceof Error) return
         Message.success('添加成功', 1, () => {
-          this.props.onOk()
+          this.props.onOk(isEdit)
           this.setState({
             nameArr: [],
           })
@@ -190,6 +190,12 @@ class NodeModal extends React.Component {
       return item.id === value
     })
     this.setState({ nameArr: node.children})
+  }
+
+  // 菜单选择改变处理函数
+  onMenuChange = (e) => {
+    const { setFieldsValue } = this.props.form
+    e.target.value === 0 && setFieldsValue({ name: undefined })
   }
 
   // 名称下拉值改变处理函数
@@ -275,7 +281,7 @@ class NodeModal extends React.Component {
               }],
             })(
               <RadioGroup
-                onChange={this.onTypeChange}
+                onChange={this.onMenuChange}
                 disabled={group === -1}
               >
                 <Radio value={1}>是</Radio>
@@ -296,7 +302,7 @@ class NodeModal extends React.Component {
                   type: 'number',
                 }],
               })(
-                <Select style={{ width: 360 }}>
+                <Select style={{ width: 360 }} placeholder="请选择名称">
                   {nameArr && nameArr.map(item => (
                     <Option key={item.id} value={item.id}>{item.name}</Option>
                   ))}
@@ -307,13 +313,15 @@ class NodeModal extends React.Component {
                   message: '请输入名称',
                   whitespace: true,
                 }, {
-                  message: '不能超过50个字符',
-                  max: 50,
+                  message: '不能超过12个字符',
+                  max: 12,
                 }, noSpecialChar],
               })(
                 <Input
                   type="text"
                   style={{ width: 360 }}
+                  maxLength={12}
+                  placeholder="请输入名称"
                 />
               )}
           </FormItem>
@@ -327,13 +335,14 @@ class NodeModal extends React.Component {
                 message: '请输入节点',
                 whitespace: true,
               }, {
-                message: '不能超过50个字符',
-                max: 50,
+                message: '不能超过18个字符',
+                max: 18,
               }, noSpecialChar],
             })(
               <Input
                 type="text"
                 style={{ width: 360 }}
+                maxLength={18}
               />,
             )}
           </FormItem>

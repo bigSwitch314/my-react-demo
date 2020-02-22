@@ -17,6 +17,7 @@ const CheckboxGroup = Checkbox.Group;
   state => ({
     allUser: state.user.allUser,
     roleList: state.role.roleList,
+    loading: state.loading['role/getRoleList'],
   }),
   {
     getAllUser,
@@ -219,7 +220,7 @@ class TabRole extends React.Component {
   }
 
   render() {
-    const { allUser, roleList={}, onChange: onChangeRole } = this.props
+    const { allUser, roleList={}, onChange: onChangeRole, loading } = this.props
     const { currentPage, pageSize, roleVisible, selectedRowKeys} = this.state
 
     const columns = [
@@ -287,6 +288,7 @@ class TabRole extends React.Component {
             selectedRowKeys,
             onChange: this.onSelectChange,
           }}
+          loading={loading}
           rowKey={record => record.id}
           columns={columns}
           dataSource={roleList.list || []}

@@ -17,17 +17,6 @@ const formItemLayout = {
 const FormItem = Form.Item
 const Option = Select.Option
 
-const levelOneList = [{
-  id: 1,
-  name: 'php',
-}, {
-  id: 2,
-  name: 'mysql',
-}, {
-  id: 3,
-  name: 'js',
-}]
-
 
 @Form.create()
 @connect(

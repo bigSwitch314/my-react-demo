@@ -27,6 +27,7 @@ class UserManage extends React.Component {
     }
     this.tabUserRef = React.createRef()
     this.tabRoleRef = React.createRef()
+    this.activeKey = null
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -40,7 +41,6 @@ class UserManage extends React.Component {
   componentDidMount() {
     this.getUserList()
     this.getRoleList()
-    this.setState({ activeKey: '1' })
   }
 
   // 获取用户列表
@@ -71,18 +71,24 @@ class UserManage extends React.Component {
     this.tabRoleRef.getAllUser()
   }
 
+  // tab切换处理函数
+  onChangeTab = (activeKey) => {
+    localStorage.setItem('userManageActiveKey', activeKey)
+  }
+
   render() {
     const { userList, roleList } = this.props
     const userCount = userList.count || 0
     const roleCount = roleList && roleList.count || 0
 
-    log('tabUserRef----', this.tabUserRef)
-    log('tabRoleRef----', this.tabRoleRef)
+    if (this.activeKey === null) {
+      this.activeKey = localStorage.getItem('userManageActiveKey') || '1'
+    }
 
     return (
       <div className="container">
         <Tabs
-          defaultActiveKey="1"
+          defaultActiveKey={this.activeKey}
           onChange={this.onChangeTab}
         >
           <TabPane tab={`用户列表(${userCount})`} key="1" forceRender={true}>

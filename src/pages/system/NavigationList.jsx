@@ -51,6 +51,7 @@ class MenuManage extends React.Component {
       divisionValue: [],
       data: [],
       expandedRowKeys: [],
+      selectedRowPid: null,
     }
     this.editData = {}
   }
@@ -121,8 +122,12 @@ class MenuManage extends React.Component {
   }
 
   addHandler = () => {
-    const { resetFields } = this.props.form
+    const { selectedRowKeys } = this.state
+    const { resetFields, setFieldsValue } = this.props.form
     resetFields()
+    if (selectedRowKeys.length ===1 ) {
+      setFieldsValue({ pid: selectedRowKeys[0]})
+    }
 
     this.setState({
       isEdit: false,
@@ -370,13 +375,14 @@ class MenuManage extends React.Component {
                     message: '请输入分类名称',
                     whitespace: true,
                   }, {
-                    message: '不能超过50个字符',
-                    max: 50,
+                    message: '不能超过12个字符',
+                    max: 12,
                   }, noSpecialChar],
                 })(
                   <Input
                     type="text"
                     style={{ width: 360 }}
+                    maxLength={12}
                   />,
                 )}
               </FormItem>

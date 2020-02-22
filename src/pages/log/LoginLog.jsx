@@ -1,7 +1,7 @@
 import React from 'react'
 // import { Icon, Avatar } from 'antd'
-import img from '@/assets/images/luo.jpg'
-import RcViewer from '@/components/viewer/RcViewer'
+// import img from '@/assets/images/luo.jpg'
+// import RcViewer from '@/components/viewer/RcViewer'
 
 
 class LoginLog extends React.Component {
@@ -27,10 +27,10 @@ class LoginLog extends React.Component {
   render() {
     return (
       <div>
-        <div>登录日志33</div>
-        <RcViewer>
+        <div>登录日志</div>
+        {/* <RcViewer>
           <img src={img} width="200px"/>
-        </RcViewer>
+        </RcViewer> */}
       </div>
     )
   }

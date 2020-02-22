@@ -87,9 +87,9 @@ class NodeManage extends React.Component {
     this.setState({ visible: false })
   }
 
-  onOk = () => {
+  onOk = (isEdit) => {
     this.setState({
-      currentPage: 1,
+      currentPage: isEdit ? this.state.currentPage : 1,
       visible: false,
     }, () => {
       this.getNodeList()

@@ -107,7 +107,11 @@ class UserLayout extends React.Component {
                           {getFieldDecorator('validCode', {
                             rules: [{ required: true, message: '请输入验证码' }],
                           })(
-                            <Input placeholder="验证码" autoComplete="off" />,
+                            <Input
+                              prefix={<Icon type="safety-certificate" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                              placeholder="验证码"
+                              autoComplete="off"
+                            />,
                           )}
                         </FormItem>
                       </div>

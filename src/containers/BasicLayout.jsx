@@ -63,7 +63,10 @@ class BasicLayout extends React.Component {
 
   componentDidMount() {
     const userInfo = sessionStorage.getItem('userInfo')
-    const { userName } = JSON.parse(userInfo)
+    const { userName } = JSON.parse(userInfo) || {}
+    if(!userName) {
+      return this.logout()
+    }
     this.setState({ userName })
   }
 
