@@ -27,32 +27,32 @@ export const routerConfig = [
     children: [
       { path: 'originalArticle', name: '原创文章', component: OriginalArticle },
       { path: 'transshipmentArticle', name: '转载文章', component: TransshipmentArticle },
-      { path: 'openSourceProject', name: '开源项目', component: OpenSourceProject },
-      { path: 'authorIntroduction', name: '个人简介', component: AuthorIntroduction },
     ],
-  },
-  {
+  }, {
     name: '分类管理',
     path: 'categoryManage',
     icon: <i className="iconfont icon-category" />,
     component: CategoryManage,
     children: [],
-  },
-  {
+  }, {
     name: '标签管理',
     path: 'labelManage',
     icon: <i className="iconfont icon-label" />,
     component: LabelManage,
     children: [],
-  },
-  {
+  }, {
+    name: '开源项目',
+    path: 'openSourceProject',
+    icon: <i className="iconfont icon-github" />,
+    component: OpenSourceProject,
+    children: [],
+  }, {
     name: '账号管理',
     path: 'userManage',
     icon: <i className="iconfont icon-user-manage" />,
     component: UserManage,
     children: [],
-  },
-  {
+  }, {
     name: '日志管理',
     path: 'logManage',
     icon: <i className="iconfont icon-log" />,
@@ -60,14 +60,14 @@ export const routerConfig = [
       { path: 'operatorLog', name: '操作日志', component: OperatorLog },
       { path: 'loginLog', name: '登录日志', component: LoginLog },
     ],
-  },
-  {
+  }, {
     name: '系统设置',
     path: 'systemSetting',
     icon: <i className="iconfont icon-setting" />,
     children: [
       { path: 'navigationList', name: '导航菜单', component: NavigationList },
       { path: 'nodeManage', name: '节点管理', component: NodeManage },
+      { path: 'authorIntroduction', name: '个人简介', component: AuthorIntroduction },
     ],
   },
 ]

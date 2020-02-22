@@ -43,6 +43,10 @@ class UserManage extends React.Component {
     this.getRoleList()
   }
 
+  componentWillUnmount() {
+    localStorage.removeItem('userManageActiveKey')
+  }
+
   // 获取用户列表
   getUserList = () => {
     this.props.getUserList({
