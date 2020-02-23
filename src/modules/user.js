@@ -24,6 +24,9 @@ export default {
     getAllUser(state, { payload }) {
       return ({ ...state, allUser: payload })
     },
+    modifyPassword(state) {
+      return ({ ...state })
+    },
   },
 }
 
@@ -35,3 +38,4 @@ export const editUser = (params) => request.post('/blog/admin/edit', n('editUser
 export const deleteUser = (params) => request.post('/blog/admin/delete', n('deleteUser'), params)
 export const changeStatus = (params) => request.post('/blog/admin/changeStatus', n('changeStatus'), params)
 export const getAllUser = (params) => request.get('/blog/admin/get', n('getAllUser'), params)
+export const modifyPassword = (params) => request.post('/blog/admin/modifyPassword', n('modifyPassword'), params)

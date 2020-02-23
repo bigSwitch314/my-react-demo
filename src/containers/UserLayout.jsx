@@ -2,7 +2,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Form, Icon, Input, Button, Row, Col } from 'antd'
 import { setLogin } from '../components/Authentication/util'
-
 import { login } from '@/modules/login'
 import './style/UserLayout.less'
 

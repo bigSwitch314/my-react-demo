@@ -1,15 +1,29 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import {Route, Link, Switch, Redirect} from 'react-router-dom'
-import { Layout, Menu, Avatar } from 'antd'
+import { Layout, Menu, Avatar, Modal, Input, Form, message } from 'antd'
 import { getRoutesData } from '../router/menu'
 import { getMenus, getRoutes, getParentKey, getCurrentRoute } from '../router/utils'
 import { removeLogin } from '../components/Authentication/util'
 import { logout } from '@/modules/login'
+import { modifyPassword } from '@/modules/user'
+import { passwordValidate } from '@/utils/validator'
 
 import './style/BasicLayout.less'
 
 const { Header, Content, Sider } = Layout
+const FormItem = Form.Item
+
+const formItemLayout = {
+  labelCol: {
+    xs: { span: 24 },
+    sm: { span: 5 },
+  },
+  wrapperCol: {
+    xs: { span: 24 },
+    sm: { span: 12 },
+  },
+}
 
 const menuCodes = {
   文章管理: '001',
@@ -29,11 +43,12 @@ const menuCodes = {
 }
 
 
+@Form.create()
 @connect(
   state => ({
     loading: state.loading['login/logout'],
   }),
-  { logout },
+  { logout, modifyPassword },
 )
 
 class BasicLayout extends React.Component {
@@ -45,7 +60,10 @@ class BasicLayout extends React.Component {
       routeMap: new Map(),
       collapsed: false,
       openkeys: '',
+      confirmDirty: false,
+      visible: false,
     }
+    this.userId=null
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -63,11 +81,12 @@ class BasicLayout extends React.Component {
 
   componentDidMount() {
     const userInfo = sessionStorage.getItem('userInfo')
-    const { userName } = JSON.parse(userInfo) || {}
+    const { userName, userId } = JSON.parse(userInfo) || {}
     if(!userName) {
       return this.logout()
     }
     this.setState({ userName })
+    this.userId = userId
   }
 
   logout = () => {
@@ -92,8 +111,65 @@ class BasicLayout extends React.Component {
     })
   }
 
+  // 修改密码相关方法
+
+  showChangePasswordModal = () => {
+    this.setState({ visible: true })
+  }
+  onOk = () => {
+    this.props.form.validateFieldsAndScroll((err, values) => {
+      if (!err) {
+        this.props.modifyPassword({
+          userid: this.userId,
+          old_password: values.oldPassword,
+          new_password: values.newPassword,
+        }).then(error => {
+          if (error instanceof Error) return
+          message.success('修改成功，请重新登录', 1, () => {
+            this.setState({ visible: false }, () => {
+              this.logout()
+            })
+          })
+        })
+      }
+    })
+  }
+
+  onCancel = () => {
+    this.setState({ visible: false }, () => {
+      this.props.form.setFieldsValue({
+        oldPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      })
+    })
+  }
+
+  validateToNextPassword = (rule, value, callback) => {
+    const form = this.props.form;
+    if (value && this.state.confirmDirty) {
+      form.validateFields(['confirmPassword'], { force: true });
+    }
+    callback();
+  }
+
+  compareToFirstPassword = (rule, value, callback) => {
+    const form = this.props.form;
+    if (value && value !== form.getFieldValue('newPassword')) {
+      callback('密码必须一致!');
+    } else {
+      callback();
+    }
+  }
+
+  handleConfirmBlur = (e) => {
+    const value = e.target.value;
+    this.setState({ confirmDirty: this.state.confirmDirty || !!value });
+  }
+
   render() {
-    const { menuData, normalRoutes, routeMap, collapsed, openkeys, userName='' } = this.state
+    const { menuData, normalRoutes, routeMap, collapsed, openkeys, userName='', visible } = this.state
+    const { getFieldDecorator } = this.props.form
     const { location } = this.props
     const currentRoute = getCurrentRoute(location.pathname, routeMap)
     const { key, parentPath } = currentRoute
@@ -110,7 +186,7 @@ class BasicLayout extends React.Component {
             </Link>
           </div>
           <div className="basic-layout-header-right">
-            <span title="修改密码">
+            <span title="修改密码" onClick={() => this.showChangePasswordModal()}>
               <span className="avatar">
                 <Avatar size="small"><i className="iconfont icon-user" /></Avatar>
               </span>
@@ -167,6 +243,69 @@ class BasicLayout extends React.Component {
             </Content>
           </Layout>
         </Content>
+        {/* 密码修改弹窗 */}
+        <Modal
+          title="修改密码"
+          width={500}
+          visible={visible}
+          onOk={this.onOk}
+          onCancel={this.onCancel}
+        >
+          <div style={{ position: 'relative', left: '40px' }}>
+            <FormItem
+              label="原始密码"
+              {...formItemLayout}
+            >
+              {getFieldDecorator('oldPassword', {
+                rules: [{
+                  required: true,
+                  message: '请输原始入密码',
+                  whitespace: true,
+                }, {
+                  min: 6, max: 16, message: '密码为6-16位',
+                },
+                ...passwordValidate,
+                ],
+              })(
+                <Input type="password" />,
+              )}
+            </FormItem>
+            <FormItem
+              label="新密码"
+              {...formItemLayout}
+            >
+              {getFieldDecorator('newPassword', {
+                rules: [{
+                  required: true,
+                  message: '请输入密码',
+                  whitespace: true,
+                }, {
+                  validator: this.validateToNextPassword,
+                }, {
+                  min: 6, max: 16, message: '密码为6-16位',
+                },
+                ...passwordValidate,
+                ],
+              })(
+                <Input type="password" />,
+              )}
+            </FormItem>
+            <FormItem
+              label="确认密码"
+              {...formItemLayout}
+            >
+              {getFieldDecorator('confirmPassword', {
+                rules: [{
+                  required: true,
+                  message: '请再次输入密码',
+                  whitespace: true,
+                }, { validator: this.compareToFirstPassword }],
+              })(
+                <Input type="password" onBlur={this.handleConfirmBlur} />,
+              )}
+            </FormItem>
+          </div>
+        </Modal>
       </Layout>
     )
   }
