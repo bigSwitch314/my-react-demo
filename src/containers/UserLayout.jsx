@@ -6,7 +6,8 @@ import { login } from '@/modules/login'
 import './style/UserLayout.less'
 
 const FormItem = Form.Item
-const baseUrl = 'http://bigswitch314.cn:80'
+// const baseUrl = 'http://bigswitch314.cn:80'
+const baseUrl = 'http://127.0.0.1:8000'
 
 @connect(
   state => ({
