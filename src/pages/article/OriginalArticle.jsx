@@ -83,6 +83,7 @@ class OriginalArticle extends React.Component {
       message.error('结束时间必须大于开始时间')
       return
     }
+    
     this.props.getArticleList({
       page_no: currentPage,
       page_size: pageSize,

@@ -28,3 +28,22 @@ export function fadeIn(id) {
     op += op * 0.05;
   }, 10);
 }
+
+/** 去除html标签 */
+export function deleteHtmlTag(str) {
+  // 去掉所有的html标签和&nbsp;之类的特殊符合
+  return str.replace(/<[^>]+>|&[^>]+;/g, '').trim()
+}
+
+/**  随机截取字符串 */
+export function substring(str, min, max) {
+  const length = getRandomIntInclusive(min, max)
+  return str.substring(0, length)
+}
+
+/** 随机获取范围内整数 */
+function getRandomIntInclusive(min, max) {
+  min = Math.ceil(min)
+  max = Math.floor(max)
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}

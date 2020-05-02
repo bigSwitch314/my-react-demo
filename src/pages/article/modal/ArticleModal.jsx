@@ -6,7 +6,7 @@ import '@/components/markdown/editor/index.less';
 import handleCode from '@/components/markdown/helpers/handelCode';
 import marked from '@/components/markdown/helpers/marked';
 import { addArticle, editArticle } from '@/modules/article';
-import { fadeIn, fadeOut } from '@/utils/common'
+import { fadeIn, fadeOut, deleteHtmlTag, substring } from '@/utils/common'
 import '../style/ArticleModal.less';
 
 const FormItem = Form.Item
@@ -39,6 +39,7 @@ const formItemLayoutContent = {
     sm: { span: 21 },
   },
 }
+
 
 @Form.create()
 @connect(
@@ -96,7 +97,7 @@ class ArticleModal extends React.Component {
     } else {
       setFieldsValue({
         category: undefined,
-        label: [],
+        label: undefined,
         title: '',
         release: 0,
       })
@@ -163,6 +164,10 @@ class ArticleModal extends React.Component {
           fadeIn('content-message')
           return
         }
+        let content_html = deleteHtmlTag(marked(htmlValue)) || ''
+        const word_number = content_html.length
+        content_html = substring(content_html, 150, 150)
+        content_html = content_html.replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ')
 
         // 保存文章
         const { title, category, label, release } = getFieldsValue()
@@ -171,7 +176,8 @@ class ArticleModal extends React.Component {
           category_id: category,
           label_ids: label.join(','),
           content_md: editorValue,
-          content_html: 'not_has_html',
+          content_html,
+          word_number,
           release,
           type: 1,
         }

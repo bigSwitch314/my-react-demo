@@ -40,14 +40,13 @@ class PreviewModal extends React.Component {
     const category = categoryList.list.find(item => item.id === record.category_id)
     this.setState({
       article: record,
-      categoryName: category.name,
+      categoryName: category ? category.name: '',
     })
   }
 
   render() {
     const { visible, onCancel} = this.props
     const { article, categoryName } = this.state
-
     return (
       <Modal
         width={760}
@@ -67,9 +66,13 @@ class PreviewModal extends React.Component {
                 <span className="block">阅读约4分钟</span>
               </div>
               <div
-                className="content for-preview for-markdown-preview"
+                className="for-preview for-markdown-preview"
                 dangerouslySetInnerHTML={{ __html: handleCode(marked(article.content_md)) }}
               />
+              {
+    console.log('handleCode(marked(article.content_md))--------', handleCode(marked(article.content_md)))
+
+              }
             </React.Fragment>
             : null}
         </div>
